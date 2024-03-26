@@ -9,8 +9,8 @@ public class Main {
     public static void main(String[] args) {
         args[0] =
                 """
-                        x: int = 5;
-                        pass (y: int) to addNumber: int -> x + y;
+                        x: num = 5;
+                        pass (y: num) to addNumber: num -> x + y;
                         addNumber(3);
                         """;
 

@@ -1,266 +1,228 @@
 grammar QuirkyFun;
 
-//Lexar Rules
+program
+: statement+ EOF
+;
 
+statement
+: declaration SEMICOLON?                                                            # DeclarationStatement
+| assignment SEMICOLON                                                              # AssignmentStatement
+| function_call SEMICOLON                                                           # FunctionCallStatement
+| PRINT LPAREN expression RPAREN SEMICOLON                                          # PrintStatement
+| function                                                                          # FunctionStatement
+| if_statement                                                                      # IfStatement
+| for_loop                                                                          # ForLoop
+| while_loop                                                                        # WhileLoop
+| switch_case                                                                       # SwitchCase
+| run_catch                                                                         # RunCatch
+;
 
-//Characters
-LETTER              : [a-zA-Z] ;                    //LETTER
-DIGIT               : [0-9] ;                       //DIGIT
-alphanum            : LETTER | DIGIT ;              //ALPHANUMERIC
+declaration
+: id COLON variable_data_type (ASSIGN expression)?                                  # VariableDeclaration
+| id COLON FUNCTION_TYPE (ASSIGN function)?                                         # FunctionDeclaration
+;
 
-//Identifiers
-id_valid            : alphanum | '_' ;              //VALID IDENTIFIER
-id                  : LETTER id_valid*;             //IDENTIFIER
+assignment
+: id ASSIGN expression                                                              # VariableAssignment
+;
 
-//Literals
-TRUE                : 'true' ;                      //TRUE
-FALSE               : 'false' ;                     //FALSE
-bool_lit            : TRUE | FALSE ;                //BOOLEAN
-byte_lit            : DIGIT+'B' ;                   //BYTE
-int_lit             : DIGIT+ ;                      //INTEGER
-long_lit            : DIGIT+'L' ;                   //LONG
-float_lit           : DIGIT+'.'DIGIT+ ;             //FLOAT
-double_lit          : DIGIT+'.'DIGIT+'D' ;          //DOUBLE
-string_lit          : '"' .*? '"' ;                 //STRING
+function_call
+: id LPAREN arguments? RPAREN                                                       # FunctionCall
+;
 
-//Data Types
-BOOL                : 'bool' ;                      //BOOLEAN TYPE
-BYTE                : 'byte' ;                      //BYTE TYPE
-INT                 : 'int' ;                       //INTEGER TYPE
-LONG                : 'long' ;                      //LONG TYPE
-FLOAT               : 'float' ;                     //FLOAT TYPE
-DOUBLE              : 'double' ;                    //DOUBLE TYPE
-STRING              : 'str' ;                       //STRING TYPE
-VOID                : 'void' ;                      //VOID TYPE
+if_statement
+: IF to_bool LBRACE statement* RBRACE (ELSE if_statement)* (ELSE LBRACE statement* RBRACE)?
+;
 
-//Operators
-PLUS                : '+' ;                         //ADDITION
-MINUS               : '-' ;                         //SUBTRACTION
-MULT                : '*' ;                         //MULTIPLICATION
-DIV                 : '/' ;                         //DIVISION
-MOD                 : '%' ;                         //MODULUS
-INC                 : '++' ;                        //INCREMENT
-DEC                 : '--' ;                        //DECREMENT
-EXPONENT            : '/\\' ;                       //EXPONENT
-SUMM                : '~' ;                         //SUMMATION
-PRODSUMM            : '~*' ;                        //PRODUCTSUMMATION
-ROOT                : '\\/' ;                       //ROOT
+for_loop
+: RUN LPAREN (declaration | expression)? SEMICOLON to_bool SEMICOLON (assignment | expression)? RPAREN LBRACE statement* RBRACE catch_statement?
+;
 
-//Assignment
-ASSIGN              : '=' ;                         //ASSIGNMENT
+while_loop
+: RUN CHECK to_bool LBRACE statement* RBRACE catch_statement?                       # WhileLoopCase
+| RUN LBRACE statement* RBRACE CHECK to_bool (SEMICOLON | catch_statement)          # DoWhileLoopCase
+;
 
-//Comparison
-EQ                  : '==' ;                        //EQUALS
-NEQ                 : '!=' ;                        //NOT EQUALS
-GT                  : '>' ;                         //GREATER THAN
-LT                  : '<' ;                         //LESS THAN
-GTE                 : '>=' ;                        //GREATER THAN OR EQUALS
-LTE                 : '<=' ;                        //LESS THAN OR EQUALS
+switch_case
+: MATCH LPAREN expression RPAREN LBRACE (IS LPAREN expression RPAREN ((LBRACE statement* RBRACE) | (return_lambda SEMICOLON)))+ (ELSE ((LBRACE statement* RBRACE) | (return_lambda SEMICOLON)))? RBRACE
+;
 
-//Logical
-AND                 : '&' ;                         //AND
-OR                  : '|' ;                         //OR
-NOT                 : '!' ;                         //NOT
-NAND                : '!&' ;                        //NAND
-NOR                 : '!|' ;                        //NOR
-XOR                 : '^' ;                         //XOR
-XNOR                : '!^' ;                        //XNOR
+run_catch
+: RUN LBRACE statement* RBRACE catch_statement
+;
 
-//Punctuation
-LPAREN              : '(' ;                         //LEFT PARENTHESIS
-RPAREN              : ')' ;                         //RIGHT PARENTHESIS
-LBRACE              : '{' ;                         //LEFT BRACE
-RBRACE              : '}' ;                         //RIGHT BRACE
-COMMA               : ',' ;                         //COMMA
-COLON               : ':' ;                         //COLON
-SEMICOLON           : ';' ;                         //SEMICOLON
-QUESTMARK           : '?' ;                         //QUESTION MARK
-ARROW               : '->' ;                        //ARROW
+variable_data_type
+: BOOL_TYPE                                                                         # BooleanDataType
+| NUMBER_TYPE                                                                       # NumberDataType
+| DECIMAL_TYPE                                                                      # DecimalDataType
+| STRING_TYPE                                                                       # StringDataType
+;
 
-
-//Keywords
-PASS                : 'pass' ;                      //PASS
-GIVE                : 'give' ;                      //GIVE
-RUN                 : 'run' ;                       //RUN
-CATCH               : 'catch' ;                     //CATCH
-CHECK               : 'check' ;                     //CHECK
-MATCH               : 'match' ;                     //MATCH
-IS                  : 'is' ;                        //IS
-TO                  : 'to' ;                        //TO
-IF                  : 'if' ;                        //IF
-ELSE                : 'else' ;                      //ELSE
-
-//Whitespace
-WS                  : [ \t\r\n]+ -> skip ;          //SKIP WHITESPACE
-
-//Comments
-COMMENT             : '*--' ~[\r\n]* -> skip ;      //SKIP COMMENTS
-BLOCK_COMMENT       : '**--' .*? '--**' -> skip ;   //SKIP BLOCK COMMENTS
-
-// Parser Rules
 expression
-: id
-| INC expression
-| DEC expression
-| expression PLUS expression
-| expression MINUS expression
-| expression MULT expression
-| expression DIV expression
-| expression MOD expression
-| expression EXPONENT expression
-| expression ROOT expression
-| expression EQ expression
-| expression NEQ expression
-| expression GT expression
-| expression LT expression
-| expression GTE expression
-| expression LTE expression
-| expression AND expression
-| expression OR expression
-| bracket_expression
-| data_literal
-| ternary_operator
-| function
-| function_call
-| summation
-| prod_summation
+: INC expression                                                                    # IncrementExpression
+| DEC expression                                                                    # DecrementExpression
+| expression PLUS expression                                                        # AdditionExpression
+| expression MINUS expression                                                       # SubtractionExpression
+| expression MULT expression                                                        # MultiplicationExpression
+| expression DIV expression                                                         # DivisionExpression
+| expression MOD expression                                                         # ModulusExpression
+| expression EXP expression                                                         # ExponentExpression
+| expression ROOT expression                                                        # RootExpression
+| expression EQ expression                                                          # EqualsExpression
+| expression NEQ expression                                                         # NotEqualsExpression
+| expression GT expression                                                          # GreaterThanExpression
+| expression LT expression                                                          # LessThanExpression
+| expression GTE expression                                                         # GreaterThanOrEqualsExpression
+| expression LTE expression                                                         # LessThanOrEqualsExpression
+| expression AND expression                                                         # AndExpression
+| expression OR expression                                                          # OrExpression
+| expression XOR expression                                                         # XorExpression
+| expression NAND expression                                                        # NandExpression
+| expression NOR expression                                                         # NorExpression
+| expression XNOR expression                                                        # XnorExpression
+| NOT expression                                                                   # NotExpression
+| LPAREN expression RPAREN                                                          # BracketExpression
+| to_bool                                                                           # ToBoolExpression
+| ternary_operator                                                                  # TernaryOperatorExpression
+| function                                                                          # FunctionExpression
+| function_call                                                                     # FunctionCallExpression
+| (number | id) SUMM (number | id) LPAREN (function | id) RPAREN                    # SummationExpression
+| (number | id) PRODSUMM (number | id) LPAREN (function | id) RPAREN                # ProdSummationExpression
+| id                                                                                # Variable
+| number                                                                            # NumberLiteral
+| decimal                                                                           # DecimalLiteral
+| boolean                                                                           # BooleanLiteral
+| string                                                                            # StringLiteral
 ;
 
-bracket_expression
-: LPAREN expression RPAREN
-;
-
-data_literal
-: int_lit
-| long_lit
-| float_lit
-| double_lit
-| string_lit
-| bool_lit
-| byte_lit
-;
-
-ternary_operator
-: to_bool ARROW expression COLON expression
+arguments
+: expression (COMMA expression)*
 ;
 
 to_bool
-: QUESTMARK bracket_expression
+: QUESTMARK LPAREN expression RPAREN
 ;
 
-function
-: PASS LPAREN parameter_list? RPAREN (TO id)? COLON data_type_function (function_body | (return_lambda SEMICOLON))
-;
-
-parameter_list
-: parameter (COMMA parameter)*
-;
-
-parameter
-: id COLON data_type_parameter
-;
-
-data_type_parameter
-: BOOL
-| BYTE
-| INT
-| LONG
-| FLOAT
-| DOUBLE
-| STRING
-;
-
-data_type_function
-: data_type_parameter
-| VOID
-;
-
-end_function
-: (function_body | return_lambda)
-;
-
-function_body
-: LBRACE statement_list RBRACE
+catch_statement
+: CATCH LPAREN id RPAREN LBRACE statement* RBRACE
 ;
 
 return_lambda
 : ARROW expression
 ;
 
-statement
-: function
-| function_call SEMICOLON
-| declaration SEMICOLON
-| assignment SEMICOLON
-| if_statement
-| for_loop
-| while_loop
-| switch_case
-| run_catch
-| return_statement SEMICOLON
+ternary_operator
+: to_bool ARROW expression COLON expression
 ;
 
-declaration
-: parameter (ASSIGN expression)?
+function
+: PASS LPAREN (parameter (COMMA parameter)*)? RPAREN (TO id)? COLON function_data_type ((LBRACE statement* (GIVE expression SEMICOLON)? RBRACE) | (return_lambda SEMICOLON))
 ;
 
-assignment
-: id ASSIGN expression
+function_data_type
+: variable_data_type                                                                # VariableFunctionDataType
+| FUNCTION_TYPE                                                                     # FunctionDataType
+| VOID_TYPE                                                                         # VoidFunctionDataType
 ;
 
-if_statement
-: IF to_bool function_body (ELSE if_statement)* (ELSE function_body)?
+parameter
+: id COLON variable_data_type                                                       # FunctionParameter
 ;
 
-for_loop
-: RUN LPAREN (declaration | expression)? SEMICOLON to_bool SEMICOLON (assignment | expression)? RPAREN function_body catch_statement?
+//Identifiers
+id                  : LETTER (LETTER | DIGIT)* ;        //IDENTIFIER
+
+//Literals
+boolean             : 'true' | 'false' ;                //BOOLEAN
+number              : DIGIT+ ;                          //LONG
+decimal             : DIGIT+'.'DIGIT+ ;                 //DECIMAL
+string              : QUOTE anychar*? QUOTE ;                     //STRING
+
+anychar
+: LETTER | DIGIT
+| LPAREN | RPAREN | LBRACE | RBRACE | COMMA | COLON | SEMICOLON | QUESTMARK
+| NOT | OR | AND | XOR
+| PLUS | MINUS | MULT | DIV | MOD | SUMM
+| OTHER_SYMBOL
+| '\\"'
 ;
 
-catch_statement
-: CATCH LPAREN id RPAREN function_body
-;
+LETTER              : [a-zA-Z] ;                        //LETTER
+DIGIT               : [0-9] ;                           //DIGIT
 
-while_loop
-: RUN CHECK to_bool function_body catch_statement?
-| RUN function_body CHECK to_bool (SEMICOLON | catch_statement)
-;
 
-switch_case
-: MATCH bracket_expression LBRACE (IS bracket_expression end_function)+ (ELSE end_function)? RBRACE
-;
+OTHER_SYMBOL              : [@#$`'.] ; //SYMBOL
+QUOTE               : '"' ;                             //QUOTE
 
-run_catch
-: RUN function_body catch_statement
-;
+//Data Types
+BOOL_TYPE           : 'bool' ;                          //BOOLEAN TYPE
+NUMBER_TYPE         : 'num' ;                           //NUMBER TYPE
+DECIMAL_TYPE        : 'dec' ;                           //DECIMAL TYPE
+STRING_TYPE         : 'str' ;                           //STRING TYPE
+VOID_TYPE           : 'void' ;                          //VOID TYPE
+FUNCTION_TYPE       : 'func' ;                          //FUNCTION TYPE
 
-return_statement
-: GIVE expression
-;
+//Operators
+PLUS                : '+' ;                             //ADDITION
+MINUS               : '-' ;                             //SUBTRACTION
+MULT                : '*' ;                             //MULTIPLICATION
+DIV                 : '/' ;                             //DIVISION
+MOD                 : '%' ;                             //MODULUS
+INC                 : '++' ;                            //INCREMENT
+DEC                 : '--' ;                            //DECREMENT
+EXP                 : '/\\' ;                           //EXPONENT
+SUMM                : '~' ;                             //SUMMATION
+PRODSUMM            : '~*' ;                            //PRODUCTSUMMATION
+ROOT                : '\\/' ;                           //ROOT
 
-summation
-: (int_lit | id) SUMM (int_lit | id) LPAREN (one_parameter_function | id) RPAREN
-;
+//Assignment
+ASSIGN              : '=' ;                             //ASSIGNMENT
 
-one_parameter_function
-: PASS LPAREN parameter RPAREN (TO id)? COLON data_literal end_function
-;
+//Comparison
+EQ                  : '==' ;                            //EQUALS
+NEQ                 : '!=' ;                            //NOT EQUALS
+GT                  : '>' ;                             //GREATER THAN
+LT                  : '<' ;                             //LESS THAN
+GTE                 : '>=' ;                            //GREATER THAN OR EQUALS
+LTE                 : '<=' ;                            //LESS THAN OR EQUALS
 
-prod_summation
-: (int_lit | id) PRODSUMM (int_lit | id) LPAREN (one_parameter_function | id) RPAREN
-;
+//Logical
+AND                 : '&' ;                             //AND
+OR                  : '|' ;                             //OR
+NOT                 : '!' ;                             //NOT
+NAND                : '!&' ;                            //NAND
+NOR                 : '!|' ;                            //NOR
+XOR                 : '^' ;                             //XOR
+XNOR                : '!^' ;                            //XNOR
 
-function_call
-: id LPAREN argument_list? RPAREN
-;
+//Punctuation
+LPAREN              : '(' ;                             //LEFT PARENTHESIS
+RPAREN              : ')' ;                             //RIGHT PARENTHESIS
+LBRACE              : '{' ;                             //LEFT BRACE
+RBRACE              : '}' ;                             //RIGHT BRACE
+COMMA               : ',' ;                             //COMMA
+COLON               : ':' ;                             //COLON
+SEMICOLON           : ';' ;                             //SEMICOLON
+QUESTMARK           : '?' ;                             //QUESTION MARK
+ARROW               : '->' ;                            //ARROW
 
-argument_list
-: expression (COMMA expression)*
-;
 
-statement_list
-: statement*
-;
+//Keywords
+PASS                : 'pass' ;                          //PASS
+GIVE                : 'give' ;                          //GIVE
+RUN                 : 'run' ;                           //RUN
+CATCH               : 'catch' ;                         //CATCH
+CHECK               : 'check' ;                         //CHECK
+MATCH               : 'match' ;                         //MATCH
+IS                  : 'is' ;                            //IS
+TO                  : 'to' ;                            //TO
+IF                  : 'if' ;                            //IF
+ELSE                : 'else' ;                          //ELSE
+PRINT               : 'print' ;                         //PRINT
 
-program
-: statement+ EOF
-;
+//Whitespace
+WS                  : [ \t\r\n]+ -> skip ;              //SKIP WHITESPACE
+
+//Comments
+COMMENT             : '*--' ~[\r\n]* -> skip ;          //SKIP COMMENTS
+BLOCK_COMMENT       : '**--' .*? '--**' -> skip ;       //SKIP BLOCK COMMENTS

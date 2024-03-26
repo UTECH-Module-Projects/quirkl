@@ -6,8 +6,9 @@
 
 ### Group Members:
 - Rushawn White (2002469)
-- 
--
+- Monique Levy (1603342)
+- Khalin Cheverria (1501396)
+- Ojay Pottinger (1903965)
 
 **Design a programming language that interfaces with a large language (LLM) model
 like OpenAI’s ChatGPT or Google’s Bard, etc, is deployed on a cloud platform such as

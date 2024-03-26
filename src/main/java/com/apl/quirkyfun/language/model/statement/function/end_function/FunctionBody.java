@@ -1,15 +1,30 @@
 package com.apl.quirkyfun.language.model.statement.function.end_function;
 
+import com.apl.quirkyfun.language.model.expression.Expression;
 import com.apl.quirkyfun.language.model.statement.Statement;
-import com.apl.quirkyfun.language.model.util.QList;
+import com.apl.quirkyfun.language.model.type.QuirkyType;
+import com.apl.quirkyfun.language.model.type.QuirkyVoid;
+import com.apl.quirkyfun.language.model.util.QuirkyList;
 import lombok.Getter;
 
 @Getter
 public class FunctionBody extends EndFunction {
-    private final QList<Statement> statements;
+    private final QuirkyList<Statement> statements;
+    private final Expression<?> returnExpression;
 
     public FunctionBody() {
-        this.statements = new QList<>();
+        this.statements = new QuirkyList<>();
+        this.returnExpression = null;
+    }
+
+    public FunctionBody(Expression<?> returnExpression) {
+        this.statements = new QuirkyList<>();
+        this.returnExpression = returnExpression;
+    }
+
+    public FunctionBody(QuirkyList<Statement> statements, Expression<?> returnExpression) {
+        this.statements = statements;
+        this.returnExpression = returnExpression;
     }
 
     public void addStatement(Statement statement) {
@@ -18,6 +33,20 @@ public class FunctionBody extends EndFunction {
 
     @Override
     public String toString() {
-        return String.join("\n", this.statements.toStringArr());
+        if (this.returnExpression == null) {
+            return String.join("\n", this.statements.toStringArr());
+        }
+        return String.join("{\n", this.statements.toStringArr()) + "\ngive " + this.returnExpression + ";\n}";
+    }
+
+    @Override
+    public QuirkyType<?> eval() {
+        for (Statement statement : this.statements)
+            statement.eval();
+
+        if (this.returnExpression == null)
+            return new QuirkyVoid();
+
+        return returnExpression.eval();
     }
 }
