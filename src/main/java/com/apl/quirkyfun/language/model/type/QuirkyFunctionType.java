@@ -1,14 +1,14 @@
 package com.apl.quirkyfun.language.model.type;
 
-import com.apl.quirkyfun.language.model.statement.function.Function;
+import com.apl.quirkyfun.language.model.variable.function.Function;
 
-public class QuirkyFunctionType extends QuirkyType<Function> {
+public class QuirkyFunctionType extends QuirkyType {
 
-    protected QuirkyFunctionType(Function value) {
-        super(value);
+    public QuirkyFunctionType(Function func) {
+        super(func);
     }
 
-    public boolean isFunctionCall(String functionName) {
-        return this.value.getName().equals(functionName);
+    public QuirkyType call(QuirkyType... args) {
+        return ((Function) this.value).apply(args);
     }
 }

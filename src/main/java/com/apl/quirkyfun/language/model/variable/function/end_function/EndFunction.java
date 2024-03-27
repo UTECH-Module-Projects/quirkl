@@ -1,4 +1,4 @@
-package com.apl.quirkyfun.language.model.statement.function.end_function;
+package com.apl.quirkyfun.language.model.variable.function.end_function;
 
 import com.apl.quirkyfun.language.model.type.QuirkyType;
 

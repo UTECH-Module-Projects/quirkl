@@ -1,7 +1,7 @@
-package com.apl.quirkyfun.language.model.expression.operation;
+package com.apl.quirkyfun.language.model.expression.operation.sum;
 
 import com.apl.quirkyfun.language.model.expression.Expression;
-import com.apl.quirkyfun.language.model.statement.function.Function;
+import com.apl.quirkyfun.language.model.variable.function.Function;
 import com.apl.quirkyfun.language.model.type.error.QuirkyMathException;
 import com.apl.quirkyfun.language.model.type.number.QuirkyLongNumber;
 import lombok.Getter;
@@ -9,19 +9,13 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ProdSummationExpression extends OperationExpression<QuirkyLongNumber> {
-    private Expression start;
-    private Expression end;
-    private Function<QuirkyLongNumber> sumFunc;
+public class SummationExpression extends SumExpression {
 
-    public ProdSummationExpression() {
-
+    public SummationExpression() {
     }
 
-    public ProdSummationExpression(Expression start, Expression end, Function<QuirkyLongNumber> sumFunc) {
-        this.start = start;
-        this.end = end;
-        this.sumFunc = sumFunc;
+    public SummationExpression(Expression start, Expression end, Function sumFunc) {
+        super(start, end, sumFunc);
     }
 
     @Override
@@ -33,9 +27,9 @@ public class ProdSummationExpression extends OperationExpression<QuirkyLongNumbe
     public QuirkyLongNumber eval() throws QuirkyMathException {
         long startValue = (long) start.eval().getValue();
         long endValue = (long) end.eval().getValue();
-        long sum = 1;
+        long sum = 0;
         for (long i = startValue; i < endValue; i++) {
-            sum *= (Integer) sumFunc.apply(new QuirkyLongNumber(i)).getValue();
+            sum += (Integer) sumFunc.apply(new QuirkyLongNumber(i)).getValue();
         }
         return new QuirkyLongNumber(sum);
     }

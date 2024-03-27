@@ -1,22 +1,29 @@
 package com.apl.quirkyfun.language.visitor;
 
-import com.apl.quirkyfun.language.model.expression.Expression;
-import com.apl.quirkyfun.language.model.expression.operation.IncrementExpression;
-import com.apl.quirkyfun.language.model.expression.operation.ProdSummationExpression;
+import com.apl.quirkyfun.language.model.expression.*;
+import com.apl.quirkyfun.language.model.expression.operation.bool.NotBooleanExpression;
 import com.apl.quirkyfun.language.model.expression.operation.literal.BooleanLiteral;
 import com.apl.quirkyfun.language.model.expression.operation.literal.DecimalLiteral;
 import com.apl.quirkyfun.language.model.expression.operation.literal.NumberLiteral;
-import com.apl.quirkyfun.language.model.expression.operation.VariableExpression;
 import com.apl.quirkyfun.language.model.expression.operation.bool.TwoExpBooleanExpression;
 import com.apl.quirkyfun.language.model.expression.operation.literal.StringLiteral;
+import com.apl.quirkyfun.language.model.expression.operation.shift.DecrementExpression;
+import com.apl.quirkyfun.language.model.expression.operation.shift.IncrementExpression;
+import com.apl.quirkyfun.language.model.expression.operation.sum.ProdSummationExpression;
+import com.apl.quirkyfun.language.model.expression.operation.sum.SumExpression;
+import com.apl.quirkyfun.language.model.expression.operation.sum.SummationExpression;
 import com.apl.quirkyfun.language.model.expression.operation.twoexp.*;
-import com.apl.quirkyfun.language.model.program.Program;
 import com.apl.quirkyfun.language.model.type.QuirkyBoolean;
+import com.apl.quirkyfun.language.model.type.QuirkyFunctionType;
 import com.apl.quirkyfun.language.model.type.QuirkyString;
 import com.apl.quirkyfun.language.model.type.number.QuirkyDoubleNumber;
 import com.apl.quirkyfun.language.model.type.number.QuirkyLongNumber;
 import com.apl.quirkyfun.language.model.variable.Variable;
+import com.apl.quirkyfun.language.model.variable.function.Function;
 import com.apl.quirkyfun.language.parser.QuirkyFunParser;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class AntlrToExpression extends QuirkyFunBaseVisitor<Expression> {
 
@@ -45,126 +52,147 @@ public class AntlrToExpression extends QuirkyFunBaseVisitor<Expression> {
         return new TwoExpOperationExpression(expNew1, expNew2);
     }
 
-    @Override
-    public Expression visitIncrementExpression(QuirkyFunParser.IncrementExpressionContext ctx) {
-
-        IncrementExpression incrementExpression = new IncrementExpression(ctx.expression().accept(this));
-        ctx.expression().accept(this);
-        return super.visitIncrementExpression(ctx);
+    public Variable checkVarExistsForSumExpression(String varName, QuirkyFunParser.ExpressionContext ctx, String type, int idCount) {
+        if (!this.program.hasVariable(varName)) {
+            var idCtx = (type.equals("ProdSummation") ? ((QuirkyFunParser.ProdSummationExpressionContext) ctx).id(idCount) : ((QuirkyFunParser.SummationExpressionContext) ctx).id(idCount));
+            this.program.addError(this.varNotDefined(idCtx));
+            return null;
+        }
+        return program.getVariable(varName);
     }
 
-    @Override
-    public Expression visitDecrementExpression(QuirkyFunParser.DecrementExpressionContext ctx) {
-
-        return super.visitDecrementExpression(ctx);
-    }
-
-    @Override
-    public Expression visitXnorExpression(QuirkyFunParser.XnorExpressionContext ctx) {
-        return super.visitXnorExpression(ctx);
-    }
-
-    @Override
-    public Expression visitNotEqualsExpression(QuirkyFunParser.NotEqualsExpressionContext ctx) {
-        return super.visitNotEqualsExpression(ctx);
-    }
-
-    @Override
-    public Expression visitXorExpression(QuirkyFunParser.XorExpressionContext ctx) {
-        return super.visitXorExpression(ctx);
-    }
-
-    @Override
-    public Expression visitNotExpression(QuirkyFunParser.NotExpressionContext ctx) {
-        return super.visitNotExpression(ctx);
-    }
-
-    @Override
-    public Expression visitTernaryOperatorExpression(QuirkyFunParser.TernaryOperatorExpressionContext ctx) {
-        return super.visitTernaryOperatorExpression(ctx);
-    }
-
-    @Override
-    public Expression visitGreaterThanExpression(QuirkyFunParser.GreaterThanExpressionContext ctx) {
-        return super.visitGreaterThanExpression(ctx);
-    }
-
-    @Override
-    public Expression visitOrExpression(QuirkyFunParser.OrExpressionContext ctx) {
-        return super.visitOrExpression(ctx);
-    }
-
-    @Override
-    public Expression visitFunctionCallExpression(QuirkyFunParser.FunctionCallExpressionContext ctx) {
-        return super.visitFunctionCallExpression(ctx);
-    }
-
-    @Override
-    public Expression visitToBoolExpression(QuirkyFunParser.ToBoolExpressionContext ctx) {
-        return super.visitToBoolExpression(ctx);
-    }
-
-    @Override
-    public Expression visitFunctionExpression(QuirkyFunParser.FunctionExpressionContext ctx) {
-        return super.visitFunctionExpression(ctx);
-    }
-
-    @Override
-    public Expression visitAndExpression(QuirkyFunParser.AndExpressionContext ctx) {
-        return super.visitAndExpression(ctx);
-    }
-
-
-
-    @Override
-    public Expression visitSummationExpression(QuirkyFunParser.SummationExpressionContext ctx) {
-        return super.visitSummationExpression(ctx);
-    }
-
-    @Override
-    public Expression visitDivisionExpression(QuirkyFunParser.DivisionExpressionContext ctx) {
-        return super.visitDivisionExpression(ctx);
-    }
-
-    @Override
-    public Expression visitProdSummationExpression(QuirkyFunParser.ProdSummationExpressionContext ctx) {
-        ProdSummationExpression exp = new ProdSummationExpression();
+    public SumExpression getSumExpression(SumExpression exp, QuirkyFunParser.ExpressionContext ctx, String type) {
+        int idCount = 0;
         var param = ctx.getChild(0);
         if (param instanceof QuirkyFunParser.NumberContext) {
             exp.setStart(new NumberLiteral(new QuirkyLongNumber(Long.parseLong(param.getText()))));
         } else {
-            String varName = param.getText();
-            if (!this.program.hasVariable(varName)) {
-                this.program.addError(this.varNotDefined(ctx.id(0)));
-                return null;
-            }
-            exp.setStart(new VariableExpression(program.getVariable(varName)));
+            var res = this.checkVarExistsForSumExpression(param.getText(), ctx, type, idCount);
+            if (res == null) return null;
+            exp.setStart(new VariableExpression(res));
+            idCount++;
         }
 
         param = ctx.getChild(1);
         if (param instanceof QuirkyFunParser.NumberContext) {
             exp.setEnd(new NumberLiteral(new QuirkyLongNumber(Long.parseLong(param.getText()))));
         } else {
-            String varName = param.getText();
-            if (!this.program.hasVariable(varName)) {
-                this.program.addError(this.varNotDefined(ctx.id(1)));
-                return null;
-            }
-            exp.setEnd(new VariableExpression(program.getVariable(varName)));
+            var res = this.checkVarExistsForSumExpression(param.getText(), ctx, type, idCount);
+            if (res == null) return null;
+            exp.setStart(new VariableExpression(res));
+            idCount++;
         }
 
         param = ctx.getChild(2);
         if (param instanceof QuirkyFunParser.FunctionContext) {
             exp.setEnd(new NumberLiteral(new QuirkyLongNumber(Long.parseLong(param.getText()))));
         } else {
-            String varName = param.getText();
-            if (!this.program.hasVariable(varName)) {
-                this.program.addError(this.varNotDefined(ctx.id(1)));
-                return null;
-            }
-            exp.setEnd(new VariableExpression(program.getVariable(varName)));
+            var res = this.checkVarExistsForSumExpression(param.getText(), ctx, type, idCount);
+            if (res == null) return null;
+            exp.setStart(new VariableExpression(res));
         }
         return exp;
+    }
+
+    @Override
+    public Expression visitIncrementExpression(QuirkyFunParser.IncrementExpressionContext ctx) {
+        return new IncrementExpression(ctx.expression().accept(this));
+    }
+
+    @Override
+    public Expression visitDecrementExpression(QuirkyFunParser.DecrementExpressionContext ctx) {
+        return new DecrementExpression(ctx.expression().accept(this));
+    }
+
+    @Override
+    public Expression visitXnorExpression(QuirkyFunParser.XnorExpressionContext ctx) {
+        return this.getTwoExpBooleanExpression(ctx.expression(0), ctx.expression(1), TwoExpBooleanExpression.EXP.XNOR);
+    }
+
+    @Override
+    public Expression visitNotEqualsExpression(QuirkyFunParser.NotEqualsExpressionContext ctx) {
+        return this.getTwoExpBooleanExpression(ctx.expression(0), ctx.expression(1), TwoExpBooleanExpression.EXP.NOT_EQUALS);
+    }
+
+    @Override
+    public Expression visitXorExpression(QuirkyFunParser.XorExpressionContext ctx) {
+        return this.getTwoExpBooleanExpression(ctx.expression(0), ctx.expression(1), TwoExpBooleanExpression.EXP.XOR);
+    }
+
+    @Override
+    public Expression visitNotExpression(QuirkyFunParser.NotExpressionContext ctx) {
+        return new NotBooleanExpression(ctx.expression().accept(this));
+    }
+
+    @Override
+    public Expression visitTernaryOperatorExpression(QuirkyFunParser.TernaryOperatorExpressionContext ctx) {
+        return ctx.ternary_operator().accept(this);
+    }
+
+    @Override
+    public Expression visitTernary_operator(QuirkyFunParser.Ternary_operatorContext ctx) {
+        Expression toBool = ctx.to_bool().accept(this);
+        Expression expTrue = ctx.expression(0).accept(this);
+        Expression expFalse = ctx.expression(1).accept(this);
+        return new TernaryOperatorExpression(new ToBoolExpression(toBool), expTrue, expFalse);
+    }
+
+    @Override
+    public Expression visitGreaterThanExpression(QuirkyFunParser.GreaterThanExpressionContext ctx) {
+        return this.getTwoExpBooleanExpression(ctx.expression(0), ctx.expression(1), TwoExpBooleanExpression.EXP.GREATER_THAN);
+    }
+
+    @Override
+    public Expression visitOrExpression(QuirkyFunParser.OrExpressionContext ctx) {
+        return this.getTwoExpBooleanExpression(ctx.expression(0), ctx.expression(1), TwoExpBooleanExpression.EXP.OR);
+    }
+
+    @Override
+    public Expression visitFunctionCallExpression(QuirkyFunParser.FunctionCallExpressionContext ctx) {
+        return ctx.function_call().accept(this);
+    }
+
+    @Override
+    public Expression visitFunctionCall(QuirkyFunParser.FunctionCallContext ctx) {
+        String varName = ctx.id().getText();
+        if (!this.program.hasVariable(varName))
+            this.program.addError(this.varNotDefined(ctx.id()));
+
+        Function func = (Function) this.program.getVariable(varName);
+
+        List<Expression> args = ctx.arguments().expression().stream().map(exp -> exp.accept(this)).collect(Collectors.toList());
+        return new FunctionCallExpression(new QuirkyFunctionType(func), args);
+    }
+
+    @Override
+    public Expression visitToBoolExpression(QuirkyFunParser.ToBoolExpressionContext ctx) {
+        return new ToBoolExpression(ctx.to_bool().accept(this));
+    }
+
+    @Override
+    public Expression visitFunctionExpression(QuirkyFunParser.FunctionExpressionContext ctx) {
+        AntlrToFunction antlrToFunction = new AntlrToFunction();
+        return new FunctionExpression(new QuirkyFunctionType(ctx.function().accept(antlrToFunction)));
+    }
+
+    @Override
+    public Expression visitAndExpression(QuirkyFunParser.AndExpressionContext ctx) {
+        return this.getTwoExpBooleanExpression(ctx.expression(0), ctx.expression(1), TwoExpBooleanExpression.EXP.AND);
+    }
+
+    @Override
+    public Expression visitSummationExpression(QuirkyFunParser.SummationExpressionContext ctx) {
+        return this.getSumExpression(new SummationExpression(), ctx, "Summation");
+    }
+
+    @Override
+    public Expression visitDivisionExpression(QuirkyFunParser.DivisionExpressionContext ctx) {
+        return new DivideExpression(this.getTwoExpOperationExpression(ctx.expression(0), ctx.expression(1)));
+    }
+
+    @Override
+    public Expression visitProdSummationExpression(QuirkyFunParser.ProdSummationExpressionContext ctx) {
+        return this.getSumExpression(new ProdSummationExpression(), ctx, "ProdSummation");
     }
 
     @Override
@@ -184,7 +212,7 @@ public class AntlrToExpression extends QuirkyFunBaseVisitor<Expression> {
 
     @Override
     public Expression visitBracketExpression(QuirkyFunParser.BracketExpressionContext ctx) {
-        return super.visitBracketExpression(ctx);
+        return new BracketExpression(ctx.expression().accept(this));
     }
 
     @Override
@@ -237,7 +265,6 @@ public class AntlrToExpression extends QuirkyFunBaseVisitor<Expression> {
         String varName = ctx.id().getText();
         if (!this.program.hasVariable(varName))
             this.program.addError(this.varNotDefined(ctx.id()));
-
         return new VariableExpression(this.program.getVariable(varName));
     }
 

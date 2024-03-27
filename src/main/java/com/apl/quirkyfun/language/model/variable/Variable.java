@@ -7,8 +7,8 @@ import lombok.Setter;
 @Getter
 public class Variable {
 
-    private final String id;
-    private final String type;
+    protected final String id;
+    protected final String type;
     @Setter
     private QuirkyType value;
 

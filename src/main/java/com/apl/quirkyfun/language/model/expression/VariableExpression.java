@@ -1,4 +1,4 @@
-package com.apl.quirkyfun.language.model.expression.operation;
+package com.apl.quirkyfun.language.model.expression;
 
 import com.apl.quirkyfun.language.model.expression.Expression;
 import com.apl.quirkyfun.language.model.type.QuirkyType;
