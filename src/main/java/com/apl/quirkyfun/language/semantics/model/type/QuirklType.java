@@ -140,4 +140,5 @@ public abstract class QuirklType<T> {
 
     public abstract void checkIfCompatible(String op, QuirklType<?> other) throws QuirklOperationException;
 
+
 }
