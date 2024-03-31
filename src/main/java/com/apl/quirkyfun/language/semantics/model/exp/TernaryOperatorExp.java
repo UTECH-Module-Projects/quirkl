@@ -1,16 +1,15 @@
-package com.apl.quirkyfun.language.semantics.model.expression;
+package com.apl.quirkyfun.language.semantics.model.exp;
 
-import com.apl.quirkyfun.language.semantics.model.coordinate.QuirklCoordinate;
+import com.apl.quirkyfun.language.semantics.model.coordinate.QuirklCoord;
 import com.apl.quirkyfun.language.semantics.model.type.QuirklType;
-import com.apl.quirkyfun.language.semantics.visitor.antlr_to_model.error.runtime.QuirklMathException;
 import com.apl.quirkyfun.language.semantics.visitor.antlr_to_model.error.runtime.QuirklRuntimeException;
 
-public class TernaryOperatorExpression extends Expression {
-    private final ToBoolExpression toBool;
-    private final Expression expTrue;
-    private final Expression expFalse;
+public class TernaryOperatorExp extends Exp {
+    private final ToBoolExp toBool;
+    private final Exp expTrue;
+    private final Exp expFalse;
 
-    public TernaryOperatorExpression(QuirklCoordinate coord, ToBoolExpression toBool, Expression expTrue, Expression expFalse) {
+    public TernaryOperatorExp(QuirklCoord coord, ToBoolExp toBool, Exp expTrue, Exp expFalse) {
         super(coord);
         this.toBool = toBool;
         this.expTrue = expTrue;

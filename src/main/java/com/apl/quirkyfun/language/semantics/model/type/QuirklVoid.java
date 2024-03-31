@@ -1,5 +1,6 @@
 package com.apl.quirkyfun.language.semantics.model.type;
 
+import com.apl.quirkyfun.language.semantics.model.coordinate.QuirklCoord;
 import com.apl.quirkyfun.language.semantics.model.type.number.QuirklDoubleNumber;
 import com.apl.quirkyfun.language.semantics.model.type.number.QuirklLongNumber;
 import com.apl.quirkyfun.language.semantics.visitor.antlr_to_model.error.runtime.QuirklCastException;
@@ -7,10 +8,10 @@ import com.apl.quirkyfun.language.semantics.visitor.antlr_to_model.error.runtime
 
 public class QuirklVoid extends QuirklType<Void> {
 
-    public static final QuirklVoid VOID = new QuirklVoid();
+    public static final QuirklVoid VOID = new QuirklVoid(QuirklCoord.ORIGIN);
 
-    private QuirklVoid() {
-        super(null);
+    public QuirklVoid(QuirklCoord coord) {
+        super(coord, null);
     }
 
     @Override
@@ -20,7 +21,7 @@ public class QuirklVoid extends QuirklType<Void> {
 
     @Override
     public QuirklType<?> cast(Object value) throws QuirklCastException {
-        return VOID;
+        return new QuirklVoid(this.getCoord());
     }
 
     @Override

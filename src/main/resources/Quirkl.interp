@@ -136,7 +136,7 @@ assignment
 functionCall
 ifCondition
 switchCase
-expression
+exp
 toBool
 catchBody
 function

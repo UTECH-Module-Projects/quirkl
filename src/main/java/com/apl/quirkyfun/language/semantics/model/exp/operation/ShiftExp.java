@@ -1,14 +1,14 @@
-package com.apl.quirkyfun.language.semantics.model.expression.operation;
+package com.apl.quirkyfun.language.semantics.model.exp.operation;
 
-import com.apl.quirkyfun.language.semantics.model.coordinate.QuirklCoordinate;
-import com.apl.quirkyfun.language.semantics.model.expression.Expression;
-import com.apl.quirkyfun.language.semantics.model.expression.VariableExpression;
+import com.apl.quirkyfun.language.semantics.model.coordinate.QuirklCoord;
+import com.apl.quirkyfun.language.semantics.model.exp.Exp;
+import com.apl.quirkyfun.language.semantics.model.exp.VariableExp;
 import com.apl.quirkyfun.language.semantics.model.type.QuirklType;
 import com.apl.quirkyfun.language.semantics.model.type.number.QuirklLongNumber;
 import com.apl.quirkyfun.language.semantics.visitor.antlr_to_model.error.runtime.QuirklRuntimeException;
 
-public class ShiftExpression extends OperationExpression {
-    private final Expression exp;
+public class ShiftExp extends OpExp {
+    private final Exp exp;
     private final OP op;
     private final static QuirklLongNumber one = new QuirklLongNumber(1L);
 
@@ -27,7 +27,7 @@ public class ShiftExpression extends OperationExpression {
         }
     }
 
-    public ShiftExpression(QuirklCoordinate coord, Expression exp, OP op) {
+    public ShiftExp(QuirklCoord coord, Exp exp, OP op) {
         super(coord);
         this.exp = exp;
         this.op = op;
@@ -43,14 +43,14 @@ public class ShiftExpression extends OperationExpression {
 
     private QuirklType<?> increment() throws QuirklRuntimeException {
         QuirklType<?> res = exp.eval().add(one);
-        if (exp instanceof VariableExpression varExp)
+        if (exp instanceof VariableExp varExp)
             varExp.getVariable().updateValue(res);
         return res;
     }
 
     private QuirklType<?> decrement() throws QuirklRuntimeException {
         QuirklType<?> res = exp.eval().subtract(one);
-        if (exp instanceof VariableExpression varExp)
+        if (exp instanceof VariableExp varExp)
             varExp.getVariable().updateValue(res);
         return res;
     }

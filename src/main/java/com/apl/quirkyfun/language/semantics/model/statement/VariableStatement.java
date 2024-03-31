@@ -1,6 +1,7 @@
 package com.apl.quirkyfun.language.semantics.model.statement;
 
-import com.apl.quirkyfun.language.semantics.model.expression.Expression;
+import com.apl.quirkyfun.language.semantics.model.coordinate.QuirklCoord;
+import com.apl.quirkyfun.language.semantics.model.exp.Exp;
 import com.apl.quirkyfun.language.semantics.model.type.QuirklType;
 import com.apl.quirkyfun.language.semantics.model.type.QuirklVoid;
 import com.apl.quirkyfun.language.semantics.model.variable.Variable;
@@ -11,22 +12,24 @@ import lombok.Getter;
 public class VariableStatement extends Statement {
 
     private final Variable variable;
-    private final Expression expression;
+    private final Exp exp;
 
-    public VariableStatement(Variable variable) {
+    public VariableStatement(QuirklCoord coord, Variable variable, Exp exp) {
+        super(coord);
         this.variable = variable;
-        this.expression = null;
+        this.exp = exp;
     }
 
-    public VariableStatement(Variable variable, Expression expression) {
+    public VariableStatement(QuirklCoord coord, Variable variable) {
+        super(coord);
         this.variable = variable;
-        this.expression = expression;
+        this.exp = null;
     }
 
     @Override
     public QuirklType<?> eval() throws QuirklRuntimeException {
-        if (expression != null) {
-            variable.setValue(expression.eval());
+        if (exp != null) {
+            variable.setValue(exp.eval());
             return QuirklVoid.VOID;
         }
         return variable.getValue();

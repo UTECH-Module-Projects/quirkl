@@ -1,7 +1,7 @@
 package com.apl.quirkyfun.language.semantics.visitor.antlr_to_model;
 
-import com.apl.quirkyfun.language.semantics.model.coordinate.QuirklCoordinate;
-import com.apl.quirkyfun.language.semantics.model.expression.Expression;
+import com.apl.quirkyfun.language.semantics.model.coordinate.QuirklCoord;
+import com.apl.quirkyfun.language.semantics.model.exp.Exp;
 import com.apl.quirkyfun.language.semantics.model.program.Program;
 import com.apl.quirkyfun.language.semantics.model.statement.Statement;
 import com.apl.quirkyfun.language.semantics.model.type.QuirklFunction;
@@ -13,6 +13,7 @@ import com.apl.quirkyfun.language.parser.QuirklParser;
 import com.apl.quirkyfun.language.semantics.model.variable.function.end_function.FunctionBody;
 import com.apl.quirkyfun.language.semantics.model.variable.function.end_function.ReturnLambda;
 import com.apl.quirkyfun.language.semantics.visitor.antlr_to_model.error.runtime.QuirklFunctionException;
+import com.apl.quirkyfun.language.semantics.visitor.antlr_to_model.util.AntlrUtil;
 import org.openjdk.jol.vm.VM;
 
 public class AntlrToFunction extends AntlrToModel<Function> {
@@ -35,9 +36,7 @@ public class AntlrToFunction extends AntlrToModel<Function> {
         Function func = new Function();
         AntlrToVariable antlrToVariable = new AntlrToVariable(program, scope);
         QuirklList<Variable> parameters = new QuirklList<>();
-        int line = ctx.getStart().getLine();
-        int pos = ctx.getStart().getCharPositionInLine();
-        QuirklCoordinate coord = new QuirklCoordinate(line, pos);
+        QuirklCoord coord = AntlrUtil.getCoord(ctx);
         func.setCoord(coord);
 
         for (QuirklParser.ParameterContext param : ctx.parameters().parameter()) {
@@ -55,13 +54,11 @@ public class AntlrToFunction extends AntlrToModel<Function> {
             func.setId(String.valueOf(VM.current().addressOf(func)));
         }
 
-        QuirklType.TYPE funcType = QuirklType.getTypeAsQuirklName(ctx.functionDataType().getText());
+        QuirklType.TYPE funcType = QuirklType.toQuirklType(ctx.functionDataType().getText());
         func.setType(funcType);
 
         QuirklParser.ExpressionContext returnExpCtx = ctx.expression();
-        int returnExpressionLine = returnExpCtx.getStart().getLine();
-        int returnExpressionPos = returnExpCtx.getStart().getCharPositionInLine();
-        QuirklCoordinate returnExpCoord = new QuirklCoordinate(returnExpressionLine, returnExpressionPos);
+        QuirklCoord returnExpCoord = AntlrUtil.getCoord(returnExpCtx);
         if (returnExpCtx.isEmpty() && funcType != QuirklType.TYPE.VOID) {
             this.program.addError(QuirklFunctionException.noReturn(returnExpCoord, func));
             return null;
@@ -71,7 +68,7 @@ public class AntlrToFunction extends AntlrToModel<Function> {
         }
 
         FunctionBody body = new FunctionBody();
-        AntlrToStatement antlrToStatement = new AntlrToStatement(program, scope);
+        AntlrToStatement antlrToStatement = new AntlrToStatement(program, func.getId());
         for (QuirklParser.StatementContext statementContext : ctx.statement()) {
             Statement statement = statementContext.accept(antlrToStatement);
             if (statement == null) return null;
@@ -79,14 +76,14 @@ public class AntlrToFunction extends AntlrToModel<Function> {
         }
 
         if (!returnExpCtx.isEmpty()) {
-            AntlrToExpression antlrToExpression = new AntlrToExpression(program, scope);
-            Expression returnExp = returnExpCtx.accept(antlrToExpression);
+            AntlrToExpression antlrToExpression = new AntlrToExpression(program, func.getId());
+            Exp returnExp = returnExpCtx.accept(antlrToExpression);
             if (returnExp == null) return null;
-            body.setReturnExpression(returnExp);
+            body.setReturnExp(returnExp);
         }
 
         func.setBody(body);
-        this.program.addVariable(new Variable(coord, QuirklType.TYPE.FUNCTION, func.getId(), new QuirklFunction(func)), scope);
+        this.program.addVariable(new Variable(coord, QuirklType.TYPE.FUNCTION, func.getId(), new QuirklFunction(coord, func)), scope);
 
         return func;
     }
@@ -96,9 +93,7 @@ public class AntlrToFunction extends AntlrToModel<Function> {
         Function func = new Function();
         AntlrToVariable antlrToVariable = new AntlrToVariable(program, scope);
         QuirklList<Variable> parameters = new QuirklList<>();
-        int line = ctx.getStart().getLine();
-        int pos = ctx.getStart().getCharPositionInLine();
-        QuirklCoordinate coord = new QuirklCoordinate(line, pos);
+        QuirklCoord coord = AntlrUtil.getCoord(ctx);
         func.setCoord(coord);
 
         for (QuirklParser.ParameterContext param : ctx.parameters().parameter()) {
@@ -116,13 +111,11 @@ public class AntlrToFunction extends AntlrToModel<Function> {
             func.setId(String.valueOf(VM.current().addressOf(func)));
         }
 
-        QuirklType.TYPE funcType = QuirklType.getTypeAsQuirklName(ctx.functionDataType().getText());
+        QuirklType.TYPE funcType = QuirklType.toQuirklType(ctx.functionDataType().getText());
         func.setType(funcType);
 
         QuirklParser.ExpressionContext returnExpCtx = ctx.expression();
-        int returnExpressionLine = returnExpCtx.getStart().getLine();
-        int returnExpressionPos = returnExpCtx.getStart().getCharPositionInLine();
-        QuirklCoordinate returnExpCoord = new QuirklCoordinate(returnExpressionLine, returnExpressionPos);
+        QuirklCoord returnExpCoord = AntlrUtil.getCoord(returnExpCtx);
         if (returnExpCtx.isEmpty() && funcType != QuirklType.TYPE.VOID) {
             this.program.addError(QuirklFunctionException.noReturn(returnExpCoord, func));
             return null;
@@ -131,13 +124,13 @@ public class AntlrToFunction extends AntlrToModel<Function> {
             return null;
         }
 
-        AntlrToExpression antlrToExpression = new AntlrToExpression(program, scope);
-        Expression returnExp = returnExpCtx.accept(antlrToExpression);
+        AntlrToExpression antlrToExpression = new AntlrToExpression(program, func.getId());
+        Exp returnExp = returnExpCtx.accept(antlrToExpression);
         if (returnExp == null) return null;
         ReturnLambda body = new ReturnLambda(returnExp);
 
         func.setBody(body);
-        this.program.addVariable(new Variable(coord, QuirklType.TYPE.FUNCTION, func.getId(), new QuirklFunction(func)), scope);
+        this.program.addVariable(new Variable(coord, QuirklType.TYPE.FUNCTION, func.getId(), new QuirklFunction(coord, func)), scope);
         return func;
     }
 }

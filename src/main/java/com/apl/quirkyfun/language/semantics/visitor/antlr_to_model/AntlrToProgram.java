@@ -6,6 +6,14 @@ import com.apl.quirkyfun.language.semantics.model.statement.Statement;
 
 public class AntlrToProgram extends AntlrToModel<Program> {
 
+    public AntlrToProgram(Program program) {
+        super(program);
+    }
+
+    public AntlrToProgram(Program program, String scope) {
+        super(program, scope);
+    }
+
     @Override
     public Program visitProgram(QuirklParser.ProgramContext ctx) {
         Program program = new Program();

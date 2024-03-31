@@ -1,5 +1,6 @@
 package com.apl.quirkyfun.language.semantics.model.program;
 
+import com.apl.quirkyfun.language.semantics.model.coordinate.QuirklCoord;
 import com.apl.quirkyfun.language.semantics.model.statement.Statement;
 import com.apl.quirkyfun.language.semantics.model.variable.Variable;
 import com.apl.quirkyfun.language.semantics.visitor.antlr_to_model.error.QuirklException;
@@ -15,17 +16,15 @@ public class Program {
 
     public static final Program INSTANCE = new Program();
 
+    private final QuirklCoord coord;
     private final List<Statement> statements;
 
     private final Map<String, Variable> symbolTable = new HashMap<>();
     private final List<QuirklException> errors = new ArrayList<>();
 
     public Program() {
+        this.coord = new QuirklCoord(0, 0);
         this.statements = new ArrayList<>();
-    }
-
-    protected Program(List<Statement> statements) {
-        this.statements = statements;
     }
 
     public void addStatement(Statement statement) {

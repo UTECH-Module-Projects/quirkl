@@ -1,6 +1,6 @@
 package com.apl.quirkyfun.language.semantics.model.variable.function;
 
-import com.apl.quirkyfun.language.semantics.model.coordinate.QuirklCoordinate;
+import com.apl.quirkyfun.language.semantics.model.coordinate.QuirklCoord;
 import com.apl.quirkyfun.language.semantics.model.variable.function.end_function.EndFunction;
 import com.apl.quirkyfun.language.semantics.model.variable.function.end_function.FunctionBody;
 import com.apl.quirkyfun.language.semantics.model.type.QuirklType;
@@ -15,7 +15,7 @@ import lombok.Setter;
 @Setter
 public class Function {
     @Getter
-    private QuirklCoordinate coord;
+    private QuirklCoord coord;
     @Getter
     private QuirklList<Variable> parameters;
     @Getter
@@ -27,14 +27,14 @@ public class Function {
     private boolean isAnonymous;
 
     public Function() {
-        this.coord = new QuirklCoordinate();
+        this.coord = new QuirklCoord();
         this.type = QuirklType.TYPE.VOID;
         this.parameters = new QuirklList<>();
         this.body = new FunctionBody();
         this.id = null;
     }
 
-    public Function(QuirklCoordinate coord, QuirklList<Variable> parameters, QuirklType.TYPE type, EndFunction body, String id) {
+    public Function(QuirklCoord coord, QuirklList<Variable> parameters, QuirklType.TYPE type, EndFunction body, String id) {
         this.coord = coord;
         this.type = type;
         this.parameters = parameters;
@@ -42,7 +42,7 @@ public class Function {
         this.id = id;
     }
 
-    public Function(QuirklCoordinate coord, QuirklList<Variable> parameters, QuirklType.TYPE type, EndFunction body) {
+    public Function(QuirklCoord coord, QuirklList<Variable> parameters, QuirklType.TYPE type, EndFunction body) {
         this.coord = coord;
         this.type = type;
         this.parameters = parameters;

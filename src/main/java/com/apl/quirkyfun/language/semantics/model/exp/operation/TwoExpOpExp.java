@@ -1,13 +1,13 @@
-package com.apl.quirkyfun.language.semantics.model.expression.operation;
+package com.apl.quirkyfun.language.semantics.model.exp.operation;
 
-import com.apl.quirkyfun.language.semantics.model.coordinate.QuirklCoordinate;
-import com.apl.quirkyfun.language.semantics.model.expression.Expression;
+import com.apl.quirkyfun.language.semantics.model.coordinate.QuirklCoord;
+import com.apl.quirkyfun.language.semantics.model.exp.Exp;
 import com.apl.quirkyfun.language.semantics.model.type.QuirklType;
 import com.apl.quirkyfun.language.semantics.visitor.antlr_to_model.error.runtime.QuirklRuntimeException;
 
-public class TwoExpOperationExpression extends OperationExpression {
-    private final Expression left;
-    private final Expression right;
+public class TwoExpOpExp extends OpExp {
+    private final Exp left;
+    private final Exp right;
     private final OP operator;
 
     public enum OP {
@@ -31,14 +31,14 @@ public class TwoExpOperationExpression extends OperationExpression {
         }
     }
 
-    public TwoExpOperationExpression(QuirklCoordinate coord, Expression left, Expression right, OP operator) {
+    public TwoExpOpExp(QuirklCoord coord, Exp left, Exp right, OP operator) {
         super(coord);
         this.left = left;
         this.right = right;
         this.operator = operator;
     }
 
-    public TwoExpOperationExpression(QuirklCoordinate coord, TwoExpOperationExpression exp) {
+    public TwoExpOpExp(QuirklCoord coord, TwoExpOpExp exp) {
         super(coord);
         this.left = exp.left;
         this.right = exp.right;

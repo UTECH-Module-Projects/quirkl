@@ -1,16 +1,14 @@
-package com.apl.quirkyfun.language.semantics.model.expression.operation.bool;
+package com.apl.quirkyfun.language.semantics.model.exp.operation.bool;
 
-import com.apl.quirkyfun.language.semantics.model.coordinate.QuirklCoordinate;
-import com.apl.quirkyfun.language.semantics.model.expression.Expression;
+import com.apl.quirkyfun.language.semantics.model.coordinate.QuirklCoord;
+import com.apl.quirkyfun.language.semantics.model.exp.Exp;
 import com.apl.quirkyfun.language.semantics.model.type.QuirklBoolean;
-import com.apl.quirkyfun.language.semantics.model.type.QuirklType;
-import com.apl.quirkyfun.language.semantics.visitor.antlr_to_model.error.runtime.QuirklMathException;
 import com.apl.quirkyfun.language.semantics.visitor.antlr_to_model.error.runtime.QuirklRuntimeException;
 
-public class TwoExpBooleanExpression extends BooleanExpression {
+public class TwoExpBoolExp extends BoolExp {
 
-    private final Expression left;
-    private final Expression right;
+    private final Exp left;
+    private final Exp right;
     private final OP operator;
 
     public enum OP {
@@ -39,7 +37,7 @@ public class TwoExpBooleanExpression extends BooleanExpression {
         }
     }
 
-    public TwoExpBooleanExpression(QuirklCoordinate coord, Expression left, Expression right, OP operator) {
+    public TwoExpBoolExp(QuirklCoord coord, Exp left, Exp right, OP operator) {
         super(coord);
         this.left = left;
         this.right = right;

@@ -1,8 +1,7 @@
 package com.apl.quirkyfun.language.semantics.visitor.antlr_to_model;
 
-import com.apl.quirkyfun.language.semantics.model.coordinate.QuirklCoordinate;
-import com.apl.quirkyfun.language.semantics.model.expression.Expression;
-import com.apl.quirkyfun.language.semantics.model.expression.FunctionExpression;
+import com.apl.quirkyfun.language.semantics.model.exp.Exp;
+import com.apl.quirkyfun.language.semantics.model.exp.FunctionExp;
 import com.apl.quirkyfun.language.semantics.model.program.Program;
 import com.apl.quirkyfun.language.semantics.model.statement.Statement;
 import com.apl.quirkyfun.language.semantics.model.statement.VariableStatement;
@@ -13,7 +12,6 @@ import com.apl.quirkyfun.language.parser.QuirklParser;
 import com.apl.quirkyfun.language.semantics.model.variable.function.Function;
 import com.apl.quirkyfun.language.semantics.visitor.antlr_to_model.error.compile.QuirklDeclarationException;
 import com.apl.quirkyfun.language.semantics.visitor.antlr_to_model.util.AntlrUtil;
-import org.antlr.v4.runtime.Token;
 
 public class AntlrToStatement extends AntlrToModel<Statement> {
 
@@ -30,20 +28,15 @@ public class AntlrToStatement extends AntlrToModel<Statement> {
         QuirklParser.IdContext idCTX = ctx.id();
         String varName = idCTX.getText();
         Variable var = program.getVariable(varName, this.scope);
-        Expression exp = null;
+        Exp exp = null;
 
         if (var != null) {
-            Token idToken = idCTX.LETTER().getFirst().getSymbol();
-            int line = idToken.getLine();
-            int column = idToken.getCharPositionInLine();
-            program.addError(QuirklDeclarationException.variableAlreadyDeclared(var, new QuirklCoordinate(line, column)));
+            program.addError(QuirklDeclarationException.variableAlreadyDeclared(AntlrUtil.getCoord(idCTX), var));
             return null;
-        } else {
-            var = new Variable(AntlrUtil.getCoord(idCTX), varName);
         }
+        var = new Variable(AntlrUtil.getCoord(idCTX), varName);
 
-        String varTypeStr = ctx.variableDataType().getText();
-        QuirklType.TYPE varType = QuirklType.getTypeAsQuirklName(varTypeStr);
+        QuirklType.TYPE varType = QuirklType.toQuirklType(ctx.variableDataType().getText());
         var.setType(varType);
 
         QuirklParser.ExpressionContext expCtx = ctx.expression();
@@ -52,8 +45,7 @@ public class AntlrToStatement extends AntlrToModel<Statement> {
             if (exp == null) return null;
         }
         program.addVariable(var, this.scope);
-        if (exp == null) return new VariableStatement(var);
-        return new VariableStatement(var, exp);
+        return new VariableStatement(AntlrUtil.getCoord(ctx), var, exp);
     }
 
     @Override
@@ -64,17 +56,12 @@ public class AntlrToStatement extends AntlrToModel<Statement> {
         Function func = null;
 
         if (var != null) {
-            Token idToken = idCTX.LETTER().getFirst().getSymbol();
-            int line = idToken.getLine();
-            int column = idToken.getCharPositionInLine();
-            program.addError(QuirklDeclarationException.variableAlreadyDeclared(var, new QuirklCoordinate(line, column)));
+            program.addError(QuirklDeclarationException.variableAlreadyDeclared(AntlrUtil.getCoord(idCTX), var));
             return null;
-        } else {
-            var = new Variable(AntlrUtil.getCoord(idCTX), varName);
         }
+        var = new Variable(AntlrUtil.getCoord(idCTX), varName);
 
-        String varTypeStr = ctx.FUNCTION_TYPE().getText();
-        QuirklType.TYPE varType = QuirklType.getTypeAsQuirklName(varTypeStr);
+        QuirklType.TYPE varType = QuirklType.toQuirklType(ctx.FUNCTION_TYPE().getText());
         var.setType(varType);
 
         QuirklParser.FunctionContext funcCtx = ctx.function();
@@ -83,8 +70,9 @@ public class AntlrToStatement extends AntlrToModel<Statement> {
             if (func == null) return null;
         }
         program.addVariable(var, this.scope);
-        if (func == null) return new VariableStatement(var);
-        return new VariableStatement(var, new FunctionExpression(AntlrUtil.getCoord(funcCtx), new QuirklFunction(func)));
+
+        FunctionExp funcExp = new FunctionExp(AntlrUtil.getCoord(funcCtx), new QuirklFunction(AntlrUtil.getCoord(funcCtx), func));
+        return new VariableStatement(AntlrUtil.getCoord(ctx), var, funcExp);
     }
 
     @Override
@@ -99,14 +87,14 @@ public class AntlrToStatement extends AntlrToModel<Statement> {
         Variable var = program.getVariable(varName, this.scope);
 
         if (var == null) {
-            program.addError(QuirklDeclarationException.undeclaredVariable(idCTX));
+            program.addError(QuirklDeclarationException.undeclaredVariable(AntlrUtil.getCoord(idCTX), varName));
             return null;
         }
 
         QuirklParser.ExpressionContext expCtx = ctx.expression();
-        Expression exp = expCtx.accept(new AntlrToExpression(program, this.scope));
+        Exp exp = expCtx.accept(new AntlrToExpression(program, this.scope));
         if (exp == null) return null;
 
-        return new VariableStatement(var, exp);
+        return new VariableStatement(AntlrUtil.getCoord(ctx), var, exp);
     }
 }

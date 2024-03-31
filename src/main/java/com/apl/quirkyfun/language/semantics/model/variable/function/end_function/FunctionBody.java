@@ -1,6 +1,6 @@
 package com.apl.quirkyfun.language.semantics.model.variable.function.end_function;
 
-import com.apl.quirkyfun.language.semantics.model.expression.Expression;
+import com.apl.quirkyfun.language.semantics.model.exp.Exp;
 import com.apl.quirkyfun.language.semantics.model.statement.Statement;
 import com.apl.quirkyfun.language.semantics.model.type.QuirklType;
 import com.apl.quirkyfun.language.semantics.model.type.QuirklVoid;
@@ -13,21 +13,21 @@ import lombok.Setter;
 @Setter
 public class FunctionBody extends EndFunction {
     private QuirklList<Statement> statements;
-    private Expression returnExpression;
+    private Exp returnExp;
 
     public FunctionBody() {
         this.statements = new QuirklList<>();
-        this.returnExpression = null;
+        this.returnExp = null;
     }
 
-    public FunctionBody(Expression returnExpression) {
+    public FunctionBody(Exp returnExp) {
         this.statements = new QuirklList<>();
-        this.returnExpression = returnExpression;
+        this.returnExp = returnExp;
     }
 
-    public FunctionBody(QuirklList<Statement> statements, Expression returnExpression) {
+    public FunctionBody(QuirklList<Statement> statements, Exp returnExp) {
         this.statements = statements;
-        this.returnExpression = returnExpression;
+        this.returnExp = returnExp;
     }
 
     public void addStatement(Statement statement) {
@@ -36,10 +36,10 @@ public class FunctionBody extends EndFunction {
 
     @Override
     public String toString() {
-        if (this.returnExpression == null) {
+        if (this.returnExp == null) {
             return String.join("\n", this.statements.toStringArr());
         }
-        return String.join("{\n", this.statements.toStringArr()) + "\ngive " + this.returnExpression + ";\n}";
+        return String.join("{\n", this.statements.toStringArr()) + "\ngive " + this.returnExp + ";\n}";
     }
 
     @Override
@@ -47,9 +47,9 @@ public class FunctionBody extends EndFunction {
         for (Statement statement : this.statements)
             statement.eval();
 
-        if (this.returnExpression == null)
+        if (this.returnExp == null)
             return QuirklVoid.VOID;
 
-        return returnExpression.eval();
+        return returnExp.eval();
     }
 }

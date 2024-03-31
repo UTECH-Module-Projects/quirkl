@@ -1,13 +1,13 @@
 package com.apl.quirkyfun.language.semantics.visitor.antlr_to_model.processor;
 
 import com.apl.quirkyfun.language.parser.QuirklParser;
-import com.apl.quirkyfun.language.semantics.model.coordinate.QuirklCoordinate;
-import com.apl.quirkyfun.language.semantics.model.expression.Expression;
-import com.apl.quirkyfun.language.semantics.model.expression.VariableExpression;
-import com.apl.quirkyfun.language.semantics.model.expression.operation.bool.TwoExpBooleanExpression;
-import com.apl.quirkyfun.language.semantics.model.expression.operation.literal.NumberLiteral;
-import com.apl.quirkyfun.language.semantics.model.expression.operation.SumExpression;
-import com.apl.quirkyfun.language.semantics.model.expression.operation.TwoExpOperationExpression;
+import com.apl.quirkyfun.language.semantics.model.coordinate.QuirklCoord;
+import com.apl.quirkyfun.language.semantics.model.exp.Exp;
+import com.apl.quirkyfun.language.semantics.model.exp.VariableExp;
+import com.apl.quirkyfun.language.semantics.model.exp.operation.SumExp;
+import com.apl.quirkyfun.language.semantics.model.exp.operation.bool.TwoExpBoolExp;
+import com.apl.quirkyfun.language.semantics.model.exp.operation.literal.NumberLit;
+import com.apl.quirkyfun.language.semantics.model.exp.operation.TwoExpOpExp;
 import com.apl.quirkyfun.language.semantics.model.program.Program;
 import com.apl.quirkyfun.language.semantics.model.type.QuirklFunction;
 import com.apl.quirkyfun.language.semantics.model.type.QuirklType;
@@ -29,29 +29,29 @@ public class AntlrToExpressionProcessor {
         this.visitor = visitor;
     }
 
-    public SumExpression getSumExpression(QuirklParser.ExpressionContext ctx, SumExpression.OPERATOR op) {
+    public SumExp getSumExpression(QuirklParser.ExpressionContext ctx, SumExp.OPERATOR op) {
         int idCount = 0;
-        Expression start;
-        Expression end;
+        Exp start;
+        Exp end;
         QuirklFunction sumFunc;
 
         var param = ctx.getChild(0);
         if (param instanceof QuirklParser.NumberContext numContext) {
-            start = new NumberLiteral(AntlrUtil.getCoord(numContext), new QuirklLongNumber(Long.parseLong(numContext.getText())));
+            start = new NumberLit(AntlrUtil.getCoord(numContext), new QuirklLongNumber(Long.parseLong(numContext.getText())));
         } else {
             var res = this.checkVarExistsForSumExpression(param.getText(), ctx, op, idCount);
             if (res == null) return null;
-            start = new VariableExpression(res.getCoord(), res);
+            start = new VariableExp(res.getCoord(), res);
             idCount++;
         }
 
         param = ctx.getChild(2);
         if (param instanceof QuirklParser.NumberContext numContext) {
-            end = new NumberLiteral(AntlrUtil.getCoord(numContext), new QuirklLongNumber(Long.parseLong(numContext.getText())));
+            end = new NumberLit(AntlrUtil.getCoord(numContext), new QuirklLongNumber(Long.parseLong(numContext.getText())));
         } else {
             var res = this.checkVarExistsForSumExpression(param.getText(), ctx, op, idCount);
             if (res == null) return null;
-            end = new VariableExpression(res.getCoord(), res);
+            end = new VariableExp(res.getCoord(), res);
             idCount++;
         }
 
@@ -70,10 +70,10 @@ public class AntlrToExpressionProcessor {
             }
             sumFunc = (QuirklFunction) res.getValue();
         }
-        return new SumExpression(AntlrUtil.getCoord(ctx), start, end, sumFunc, op);
+        return new SumExp(AntlrUtil.getCoord(ctx), start, end, sumFunc, op);
     }
 
-    private Variable checkVarExistsForSumExpression(String varName, QuirklParser.ExpressionContext ctx, SumExpression.OPERATOR type, int idCount) {
+    private Variable checkVarExistsForSumExpression(String varName, QuirklParser.ExpressionContext ctx, SumExp.OPERATOR type, int idCount) {
         if (!this.program.hasVariable(varName, this.visitor.getScope())) {
             QuirklParser.IdContext idCtx = switch (type) {
                 case SUMM -> ((QuirklParser.SummationExpressionContext) ctx).id(idCount);
@@ -85,23 +85,23 @@ public class AntlrToExpressionProcessor {
         return program.getVariable(varName, this.visitor.getScope());
     }
 
-    public TwoExpOperationExpression getTwoExpOperationExpression(QuirklCoordinate coord, QuirklParser.ExpressionContext expCtx1, QuirklParser.ExpressionContext expCtx2, TwoExpOperationExpression.OP op, AntlrToExpression visitor) {
-        Expression exp1 = expCtx1.accept(visitor);
+    public TwoExpOpExp getTwoExpOperationExpression(QuirklCoord coord, QuirklParser.ExpressionContext expCtx1, QuirklParser.ExpressionContext expCtx2, TwoExpOpExp.OP op, AntlrToExpression visitor) {
+        Exp exp1 = expCtx1.accept(visitor);
         if (exp1 == null)
             return null;
-        Expression exp2 = expCtx2.accept(visitor);
+        Exp exp2 = expCtx2.accept(visitor);
         if (exp2 == null)
             return null;
-        return new TwoExpOperationExpression(coord, exp1, exp2, op);
+        return new TwoExpOpExp(coord, exp1, exp2, op);
     }
 
-    public TwoExpBooleanExpression getTwoExpBooleanExpression(QuirklCoordinate coord, QuirklParser.ExpressionContext expCtx1, QuirklParser.ExpressionContext expCtx2, TwoExpBooleanExpression.OP OP, AntlrToExpression visitor) {
-        Expression exp1 = expCtx1.accept(visitor);
+    public TwoExpBoolExp getTwoExpBoolExpression(QuirklCoord coord, QuirklParser.ExpressionContext expCtx1, QuirklParser.ExpressionContext expCtx2, TwoExpBoolExp.OP OP, AntlrToExpression visitor) {
+        Exp exp1 = expCtx1.accept(visitor);
         if (exp1 == null)
             return null;
-        Expression exp2 = expCtx2.accept(visitor);
+        Exp exp2 = expCtx2.accept(visitor);
         if (exp2 == null)
             return null;
-        return new TwoExpBooleanExpression(coord, exp1, exp2, OP);
+        return new TwoExpBoolExp(coord, exp1, exp2, OP);
     }
 }

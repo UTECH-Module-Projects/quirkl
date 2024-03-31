@@ -1,13 +1,10 @@
-package com.apl.quirkyfun.language.semantics.model.expression.operation;
+package com.apl.quirkyfun.language.semantics.model.exp.operation;
 
-import com.apl.quirkyfun.language.semantics.model.coordinate.QuirklCoordinate;
-import com.apl.quirkyfun.language.semantics.model.expression.Expression;
+import com.apl.quirkyfun.language.semantics.model.coordinate.QuirklCoord;
+import com.apl.quirkyfun.language.semantics.model.exp.Exp;
 import com.apl.quirkyfun.language.semantics.model.type.QuirklFunction;
 import com.apl.quirkyfun.language.semantics.model.type.QuirklType;
-import com.apl.quirkyfun.language.semantics.model.variable.function.Function;
 import com.apl.quirkyfun.language.semantics.model.type.number.QuirklLongNumber;
-import com.apl.quirkyfun.language.semantics.visitor.antlr_to_model.error.runtime.QuirklCastException;
-import com.apl.quirkyfun.language.semantics.visitor.antlr_to_model.error.runtime.QuirklFunctionException;
 import com.apl.quirkyfun.language.semantics.visitor.antlr_to_model.error.runtime.QuirklOperationException;
 import com.apl.quirkyfun.language.semantics.visitor.antlr_to_model.error.runtime.QuirklRuntimeException;
 import lombok.Getter;
@@ -16,9 +13,9 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class SumExpression extends OperationExpression {
-    private Expression start;
-    private Expression end;
+public class SumExp extends OpExp {
+    private Exp start;
+    private Exp end;
     private QuirklFunction sumFunc;
     private OPERATOR operator;
 
@@ -38,7 +35,7 @@ public class SumExpression extends OperationExpression {
         }
     }
 
-    public SumExpression(QuirklCoordinate coord) {
+    public SumExp(QuirklCoord coord) {
         super(coord);
         this.start = null;
         this.end = null;
@@ -46,7 +43,7 @@ public class SumExpression extends OperationExpression {
         this.operator = null;
     }
 
-    public SumExpression(QuirklCoordinate coord, Expression start, Expression end, QuirklFunction sumFunc, OPERATOR operator) {
+    public SumExp(QuirklCoord coord, Exp start, Exp end, QuirklFunction sumFunc, OPERATOR operator) {
         super(coord);
         this.start = start;
         this.end = end;

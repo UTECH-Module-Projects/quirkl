@@ -1,7 +1,7 @@
 package com.apl.quirkyfun.language.semantics.model.type.number;
 
-import com.apl.quirkyfun.language.semantics.model.expression.operation.TwoExpOperationExpression;
-import com.apl.quirkyfun.language.semantics.model.expression.operation.bool.TwoExpBooleanExpression;
+import com.apl.quirkyfun.language.semantics.model.coordinate.QuirklCoord;
+import com.apl.quirkyfun.language.semantics.model.exp.operation.TwoExpOpExp;
 import com.apl.quirkyfun.language.semantics.model.type.*;
 import com.apl.quirkyfun.language.semantics.visitor.antlr_to_model.error.runtime.QuirklMathException;
 import com.apl.quirkyfun.language.semantics.visitor.antlr_to_model.error.runtime.QuirklCastException;
@@ -11,8 +11,8 @@ import lombok.Getter;
 @Getter
 public abstract class QuirklNumber<T extends Number> extends QuirklType<T> {
 
-    protected QuirklNumber(T value) {
-        super(value);
+    public QuirklNumber(QuirklCoord coord, T value) {
+        super(coord, value);
     }
 
     @Override
@@ -51,7 +51,7 @@ public abstract class QuirklNumber<T extends Number> extends QuirklType<T> {
             double result = this.toDouble().getValue() + other.toDouble().getValue();
             return this.castToBigger(result, other);
         } catch (QuirklCastException e) {
-            throw QuirklOperationException.notCompatible(TwoExpOperationExpression.OP.PLUS.toString(), this.getType(), other.getType());
+            throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.PLUS.toString(), this.getType(), other.getType());
         }
     }
 
@@ -61,7 +61,7 @@ public abstract class QuirklNumber<T extends Number> extends QuirklType<T> {
             double result = this.toDouble().getValue() - other.toDouble().getValue();
             return this.castToBigger(result, other);
         } catch (QuirklCastException e) {
-            throw QuirklOperationException.notCompatible(TwoExpOperationExpression.OP.MINUS.toString(), this.getType(), other.getType());
+            throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.MINUS.toString(), this.getType(), other.getType());
         }
     }
 
@@ -71,7 +71,7 @@ public abstract class QuirklNumber<T extends Number> extends QuirklType<T> {
             double result = this.toDouble().getValue() * other.toDouble().getValue();
             return this.castToBigger(result, other);
         } catch (QuirklCastException e) {
-            throw QuirklOperationException.notCompatible(TwoExpOperationExpression.OP.MULTIPLY.toString(), this.getType(), other.getType());
+            throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.MULTIPLY.toString(), this.getType(), other.getType());
         }
     }
 
@@ -85,7 +85,7 @@ public abstract class QuirklNumber<T extends Number> extends QuirklType<T> {
             double result = this.toDouble().getValue() / otherValue;
             return this.castToBigger(result, other);
         } catch (QuirklCastException e) {
-            throw QuirklOperationException.notCompatible(TwoExpOperationExpression.OP.DIVIDE.toString(), this.getType(), other.getType());
+            throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.DIVIDE.toString(), this.getType(), other.getType());
         }
     }
 
@@ -99,7 +99,7 @@ public abstract class QuirklNumber<T extends Number> extends QuirklType<T> {
             double result = this.toDouble().getValue() / otherValue;
             return this.castToBigger(result, other);
         } catch (QuirklCastException e) {
-            throw QuirklOperationException.notCompatible(TwoExpOperationExpression.OP.MODULO.toString(), this.getType(), other.getType());
+            throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.MODULO.toString(), this.getType(), other.getType());
         }
     }
 
@@ -116,7 +116,7 @@ public abstract class QuirklNumber<T extends Number> extends QuirklType<T> {
             double result = Math.pow(thisValue, otherValue);
             return this.castToBigger(result, other);
         } catch (QuirklCastException e) {
-            throw QuirklOperationException.notCompatible(TwoExpOperationExpression.OP.POWER.toString(), this.getType(), other.getType());
+            throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.POWER.toString(), this.getType(), other.getType());
         }
     }
 
@@ -131,7 +131,7 @@ public abstract class QuirklNumber<T extends Number> extends QuirklType<T> {
             double result = Math.pow(thisValue, 1 / otherValue);
             return this.castToBigger(result, other);
         } catch (QuirklCastException e) {
-            throw QuirklOperationException.notCompatible(TwoExpOperationExpression.OP.ROOT.toString(), this.getType(), other.getType());
+            throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.ROOT.toString(), this.getType(), other.getType());
         }
     }
 

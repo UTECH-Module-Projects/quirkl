@@ -1,19 +1,20 @@
 package com.apl.quirkyfun.language.semantics.model.coordinate;
 
-import com.apl.quirkyfun.language.semantics.model.variable.Variable;
 import lombok.Getter;
 
 @Getter
-public class QuirklCoordinate {
+public class QuirklCoord {
     private final int row;
     private final int column;
 
-    public QuirklCoordinate() {
+    public static final QuirklCoord ORIGIN = new QuirklCoord(0, 0);
+
+    public QuirklCoord() {
         this.row = 0;
         this.column = 0;
     }
 
-    public QuirklCoordinate(int row, int column) {
+    public QuirklCoord(int row, int column) {
         this.row = row;
         this.column = column;
     }
@@ -24,10 +25,10 @@ public class QuirklCoordinate {
     }
 
     @Override
-    public QuirklCoordinate clone() {
+    public QuirklCoord clone() {
         try {
             super.clone();
-            return new QuirklCoordinate(this.row, this.column);
+            return new QuirklCoord(this.row, this.column);
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();
         }

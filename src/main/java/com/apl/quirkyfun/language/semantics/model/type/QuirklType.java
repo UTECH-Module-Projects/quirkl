@@ -1,7 +1,8 @@
 package com.apl.quirkyfun.language.semantics.model.type;
 
-import com.apl.quirkyfun.language.semantics.model.expression.operation.bool.NotBooleanExpression;
-import com.apl.quirkyfun.language.semantics.model.expression.operation.bool.TwoExpBooleanExpression;
+import com.apl.quirkyfun.language.semantics.model.coordinate.QuirklCoord;
+import com.apl.quirkyfun.language.semantics.model.exp.operation.bool.NotBoolExp;
+import com.apl.quirkyfun.language.semantics.model.exp.operation.bool.TwoExpBoolExp;
 import com.apl.quirkyfun.language.semantics.visitor.antlr_to_model.error.runtime.QuirklFunctionException;
 import com.apl.quirkyfun.language.semantics.visitor.antlr_to_model.error.runtime.QuirklMathException;
 import com.apl.quirkyfun.language.semantics.model.type.number.QuirklDoubleNumber;
@@ -9,12 +10,14 @@ import com.apl.quirkyfun.language.semantics.model.type.number.QuirklLongNumber;
 import com.apl.quirkyfun.language.semantics.visitor.antlr_to_model.error.runtime.QuirklCastException;
 import com.apl.quirkyfun.language.semantics.visitor.antlr_to_model.error.runtime.QuirklOperationException;
 import lombok.Getter;
+import lombok.SneakyThrows;
 
 import java.util.HashMap;
 import java.util.List;
 
 @Getter
 public abstract class QuirklType<T> {
+    private final QuirklCoord coord;
     protected T value;
     private static final HashMap<String, TYPE> typeMap;
     private static final HashMap<TYPE, Integer> hierarchy;
@@ -53,7 +56,8 @@ public abstract class QuirklType<T> {
         typeMap.put("func", TYPE.FUNCTION);
     }
 
-    protected QuirklType(T value) {
+    public QuirklType(QuirklCoord coord, T value) {
+        this.coord = coord;
         this.value = value;
     }
 
@@ -63,6 +67,14 @@ public abstract class QuirklType<T> {
             this.value = (T) value;
         } catch (Exception e) {
             throw QuirklCastException.notCompatible(value.toString(), this.getType());
+        }
+    }
+
+    public final void setValue(QuirklType<T> value) throws QuirklCastException {
+        try {
+            this.value = value.getValue();
+        } catch (Exception e) {
+            throw QuirklCastException.notCompatible(value.getValue().toString(), this.getType());
         }
     }
 
@@ -94,7 +106,7 @@ public abstract class QuirklType<T> {
         return this.isSubtype(other) ? other.cast(value) : this.cast(value);
     }
 
-    public static TYPE getTypeAsQuirklName(String type) {
+    public static TYPE toQuirklType(String type) {
         return typeMap.getOrDefault(type, null);
     }
 
@@ -160,7 +172,7 @@ public abstract class QuirklType<T> {
         try {
             return new QuirklBoolean(this.toBoolean().getValue() && other.toBoolean().getValue());
         } catch (QuirklCastException e) {
-            throw QuirklOperationException.notCompatible(TwoExpBooleanExpression.OP.AND.toString(), this.getType(), other.getType());
+            throw QuirklOperationException.notCompatible(TwoExpBoolExp.OP.AND.toString(), this.getType(), other.getType());
         }
     }
 
@@ -168,7 +180,7 @@ public abstract class QuirklType<T> {
         try {
             return new QuirklBoolean(this.toBoolean().getValue() || other.toBoolean().getValue());
         } catch (QuirklCastException e) {
-            throw QuirklOperationException.notCompatible(TwoExpBooleanExpression.OP.OR.toString(), this.getType(), other.getType());
+            throw QuirklOperationException.notCompatible(TwoExpBoolExp.OP.OR.toString(), this.getType(), other.getType());
         }
     }
 
@@ -176,7 +188,7 @@ public abstract class QuirklType<T> {
         try {
             return new QuirklBoolean(this.toBoolean().getValue() ^ other.toBoolean().getValue());
         } catch (QuirklCastException e) {
-            throw QuirklOperationException.notCompatible(TwoExpBooleanExpression.OP.XOR.toString(), this.getType(), other.getType());
+            throw QuirklOperationException.notCompatible(TwoExpBoolExp.OP.XOR.toString(), this.getType(), other.getType());
         }
     }
 
@@ -184,7 +196,7 @@ public abstract class QuirklType<T> {
         try {
             return new QuirklBoolean(!(this.toBoolean().getValue() && other.toBoolean().getValue()));
         } catch (QuirklCastException e) {
-            throw QuirklOperationException.notCompatible(TwoExpBooleanExpression.OP.NAND.toString(), this.getType(), other.getType());
+            throw QuirklOperationException.notCompatible(TwoExpBoolExp.OP.NAND.toString(), this.getType(), other.getType());
         }
     }
 
@@ -192,7 +204,7 @@ public abstract class QuirklType<T> {
         try {
             return new QuirklBoolean(!(this.toBoolean().getValue() || other.toBoolean().getValue()));
         } catch (QuirklCastException e) {
-            throw QuirklOperationException.notCompatible(TwoExpBooleanExpression.OP.NOR.toString(), this.getType(), other.getType());
+            throw QuirklOperationException.notCompatible(TwoExpBoolExp.OP.NOR.toString(), this.getType(), other.getType());
         }
 
     }
@@ -201,7 +213,7 @@ public abstract class QuirklType<T> {
         try {
             return new QuirklBoolean(this.toBoolean().getValue() == other.toBoolean().getValue());
         } catch (QuirklCastException e) {
-            throw QuirklOperationException.notCompatible(TwoExpBooleanExpression.OP.XNOR.toString(), this.getType(), other.getType());
+            throw QuirklOperationException.notCompatible(TwoExpBoolExp.OP.XNOR.toString(), this.getType(), other.getType());
         }
     }
 
@@ -209,11 +221,11 @@ public abstract class QuirklType<T> {
         try {
             return new QuirklBoolean(!this.toBoolean().getValue());
         } catch (QuirklCastException e) {
-            throw QuirklOperationException.notCompatible(NotBooleanExpression.NOT, this.getType());
+            throw QuirklOperationException.notCompatible(NotBoolExp.NOT, this.getType());
         }
     }
 
-    public abstract QuirklType<?> cast(Object value) throws QuirklCastException;
+    public abstract QuirklType<?> cast(QuirklCoord coord, Object value) throws QuirklCastException;
 
     public abstract QuirklVoid toVoid() throws QuirklCastException;
 
