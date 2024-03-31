@@ -1,5 +1,6 @@
 grammar Quirkl;
 
+//COMPLETE
 program
 : statement+ EOF
 ;
@@ -42,10 +43,9 @@ switchCase
 ;
 
 expression
-: LPAREN expression RPAREN                                                                                                                      # BracketExpression
+: MINUS? LPAREN expression RPAREN                                                                                                               # BracketExpression
 | INC expression                                                                                                                                # IncrementExpression
 | DEC expression                                                                                                                                # DecrementExpression
-| MINUS expression                                                                                                                              # NegationExpression
 | expression EXP expression                                                                                                                     # ExponentExpression
 | expression ROOT expression                                                                                                                    # RootExpression
 | expression MULT expression                                                                                                                    # MultiplicationExpression
@@ -74,10 +74,12 @@ expression
 | functionWithLambda                                                                                                                            # FunctionWithLambdaExpression
 | functionCall                                                                                                                                  # FunctionCallExpression
 | MINUS? id                                                                                                                                     # VariableExpression
-| MINUS? number                                                                                                                                 # NumberLiteralExpression
+| number                                                                                                                                        # NumberLiteralExpression
 | MINUS? DIGIT+'.'DIGIT+                                                                                                                        # DecimalLiteralExpression
 | boolean                                                                                                                                       # BooleanLiteralExpression
 | QUOTE anychar*? QUOTE                                                                                                                         # StringLiteralExpression
+| id INC                                                                                                                                        # LateIncrementExpression
+| id DEC                                                                                                                                        # LateDecrementExpression
 ;
 
 toBool
@@ -127,7 +129,7 @@ id                  : LETTER (LETTER | DIGIT)* ;        //IDENTIFIER
 
 //Literals
 boolean             : 'true' | 'false' ;                //BOOLEAN
-number              : DIGIT+ ;                          //LONG
+number              : MINUS? DIGIT+ ;                          //LONG
 
 anychar
 : LETTER | DIGIT

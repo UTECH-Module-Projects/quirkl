@@ -277,14 +277,14 @@ public class QuirklBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitNegationExpression(QuirklParser.NegationExpressionContext ctx) { return visitChildren(ctx); }
+	@Override public T visitProdSummationExpression(QuirklParser.ProdSummationExpressionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitProdSummationExpression(QuirklParser.ProdSummationExpressionContext ctx) { return visitChildren(ctx); }
+	@Override public T visitLateDecrementExpression(QuirklParser.LateDecrementExpressionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -341,6 +341,13 @@ public class QuirklBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public T visitVariableExpression(QuirklParser.VariableExpressionContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitLateIncrementExpression(QuirklParser.LateIncrementExpressionContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *

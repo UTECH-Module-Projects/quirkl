@@ -9,42 +9,36 @@ import com.apl.quirkyfun.language.semantics.visitor.antlr_to_model.error.runtime
 
 public class QuirklBoolean extends QuirklType<Boolean> {
 
-    public static final QuirklBoolean TRUE = new QuirklBoolean(QuirklCoord.ORIGIN, true);
-    public static final QuirklBoolean FALSE = new QuirklBoolean(QuirklCoord.ORIGIN, false);
+    public static final QuirklBoolean TRUE = new QuirklBoolean(true);
+    public static final QuirklBoolean FALSE = new QuirklBoolean(false);
 
     public QuirklBoolean() {
-        super(QuirklCoord.ORIGIN, false);
+        super(false);
     }
 
-    public QuirklBoolean(QuirklCoord coord) {
-        super(coord, false);
-    }
-
-    public QuirklBoolean(QuirklCoord coord, Boolean value) {
-        super(coord, value);
+    public QuirklBoolean(Boolean value) {
+        super(value);
     }
 
     public QuirklBoolean(QuirklBoolean value) {
-        super(value.getCoord(), value.getValue());
+        super(value.getValue());
     }
 
     @Override
-    public QuirklBoolean cast(QuirklCoord coord, Object value) throws QuirklCastException {
+    public QuirklBoolean cast(Object value) throws QuirklCastException {
         String valueStr = value.toString().toLowerCase();
-        QuirklBoolean bool = new QuirklBoolean(this.getCoord());
-        if (value instanceof Double) bool.setValue((Double) value == 0 ? FALSE : TRUE);
-        if (value instanceof Function) bool.setValue(valueStr.equals(QuirklFunction.EMPTY.toString()) ? FALSE : TRUE);
-        if (valueStr.isBlank()) bool.setValue(FALSE);
-        bool.setValue(switch (valueStr) {
+        if (value instanceof Double) return (Double) value == 0 ? FALSE : TRUE;
+        if (value instanceof Function) return valueStr.equals(QuirklFunction.EMPTY.toString()) ? FALSE : TRUE;
+        if (valueStr.isBlank()) return FALSE;
+        return switch (valueStr) {
             case "false", "null", "0" -> FALSE;
             default -> TRUE;
-        });
-        return bool;
+        };
     }
 
     @Override
     public QuirklVoid toVoid() {
-        return new QuirklVoid(this.getCoord());
+        return QuirklVoid.VOID;
     }
 
     @Override
@@ -53,28 +47,28 @@ public class QuirklBoolean extends QuirklType<Boolean> {
     }
 
     @Override
-    public QuirklLongNumber toLong() throws QuirklCastException {
+    public QuirklLongNumber toLong() {
         return new QuirklLongNumber(this.getValue() ? QuirklLongNumber.ONE : QuirklLongNumber.ZERO);
     }
 
     @Override
-    public QuirklDoubleNumber toDouble() throws QuirklCastException {
+    public QuirklDoubleNumber toDouble() {
         return new QuirklDoubleNumber(this.getValue() ? QuirklDoubleNumber.ONE : QuirklDoubleNumber.ZERO);
     }
 
     @Override
     public QuirklString toStr() throws QuirklCastException {
-        return new QuirklString(this.getCoord(), this.getValue().toString());
+        return new QuirklString(this.getValue().toString());
     }
 
     @Override
     public QuirklFunction toFunction() throws QuirklCastException {
-        return null;
+        throw QuirklCastException.notCompatible(this.toString(), TYPE.FUNCTION);
     }
 
     @Override
     public int compareTo(QuirklType<?> other) throws QuirklMathException {
-        return 0;
+        return this.value.compareTo(other.toBoolean().getValue());
     }
 
     @Override

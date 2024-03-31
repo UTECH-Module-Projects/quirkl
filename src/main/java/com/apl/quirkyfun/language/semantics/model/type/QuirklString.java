@@ -1,6 +1,5 @@
 package com.apl.quirkyfun.language.semantics.model.type;
 
-import com.apl.quirkyfun.language.semantics.model.coordinate.QuirklCoord;
 import com.apl.quirkyfun.language.semantics.model.exp.operation.TwoExpOpExp;
 import com.apl.quirkyfun.language.semantics.model.type.number.QuirklDoubleNumber;
 import com.apl.quirkyfun.language.semantics.model.type.number.QuirklLongNumber;
@@ -10,23 +9,19 @@ import com.apl.quirkyfun.language.semantics.visitor.antlr_to_model.error.runtime
 
 public class QuirklString extends QuirklType<String> {
 
-    public static final QuirklString EMPTY = new QuirklString(QuirklCoord.ORIGIN, "");
+    public static final QuirklString EMPTY = new QuirklString("");
 
     public QuirklString() {
-        super(QuirklCoord.ORIGIN, "");
+        super("");
     }
 
-    public QuirklString(QuirklCoord coord) {
-        super(coord, "");
-    }
-
-    public QuirklString(QuirklCoord coord, String value) {
-        super(coord, value);
+    public QuirklString(String value) {
+        super(value);
     }
 
     @Override
-    public QuirklString cast(QuirklCoord coord, Object value) {
-        return new QuirklString(coord, value.toString());
+    public QuirklString cast(Object value) {
+        return new QuirklString(value.toString());
     }
 
     @Override
@@ -36,13 +31,13 @@ public class QuirklString extends QuirklType<String> {
 
     @Override
     public QuirklBoolean toBoolean() {
-        return new QuirklBoolean(this.getCoord(), !this.value.isEmpty());
+        return new QuirklBoolean(!this.value.isEmpty());
     }
 
     @Override
     public QuirklLongNumber toLong() throws QuirklCastException {
         try {
-            return new QuirklLongNumber(this.getCoord(),Long.parseLong(this.value));
+            return new QuirklLongNumber(Long.parseLong(this.value));
         } catch (NumberFormatException e) {
             throw QuirklCastException.notCompatible(this.value, QuirklType.TYPE.LONG_NUMBER);
         }
@@ -51,7 +46,7 @@ public class QuirklString extends QuirklType<String> {
     @Override
     public QuirklDoubleNumber toDouble() throws QuirklCastException {
         try {
-            return new QuirklDoubleNumber(this.getCoord(), Double.parseDouble(this.value));
+            return new QuirklDoubleNumber(Double.parseDouble(this.value));
         } catch (NullPointerException | NumberFormatException e) {
             throw QuirklCastException.notCompatible(this.value, QuirklType.TYPE.DOUBLE_NUMBER);
         }
@@ -59,7 +54,7 @@ public class QuirklString extends QuirklType<String> {
 
     @Override
     public QuirklString toStr() {
-        return this.cast(this.getCoord(), this.value);
+        return this.cast(this.value);
     }
 
     @Override
@@ -74,7 +69,7 @@ public class QuirklString extends QuirklType<String> {
 
     @Override
     public QuirklType<String> add(QuirklType<?> other) throws QuirklCastException {
-        return new QuirklString(this.getCoord(),this.value + other.toStr().getValue());
+        return new QuirklString(this.value + other.toStr().getValue());
     }
 
     @Override

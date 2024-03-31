@@ -17,7 +17,6 @@ import java.util.List;
 
 @Getter
 public abstract class QuirklType<T> {
-    private final QuirklCoord coord;
     protected T value;
     private static final HashMap<String, TYPE> typeMap;
     private static final HashMap<TYPE, Integer> hierarchy;
@@ -56,8 +55,7 @@ public abstract class QuirklType<T> {
         typeMap.put("func", TYPE.FUNCTION);
     }
 
-    public QuirklType(QuirklCoord coord, T value) {
-        this.coord = coord;
+    public QuirklType(T value) {
         this.value = value;
     }
 
@@ -225,7 +223,7 @@ public abstract class QuirklType<T> {
         }
     }
 
-    public abstract QuirklType<?> cast(QuirklCoord coord, Object value) throws QuirklCastException;
+    public abstract QuirklType<?> cast(Object value) throws QuirklCastException;
 
     public abstract QuirklVoid toVoid() throws QuirklCastException;
 

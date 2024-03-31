@@ -31,11 +31,11 @@ public class QuirklFunction extends QuirklType<Function> {
     public static final QuirklFunction EMPTY = new QuirklFunction();
 
     public QuirklFunction() {
-        super(ORIGIN, new Function());
+        super(new Function());
     }
 
-    public QuirklFunction(QuirklCoord coord, Function value) {
-        super(coord, value);
+    public QuirklFunction(Function value) {
+        super(value);
     }
 
     public int getTotParam() {
@@ -44,7 +44,7 @@ public class QuirklFunction extends QuirklType<Function> {
 
     @Override
     public QuirklFunction cast(Object value) throws QuirklCastException {
-        if (value instanceof Function) return new QuirklFunction(ORIGIN, (Function) value);
+        if (value instanceof Function) return new QuirklFunction((Function) value);
         String valueStr = value.toString();
 
         Program tempProgram = new Program();
@@ -58,7 +58,7 @@ public class QuirklFunction extends QuirklType<Function> {
         if (function == null)
             throw QuirklCastException.notCompatible(valueStr, QuirklType.TYPE.FUNCTION);
 
-        return new QuirklFunction(ORIGIN, function);
+        return new QuirklFunction(function);
     }
 
     @Override
@@ -116,20 +116,20 @@ public class QuirklFunction extends QuirklType<Function> {
 
             if (otherFunctionSize == 0) {
                 FunctionBody functionBody = new FunctionBody();
-                functionBody.addStatement(new FuncCallStatement(this.getCoord(), this, varArguments));
+                functionBody.addStatement(new FuncCallStatement(this.getValue().getCoord(), this, varArguments));
                 if (otherFunction.getType().equals(QuirklType.TYPE.VOID)) {
-                    functionBody.addStatement(new FuncCallStatement(this.getCoord(), this, new QuirklList<>()));
+                    functionBody.addStatement(new FuncCallStatement(this.getValue().getCoord(), this, new QuirklList<>()));
                 } else {
-                    functionBody.setReturnExp(new FunctionCallExp(this.getCoord(), otherFunction, new QuirklList<>()));
+                    functionBody.setReturnExp(new FunctionCallExp(this.getValue().getCoord(), otherFunction, new QuirklList<>()));
                 }
             } else {
-                FunctionCallExp smallFunctionCall = new FunctionCallExp(this.getCoord(), this, varArguments);
-                FunctionCallExp bigFunctionCall = new FunctionCallExp(this.getCoord(), otherFunction,List.of(smallFunctionCall));
+                FunctionCallExp smallFunctionCall = new FunctionCallExp(this.getValue().getCoord(), this, varArguments);
+                FunctionCallExp bigFunctionCall = new FunctionCallExp(this.getValue().getCoord(), otherFunction,List.of(smallFunctionCall));
                 ReturnLambda returnLambda = new ReturnLambda(bigFunctionCall);
 
                 newFunc.setBody(returnLambda);
             }
-            return new QuirklFunction(this.getCoord(), newFunc);
+            return new QuirklFunction(newFunc);
         } else return this.add(other.toFunction());
     }
 

@@ -8,10 +8,16 @@ import com.apl.quirkyfun.language.semantics.model.exp.operation.TwoExpOpExp;
 import com.apl.quirkyfun.language.parser.QuirklParser;
 import com.apl.quirkyfun.language.semantics.model.exp.operation.bool.NotBoolExp;
 import com.apl.quirkyfun.language.semantics.model.exp.operation.bool.TwoExpBoolExp;
+import com.apl.quirkyfun.language.semantics.model.exp.operation.literal.BooleanLit;
+import com.apl.quirkyfun.language.semantics.model.exp.operation.literal.DecimalLit;
 import com.apl.quirkyfun.language.semantics.model.exp.operation.literal.NumberLit;
+import com.apl.quirkyfun.language.semantics.model.exp.operation.literal.StringLit;
 import com.apl.quirkyfun.language.semantics.model.program.Program;
+import com.apl.quirkyfun.language.semantics.model.type.QuirklBoolean;
 import com.apl.quirkyfun.language.semantics.model.type.QuirklFunction;
+import com.apl.quirkyfun.language.semantics.model.type.QuirklString;
 import com.apl.quirkyfun.language.semantics.model.type.QuirklType;
+import com.apl.quirkyfun.language.semantics.model.type.number.QuirklDoubleNumber;
 import com.apl.quirkyfun.language.semantics.model.type.number.QuirklLongNumber;
 import com.apl.quirkyfun.language.semantics.model.util.QuirklList;
 import com.apl.quirkyfun.language.semantics.model.variable.Variable;
@@ -44,7 +50,11 @@ public class AntlrToExpression extends AntlrToModel<Exp> {
     public Exp visitBracketExpression(QuirklParser.BracketExpressionContext ctx) {
         Exp result = ctx.expression().accept(this);
         if (result == null) return null;
-        return new BracketExp(AntlrUtil.getCoord(ctx), result);
+        BracketExp bracketExp = new BracketExp(AntlrUtil.getCoord(ctx), result);
+        if (ctx.getChild(1) instanceof QuirklParser.ExpressionContext) {
+            return bracketExp;
+        }
+        return new TwoExpOpExp(AntlrUtil.getCoord(ctx), bracketExp, new NumberLit(AntlrUtil.getCoord(ctx), new QuirklLongNumber(-1L)), TwoExpOpExp.OP.MULTIPLY);
     }
 
     @Override
@@ -201,7 +211,7 @@ public class AntlrToExpression extends AntlrToModel<Exp> {
         Function func = ctx.functionWithBody().accept(new AntlrToFunction(program, scope));
         if (func == null) return null;
         QuirklCoord coord = AntlrUtil.getCoord(ctx);
-        return new FunctionExp(coord, new QuirklFunction(coord, func));
+        return new FunctionExp(coord, new QuirklFunction(func));
     }
 
     @Override
@@ -209,7 +219,7 @@ public class AntlrToExpression extends AntlrToModel<Exp> {
         Function func = ctx.functionWithLambda().accept(new AntlrToFunction(program, scope));
         if (func == null) return null;
         QuirklCoord coord = AntlrUtil.getCoord(ctx);
-        return new FunctionExp(coord, new QuirklFunction(coord, func));
+        return new FunctionExp(coord, new QuirklFunction(func));
     }
 
     @Override
@@ -261,13 +271,49 @@ public class AntlrToExpression extends AntlrToModel<Exp> {
             program.addError(QuirklDeclarationException.undeclaredVariable(AntlrUtil.getCoord(idCTX), varName));
             return null;
         }
-
+        VariableExp varExp = new VariableExp(AntlrUtil.getCoord(ctx), var);
         if (ctx.getChild(0) instanceof QuirklParser.IdContext) {
-            return new VariableExp(AntlrUtil.getCoord(ctx), var);
+            return varExp;
         } else {
-            return new TwoExpOpExp(AntlrUtil.getCoord(ctx), var, new NumberLit(AntlrUtil.getCoord(ctx), new QuirklLongNumber(-1)), TwoExpOpExp.OP.PLUS);
+            return new TwoExpOpExp(AntlrUtil.getCoord(ctx), varExp, new NumberLit(AntlrUtil.getCoord(ctx), new QuirklLongNumber(-1L)), TwoExpOpExp.OP.MULTIPLY);
         }
+    }
 
+    @Override
+    public Exp visitNumberLiteralExpression(QuirklParser.NumberLiteralExpressionContext ctx) {
+        long value = Long.parseLong(ctx.number().getText());
+        return new NumberLit(AntlrUtil.getCoord(ctx), new QuirklLongNumber(value));
+    }
 
+    @Override
+    public Exp visitDecimalLiteralExpression(QuirklParser.DecimalLiteralExpressionContext ctx) {
+        double value = Double.parseDouble(ctx.getText());
+        return new DecimalLit(AntlrUtil.getCoord(ctx), new QuirklDoubleNumber(value));
+    }
+
+    @Override
+    public Exp visitBooleanLiteralExpression(QuirklParser.BooleanLiteralExpressionContext ctx) {
+        boolean value = Boolean.parseBoolean(ctx.getText());
+        return new BooleanLit(AntlrUtil.getCoord(ctx), new QuirklBoolean(value));
+    }
+
+    @Override
+    public Exp visitStringLiteralExpression(QuirklParser.StringLiteralExpressionContext ctx) {
+        String value = ctx.getText();
+        return new StringLit(AntlrUtil.getCoord(ctx), new QuirklString(value));
+    }
+
+    @Override
+    public Exp visitLateIncrementExpression(QuirklParser.LateIncrementExpressionContext ctx) {
+        Variable var = AntlrUtil.getVariable(program, this.scope, ctx.id());
+        if (var == null) return null;
+        return new ShiftExp(AntlrUtil.getCoord(ctx), new VariableExp(AntlrUtil.getCoord(ctx), var), ShiftExp.OP.INC);
+    }
+
+    @Override
+    public Exp visitLateDecrementExpression(QuirklParser.LateDecrementExpressionContext ctx) {
+        Variable var = AntlrUtil.getVariable(program, this.scope, ctx.id());
+        if (var == null) return null;
+        return new ShiftExp(AntlrUtil.getCoord(ctx), new VariableExp(AntlrUtil.getCoord(ctx), var), ShiftExp.OP.DEC);
     }
 }

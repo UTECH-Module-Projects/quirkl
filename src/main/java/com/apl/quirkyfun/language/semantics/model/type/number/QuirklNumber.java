@@ -11,8 +11,8 @@ import lombok.Getter;
 @Getter
 public abstract class QuirklNumber<T extends Number> extends QuirklType<T> {
 
-    public QuirklNumber(QuirklCoord coord, T value) {
-        super(coord, value);
+    public QuirklNumber(T value) {
+        super(value);
     }
 
     @Override

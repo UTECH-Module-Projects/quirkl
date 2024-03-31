@@ -50,29 +50,19 @@ public class AntlrToStatement extends AntlrToModel<Statement> {
 
     @Override
     public Statement visitFunctionDeclaration(QuirklParser.FunctionDeclarationContext ctx) {
-        QuirklParser.IdContext idCTX = ctx.id();
-        String varName = idCTX.getText();
-        Variable var = program.getVariable(varName, this.scope);
-        Function func = null;
-
-        if (var != null) {
-            program.addError(QuirklDeclarationException.variableAlreadyDeclared(AntlrUtil.getCoord(idCTX), var));
-            return null;
-        }
-        var = new Variable(AntlrUtil.getCoord(idCTX), varName);
-
-        QuirklType.TYPE varType = QuirklType.toQuirklType(ctx.FUNCTION_TYPE().getText());
-        var.setType(varType);
+        Variable var = AntlrUtil.newVariable(program, this.scope, ctx.id(), ctx.FUNCTION_TYPE().getText());
+        if (var == null) return null;
 
         QuirklParser.FunctionContext funcCtx = ctx.function();
         if (!funcCtx.isEmpty()) {
-            func = funcCtx.accept(new AntlrToFunction(program, this.scope));
+            Function func = funcCtx.accept(new AntlrToFunction(program, this.scope));
             if (func == null) return null;
-        }
-        program.addVariable(var, this.scope);
 
-        FunctionExp funcExp = new FunctionExp(AntlrUtil.getCoord(funcCtx), new QuirklFunction(AntlrUtil.getCoord(funcCtx), func));
-        return new VariableStatement(AntlrUtil.getCoord(ctx), var, funcExp);
+            FunctionExp funcExp = new FunctionExp(AntlrUtil.getCoord(funcCtx), new QuirklFunction(func));
+            return new VariableStatement(AntlrUtil.getCoord(ctx), var, funcExp);
+        }
+
+        return new VariableStatement(AntlrUtil.getCoord(ctx), var);
     }
 
     @Override
@@ -82,14 +72,8 @@ public class AntlrToStatement extends AntlrToModel<Statement> {
 
     @Override
     public Statement visitAssignment(QuirklParser.AssignmentContext ctx) {
-        QuirklParser.IdContext idCTX = ctx.id();
-        String varName = idCTX.getText();
-        Variable var = program.getVariable(varName, this.scope);
-
-        if (var == null) {
-            program.addError(QuirklDeclarationException.undeclaredVariable(AntlrUtil.getCoord(idCTX), varName));
-            return null;
-        }
+        Variable var = AntlrUtil.getVariable(program, this.scope, ctx.id());
+        if (var == null) return null;
 
         QuirklParser.ExpressionContext expCtx = ctx.expression();
         Exp exp = expCtx.accept(new AntlrToExpression(program, this.scope));
