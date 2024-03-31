@@ -1,24 +1,23 @@
 package com.apl.quirkyfun.language.semantics.model.type;
 
+import com.apl.quirkyfun.language.semantics.model.expression.operation.bool.NotBooleanExpression;
+import com.apl.quirkyfun.language.semantics.model.expression.operation.bool.TwoExpBooleanExpression;
+import com.apl.quirkyfun.language.semantics.visitor.antlr_to_model.error.runtime.QuirklFunctionException;
 import com.apl.quirkyfun.language.semantics.visitor.antlr_to_model.error.runtime.QuirklMathException;
 import com.apl.quirkyfun.language.semantics.model.type.number.QuirklDoubleNumber;
 import com.apl.quirkyfun.language.semantics.model.type.number.QuirklLongNumber;
-import com.apl.quirkyfun.language.semantics.model.util.QuirklList;
-import com.apl.quirkyfun.language.semantics.model.variable.function.Function;
-import com.apl.quirkyfun.language.semantics.model.variable.function.end_function.FunctionBody;
 import com.apl.quirkyfun.language.semantics.visitor.antlr_to_model.error.runtime.QuirklCastException;
 import com.apl.quirkyfun.language.semantics.visitor.antlr_to_model.error.runtime.QuirklOperationException;
 import lombok.Getter;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Getter
 public abstract class QuirklType<T> {
-    protected final T value;
+    protected T value;
     private static final HashMap<String, TYPE> typeMap;
-    private static final HashMap<TYPE, Map.Entry<Integer, QuirklType<?>>> hierarchy;
+    private static final HashMap<TYPE, Integer> hierarchy;
     private static final List<TYPE> numberTypes;
 
     public static enum TYPE {
@@ -36,14 +35,14 @@ public abstract class QuirklType<T> {
     }
 
     static {
-        numberTypes = List.of(TYPE.LONG_NUMBER, TYPE.DOUBLE_NUMBER);
+        numberTypes = List.of(TYPE.BOOLEAN, TYPE.LONG_NUMBER, TYPE.DOUBLE_NUMBER);
         hierarchy = new HashMap<>();
-        hierarchy.put(TYPE.VOID, Map.entry(0, new QuirklVoid()));
-        hierarchy.put(TYPE.BOOLEAN, Map.entry(1, new QuirklBoolean(false)));
-        hierarchy.put(TYPE.LONG_NUMBER, Map.entry(2, new QuirklLongNumber(0L)));
-        hierarchy.put(TYPE.DOUBLE_NUMBER, Map.entry(3, new QuirklDoubleNumber(0D)));
-        hierarchy.put(TYPE.STRING, Map.entry(4, new QuirklString("")));
-        hierarchy.put(TYPE.FUNCTION, Map.entry(5, new QuirklFunction(new Function(new QuirklList<>(), "QuirklVoid", new FunctionBody()))));
+        hierarchy.put(TYPE.VOID, 0);
+        hierarchy.put(TYPE.BOOLEAN, 1);
+        hierarchy.put(TYPE.LONG_NUMBER, 2);
+        hierarchy.put(TYPE.DOUBLE_NUMBER, 3);
+        hierarchy.put(TYPE.STRING, 4);
+        hierarchy.put(TYPE.FUNCTION, 5);
 
         typeMap = new HashMap<>();
         typeMap.put("void", TYPE.VOID);
@@ -54,73 +53,183 @@ public abstract class QuirklType<T> {
         typeMap.put("func", TYPE.FUNCTION);
     }
 
-    @SuppressWarnings("unchecked")
-    protected QuirklType() {
-        this.value = (T) this.getDefaultValue().getValue();
-    }
-
     protected QuirklType(T value) {
         this.value = value;
     }
 
-    public TYPE getType() {
+    @SuppressWarnings("unchecked")
+    public final void setValue(Object value) throws QuirklCastException {
+        try {
+            this.value = (T) value;
+        } catch (Exception e) {
+            throw QuirklCastException.notCompatible(value.toString(), this.getType());
+        }
+    }
+
+    public final TYPE getType() {
         return TYPE.valueOf(this.getClass().getSimpleName());
     }
 
-    public boolean isType(TYPE type) {
+    public final boolean isType(TYPE type) {
         return this.getType().equals(type);
     }
 
-    public QuirklType<?> getDefaultValue() {
-        var result = hierarchy.getOrDefault(this.getType(), null);
-        if (result == null) {
-            return null;
-        }
-        return result.getValue();
-    }
-
-    public boolean isNumberType() {
+    public final boolean isNumberType() {
         return isNumberType(this.getType());
     }
 
-    public boolean isSubtype(QuirklType<?> type) {
+    public final boolean isNotNumberType() {
+        return !isNumberType(this.getType());
+    }
+
+    public final boolean isSubtype(QuirklType<?> type) {
         return isSubtype(this.getType(), type.getType());
     }
 
-    public boolean isSubtype(String type) {
-        return isSubtype(this.getType(), type);
+    public final boolean isSameType(QuirklType<?> type) {
+        return isSameType(this.getType(), type.getType());
     }
 
-    public boolean isMathCompatible(QuirklType<?> type) {
-        return isMathCompatible(this.getType(), type.getType());
-    }
-
-    public boolean isMathCompatible(String type) {
-        return isMathCompatible(this.getType(), type);
-    }
-
-    private static boolean isSubtype(TYPE type1, TYPE type2) {
-        Integer hierarchy1 = hierarchy.get(type1).getKey();
-        Integer hierarchy2 = hierarchy.get(type2).getKey();
-        if (hierarchy1 == null || hierarchy2 == null) {
-            return false;
-        }
-        return hierarchy1 <= hierarchy2;
-    }
-
-    private static boolean isNumberType(TYPE type) {
-        return numberTypes.contains(type);
-    }
-
-    private static boolean isMathCompatible(TYPE type1, TYPE type2) {
-        return isNumberType(type1) && isNumberType(type2);
+    public final QuirklType<?> castToBigger(Object value, QuirklType<?> other) throws QuirklCastException {
+        return this.isSubtype(other) ? other.cast(value) : this.cast(value);
     }
 
     public static TYPE getTypeAsQuirklName(String type) {
         return typeMap.getOrDefault(type, null);
     }
 
-    public abstract QuirklType<?> add(QuirklType<?> other) throws QuirklMathException;
+    private static boolean isSubtype(TYPE type1, TYPE type2) {
+        Integer hierarchy1 = hierarchy.get(type1);
+        Integer hierarchy2 = hierarchy.get(type2);
+        if (hierarchy1 == null || hierarchy2 == null) {
+            return false;
+        }
+        return hierarchy1 <= hierarchy2;
+    }
+
+    private static boolean isSameType(TYPE type1, TYPE type2) {
+        return type1.equals(type2);
+    }
+
+    private static boolean isNumberType(TYPE type) {
+        return numberTypes.contains(type);
+    }
+
+    @Override
+    public String toString() {
+        return value.toString();
+    }
+
+    public final QuirklBoolean eq(QuirklType<?> other) throws QuirklMathException {
+        QuirklType<?> thisValue = this.castToBigger(this.value, other);
+        QuirklType<?> otherValue = other.castToBigger(other.value, this);
+        return new QuirklBoolean(thisValue.getValue().equals(otherValue.getValue()));
+    }
+
+    public final QuirklBoolean neq(QuirklType<?> other) throws QuirklMathException {
+        QuirklType<?> thisValue = this.castToBigger(this.value, other);
+        QuirklType<?> otherValue = other.castToBigger(other.value, this);
+        return new QuirklBoolean(!thisValue.getValue().equals(otherValue.getValue()));
+    }
+
+    public final QuirklBoolean gt(QuirklType<?> other) throws QuirklMathException {
+        QuirklType<?> thisValue = this.castToBigger(this.value, other);
+        QuirklType<?> otherValue = other.castToBigger(other.value, this);
+        return thisValue.compareTo(otherValue) > 0 ? QuirklBoolean.TRUE : QuirklBoolean.FALSE;
+    }
+
+    public final QuirklBoolean lt(QuirklType<?> other) throws QuirklMathException {
+        QuirklType<?> thisValue = this.castToBigger(this.value, other);
+        QuirklType<?> otherValue = other.castToBigger(other.value, this);
+        return thisValue.compareTo(otherValue) < 0 ? QuirklBoolean.TRUE : QuirklBoolean.FALSE;
+    }
+
+    public final QuirklBoolean gte(QuirklType<?> other) throws QuirklMathException {
+        QuirklType<?> thisValue = this.castToBigger(this.value, other);
+        QuirklType<?> otherValue = other.castToBigger(other.value, this);
+        return thisValue.compareTo(otherValue) >= 0 ? QuirklBoolean.TRUE : QuirklBoolean.FALSE;
+    }
+
+    public final QuirklBoolean lte(QuirklType<?> other) throws QuirklMathException {
+        QuirklType<?> thisValue = this.castToBigger(this.value, other);
+        QuirklType<?> otherValue = other.castToBigger(other.value, this);
+        return thisValue.compareTo(otherValue) <= 0 ? QuirklBoolean.TRUE : QuirklBoolean.FALSE;
+    }
+
+    public final QuirklBoolean and(QuirklType<?> other) throws QuirklMathException {
+        try {
+            return new QuirklBoolean(this.toBoolean().getValue() && other.toBoolean().getValue());
+        } catch (QuirklCastException e) {
+            throw QuirklOperationException.notCompatible(TwoExpBooleanExpression.OP.AND.toString(), this.getType(), other.getType());
+        }
+    }
+
+    public final QuirklBoolean or(QuirklType<?> other) throws QuirklMathException {
+        try {
+            return new QuirklBoolean(this.toBoolean().getValue() || other.toBoolean().getValue());
+        } catch (QuirklCastException e) {
+            throw QuirklOperationException.notCompatible(TwoExpBooleanExpression.OP.OR.toString(), this.getType(), other.getType());
+        }
+    }
+
+    public final QuirklBoolean xor(QuirklType<?> other) throws QuirklMathException {
+        try {
+            return new QuirklBoolean(this.toBoolean().getValue() ^ other.toBoolean().getValue());
+        } catch (QuirklCastException e) {
+            throw QuirklOperationException.notCompatible(TwoExpBooleanExpression.OP.XOR.toString(), this.getType(), other.getType());
+        }
+    }
+
+    public final QuirklBoolean nand(QuirklType<?> other) throws QuirklMathException {
+        try {
+            return new QuirklBoolean(!(this.toBoolean().getValue() && other.toBoolean().getValue()));
+        } catch (QuirklCastException e) {
+            throw QuirklOperationException.notCompatible(TwoExpBooleanExpression.OP.NAND.toString(), this.getType(), other.getType());
+        }
+    }
+
+    public final QuirklBoolean nor(QuirklType<?> other) throws QuirklMathException {
+        try {
+            return new QuirklBoolean(!(this.toBoolean().getValue() || other.toBoolean().getValue()));
+        } catch (QuirklCastException e) {
+            throw QuirklOperationException.notCompatible(TwoExpBooleanExpression.OP.NOR.toString(), this.getType(), other.getType());
+        }
+
+    }
+
+    public final QuirklBoolean xnor(QuirklType<?> other) throws QuirklMathException {
+        try {
+            return new QuirklBoolean(this.toBoolean().getValue() == other.toBoolean().getValue());
+        } catch (QuirklCastException e) {
+            throw QuirklOperationException.notCompatible(TwoExpBooleanExpression.OP.XNOR.toString(), this.getType(), other.getType());
+        }
+    }
+
+    public final QuirklBoolean not() throws QuirklMathException {
+        try {
+            return new QuirklBoolean(!this.toBoolean().getValue());
+        } catch (QuirklCastException e) {
+            throw QuirklOperationException.notCompatible(NotBooleanExpression.NOT, this.getType());
+        }
+    }
+
+    public abstract QuirklType<?> cast(Object value) throws QuirklCastException;
+
+    public abstract QuirklVoid toVoid() throws QuirklCastException;
+
+    public abstract QuirklBoolean toBoolean() throws QuirklCastException;
+
+    public abstract QuirklLongNumber toLong() throws QuirklCastException;
+
+    public abstract QuirklDoubleNumber toDouble() throws QuirklCastException;
+
+    public abstract QuirklString toStr() throws QuirklCastException;
+
+    public abstract QuirklFunction toFunction() throws QuirklCastException;
+
+    public abstract int compareTo(QuirklType<?> other) throws QuirklMathException;
+
+    public abstract QuirklType<?> add(QuirklType<?> other) throws QuirklMathException, QuirklFunctionException;
 
     public abstract QuirklType<?> subtract(QuirklType<?> other) throws QuirklMathException;
 
@@ -134,11 +243,5 @@ public abstract class QuirklType<T> {
 
     public abstract QuirklType<?> root(QuirklType<?> other) throws QuirklMathException;
 
-    public abstract QuirklType<?> cast(Object value) throws QuirklCastException;
-
-    public abstract QuirklType<?> castToBigger(Object value, QuirklType<?> other) throws QuirklCastException;
-
-    public abstract void checkIfCompatible(String op, QuirklType<?> other) throws QuirklOperationException;
-
-
+    public abstract QuirklType<?> negate() throws QuirklMathException;
 }

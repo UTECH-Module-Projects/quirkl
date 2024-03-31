@@ -45,6 +45,7 @@ expression
 : LPAREN expression RPAREN                                                                                                                      # BracketExpression
 | INC expression                                                                                                                                # IncrementExpression
 | DEC expression                                                                                                                                # DecrementExpression
+| MINUS expression                                                                                                                              # NegationExpression
 | expression EXP expression                                                                                                                     # ExponentExpression
 | expression ROOT expression                                                                                                                    # RootExpression
 | expression MULT expression                                                                                                                    # MultiplicationExpression
@@ -54,36 +55,33 @@ expression
 | expression MINUS expression                                                                                                                   # SubtractionExpression
 | (number | id) SUMM (number | id) LPAREN (function | id) RPAREN                                                                                # SummationExpression
 | (number | id) PRODSUMM (number | id) LPAREN (function | id) RPAREN                                                                            # ProdSummationExpression
+| NOT expression                                                                                                                                # NotBooleanExpression
+| expression EQ expression                                                                                                                      # EqualsBooleanExpression
+| expression NEQ expression                                                                                                                     # NotEqualsBooleanExpression
+| expression GT expression                                                                                                                      # GreaterThanBooleanExpression
+| expression LT expression                                                                                                                      # LessThanBooleanExpression
+| expression GTE expression                                                                                                                     # GreaterThanOrEqualsBooleanExpression
+| expression LTE expression                                                                                                                     # LessThanOrEqualsBooleanExpression
+| expression AND expression                                                                                                                     # AndBooleanExpression
+| expression OR expression                                                                                                                      # OrBooleanExpression
+| expression XOR expression                                                                                                                     # XorBooleanExpression
+| expression NAND expression                                                                                                                    # NandBooleanExpression
+| expression NOR expression                                                                                                                     # NorBooleanExpression
+| expression XNOR expression                                                                                                                    # XnorBooleanExpression
 | toBool                                                                                                                                        # ToBoolExpression
 | toBool ARROW expression COLON expression                                                                                                      # TernaryOperatorExpression
 | functionWithBody                                                                                                                              # FunctionWithBodyExpression
 | functionWithLambda                                                                                                                            # FunctionWithLambdaExpression
 | functionCall                                                                                                                                  # FunctionCallExpression
-| id                                                                                                                                            # VariableExpression
-| number                                                                                                                                        # NumberLiteralExpression
-| DIGIT+'.'DIGIT+                                                                                                                               # DecimalLiteralExpression
+| MINUS? id                                                                                                                                     # VariableExpression
+| MINUS? number                                                                                                                                 # NumberLiteralExpression
+| MINUS? DIGIT+'.'DIGIT+                                                                                                                        # DecimalLiteralExpression
 | boolean                                                                                                                                       # BooleanLiteralExpression
 | QUOTE anychar*? QUOTE                                                                                                                         # StringLiteralExpression
 ;
 
 toBool
-: QUESTMARK LPAREN booleanExpression RPAREN
-;
-
-booleanExpression
-: NOT expression                                                                    # NotBoolean
-| expression EQ expression                                                          # EqualsBoolean
-| expression NEQ expression                                                         # NotEqualsBoolean
-| expression GT expression                                                          # GreaterThanBoolean
-| expression LT expression                                                          # LessThanBoolean
-| expression GTE expression                                                         # GreaterThanOrEqualsBoolean
-| expression LTE expression                                                         # LessThanOrEqualsBoolean
-| expression AND expression                                                         # AndBoolean
-| expression OR expression                                                          # OrBoolean
-| expression XOR expression                                                         # XorBoolean
-| expression NAND expression                                                        # NandBoolean
-| expression NOR expression                                                         # NorBoolean
-| expression XNOR expression                                                        # XnorBoolean
+: QUESTMARK LPAREN expression RPAREN
 ;
 
 catchBody

@@ -147,33 +147,19 @@ public interface QuirklVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitSwitchCaseWithLambda(QuirklParser.SwitchCaseWithLambdaContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code NumberLiteralExpression}
-	 * labeled alternative in {@link QuirklParser#expression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitNumberLiteralExpression(QuirklParser.NumberLiteralExpressionContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code ExponentExpression}
-	 * labeled alternative in {@link QuirklParser#expression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitExponentExpression(QuirklParser.ExponentExpressionContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code AdditionExpression}
-	 * labeled alternative in {@link QuirklParser#expression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitAdditionExpression(QuirklParser.AdditionExpressionContext ctx);
-	/**
 	 * Visit a parse tree produced by the {@code DecrementExpression}
 	 * labeled alternative in {@link QuirklParser#expression}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitDecrementExpression(QuirklParser.DecrementExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code OrBooleanExpression}
+	 * labeled alternative in {@link QuirklParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitOrBooleanExpression(QuirklParser.OrBooleanExpressionContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code StringLiteralExpression}
 	 * labeled alternative in {@link QuirklParser#expression}.
@@ -182,19 +168,12 @@ public interface QuirklVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitStringLiteralExpression(QuirklParser.StringLiteralExpressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code ModulusExpression}
+	 * Visit a parse tree produced by the {@code LessThanBooleanExpression}
 	 * labeled alternative in {@link QuirklParser#expression}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitModulusExpression(QuirklParser.ModulusExpressionContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code DecimalLiteralExpression}
-	 * labeled alternative in {@link QuirklParser#expression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitDecimalLiteralExpression(QuirklParser.DecimalLiteralExpressionContext ctx);
+	T visitLessThanBooleanExpression(QuirklParser.LessThanBooleanExpressionContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code TernaryOperatorExpression}
 	 * labeled alternative in {@link QuirklParser#expression}.
@@ -203,19 +182,19 @@ public interface QuirklVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitTernaryOperatorExpression(QuirklParser.TernaryOperatorExpressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code VariableExpression}
-	 * labeled alternative in {@link QuirklParser#expression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitVariableExpression(QuirklParser.VariableExpressionContext ctx);
-	/**
 	 * Visit a parse tree produced by the {@code FunctionWithBodyExpression}
 	 * labeled alternative in {@link QuirklParser#expression}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitFunctionWithBodyExpression(QuirklParser.FunctionWithBodyExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code LessThanOrEqualsBooleanExpression}
+	 * labeled alternative in {@link QuirklParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLessThanOrEqualsBooleanExpression(QuirklParser.LessThanOrEqualsBooleanExpressionContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code FunctionCallExpression}
 	 * labeled alternative in {@link QuirklParser#expression}.
@@ -224,13 +203,6 @@ public interface QuirklVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitFunctionCallExpression(QuirklParser.FunctionCallExpressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code BracketExpression}
-	 * labeled alternative in {@link QuirklParser#expression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitBracketExpression(QuirklParser.BracketExpressionContext ctx);
-	/**
 	 * Visit a parse tree produced by the {@code ToBoolExpression}
 	 * labeled alternative in {@link QuirklParser#expression}.
 	 * @param ctx the parse tree
@@ -238,19 +210,19 @@ public interface QuirklVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitToBoolExpression(QuirklParser.ToBoolExpressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code SubtractionExpression}
+	 * Visit a parse tree produced by the {@code NotEqualsBooleanExpression}
 	 * labeled alternative in {@link QuirklParser#expression}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitSubtractionExpression(QuirklParser.SubtractionExpressionContext ctx);
+	T visitNotEqualsBooleanExpression(QuirklParser.NotEqualsBooleanExpressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code RootExpression}
+	 * Visit a parse tree produced by the {@code NorBooleanExpression}
 	 * labeled alternative in {@link QuirklParser#expression}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitRootExpression(QuirklParser.RootExpressionContext ctx);
+	T visitNorBooleanExpression(QuirklParser.NorBooleanExpressionContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code IncrementExpression}
 	 * labeled alternative in {@link QuirklParser#expression}.
@@ -273,6 +245,13 @@ public interface QuirklVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitDivisionExpression(QuirklParser.DivisionExpressionContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code EqualsBooleanExpression}
+	 * labeled alternative in {@link QuirklParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitEqualsBooleanExpression(QuirklParser.EqualsBooleanExpressionContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code FunctionWithLambdaExpression}
 	 * labeled alternative in {@link QuirklParser#expression}.
 	 * @param ctx the parse tree
@@ -287,12 +266,12 @@ public interface QuirklVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitBooleanLiteralExpression(QuirklParser.BooleanLiteralExpressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code MultiplicationExpression}
+	 * Visit a parse tree produced by the {@code NegationExpression}
 	 * labeled alternative in {@link QuirklParser#expression}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitMultiplicationExpression(QuirklParser.MultiplicationExpressionContext ctx);
+	T visitNegationExpression(QuirklParser.NegationExpressionContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code ProdSummationExpression}
 	 * labeled alternative in {@link QuirklParser#expression}.
@@ -301,102 +280,130 @@ public interface QuirklVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitProdSummationExpression(QuirklParser.ProdSummationExpressionContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code NumberLiteralExpression}
+	 * labeled alternative in {@link QuirklParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitNumberLiteralExpression(QuirklParser.NumberLiteralExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ExponentExpression}
+	 * labeled alternative in {@link QuirklParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExponentExpression(QuirklParser.ExponentExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code AdditionExpression}
+	 * labeled alternative in {@link QuirklParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitAdditionExpression(QuirklParser.AdditionExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code XnorBooleanExpression}
+	 * labeled alternative in {@link QuirklParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitXnorBooleanExpression(QuirklParser.XnorBooleanExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code ModulusExpression}
+	 * labeled alternative in {@link QuirklParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitModulusExpression(QuirklParser.ModulusExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code NandBooleanExpression}
+	 * labeled alternative in {@link QuirklParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitNandBooleanExpression(QuirklParser.NandBooleanExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code DecimalLiteralExpression}
+	 * labeled alternative in {@link QuirklParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDecimalLiteralExpression(QuirklParser.DecimalLiteralExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code VariableExpression}
+	 * labeled alternative in {@link QuirklParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitVariableExpression(QuirklParser.VariableExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code XorBooleanExpression}
+	 * labeled alternative in {@link QuirklParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitXorBooleanExpression(QuirklParser.XorBooleanExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code BracketExpression}
+	 * labeled alternative in {@link QuirklParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitBracketExpression(QuirklParser.BracketExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code SubtractionExpression}
+	 * labeled alternative in {@link QuirklParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSubtractionExpression(QuirklParser.SubtractionExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code NotBooleanExpression}
+	 * labeled alternative in {@link QuirklParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitNotBooleanExpression(QuirklParser.NotBooleanExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code AndBooleanExpression}
+	 * labeled alternative in {@link QuirklParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitAndBooleanExpression(QuirklParser.AndBooleanExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code RootExpression}
+	 * labeled alternative in {@link QuirklParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitRootExpression(QuirklParser.RootExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code GreaterThanBooleanExpression}
+	 * labeled alternative in {@link QuirklParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitGreaterThanBooleanExpression(QuirklParser.GreaterThanBooleanExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code MultiplicationExpression}
+	 * labeled alternative in {@link QuirklParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitMultiplicationExpression(QuirklParser.MultiplicationExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code GreaterThanOrEqualsBooleanExpression}
+	 * labeled alternative in {@link QuirklParser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitGreaterThanOrEqualsBooleanExpression(QuirklParser.GreaterThanOrEqualsBooleanExpressionContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link QuirklParser#toBool}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitToBool(QuirklParser.ToBoolContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code NotBoolean}
-	 * labeled alternative in {@link QuirklParser#booleanExpression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitNotBoolean(QuirklParser.NotBooleanContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code EqualsBoolean}
-	 * labeled alternative in {@link QuirklParser#booleanExpression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitEqualsBoolean(QuirklParser.EqualsBooleanContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code NotEqualsBoolean}
-	 * labeled alternative in {@link QuirklParser#booleanExpression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitNotEqualsBoolean(QuirklParser.NotEqualsBooleanContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code GreaterThanBoolean}
-	 * labeled alternative in {@link QuirklParser#booleanExpression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitGreaterThanBoolean(QuirklParser.GreaterThanBooleanContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code LessThanBoolean}
-	 * labeled alternative in {@link QuirklParser#booleanExpression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitLessThanBoolean(QuirklParser.LessThanBooleanContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code GreaterThanOrEqualsBoolean}
-	 * labeled alternative in {@link QuirklParser#booleanExpression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitGreaterThanOrEqualsBoolean(QuirklParser.GreaterThanOrEqualsBooleanContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code LessThanOrEqualsBoolean}
-	 * labeled alternative in {@link QuirklParser#booleanExpression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitLessThanOrEqualsBoolean(QuirklParser.LessThanOrEqualsBooleanContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code AndBoolean}
-	 * labeled alternative in {@link QuirklParser#booleanExpression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitAndBoolean(QuirklParser.AndBooleanContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code OrBoolean}
-	 * labeled alternative in {@link QuirklParser#booleanExpression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitOrBoolean(QuirklParser.OrBooleanContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code XorBoolean}
-	 * labeled alternative in {@link QuirklParser#booleanExpression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitXorBoolean(QuirklParser.XorBooleanContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code NandBoolean}
-	 * labeled alternative in {@link QuirklParser#booleanExpression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitNandBoolean(QuirklParser.NandBooleanContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code NorBoolean}
-	 * labeled alternative in {@link QuirklParser#booleanExpression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitNorBoolean(QuirklParser.NorBooleanContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code XnorBoolean}
-	 * labeled alternative in {@link QuirklParser#booleanExpression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitXnorBoolean(QuirklParser.XnorBooleanContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link QuirklParser#catchBody}.
 	 * @param ctx the parse tree

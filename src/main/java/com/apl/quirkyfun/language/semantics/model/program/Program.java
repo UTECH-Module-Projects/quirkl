@@ -20,7 +20,7 @@ public class Program {
     private final Map<String, Variable> symbolTable = new HashMap<>();
     private final List<QuirklException> errors = new ArrayList<>();
 
-    protected Program() {
+    public Program() {
         this.statements = new ArrayList<>();
     }
 
@@ -32,8 +32,8 @@ public class Program {
         this.statements.add(statement);
     }
 
-    public boolean hasVariable(String name) {
-        return this.symbolTable.containsKey(name);
+    public boolean hasVariable(String name, String scope) {
+        return this.symbolTable.containsKey(getKey(name, scope));
     }
 
     private String getKey(String name, String scope) {

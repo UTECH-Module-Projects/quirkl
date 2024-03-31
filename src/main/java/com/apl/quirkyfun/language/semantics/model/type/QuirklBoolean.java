@@ -1,68 +1,105 @@
 package com.apl.quirkyfun.language.semantics.model.type;
 
+import com.apl.quirkyfun.language.semantics.model.type.number.QuirklDoubleNumber;
+import com.apl.quirkyfun.language.semantics.model.type.number.QuirklLongNumber;
+import com.apl.quirkyfun.language.semantics.model.variable.function.Function;
+import com.apl.quirkyfun.language.semantics.visitor.antlr_to_model.error.runtime.QuirklCastException;
+import com.apl.quirkyfun.language.semantics.visitor.antlr_to_model.error.runtime.QuirklMathException;
+
 public class QuirklBoolean extends QuirklType<Boolean> {
 
+    public static final QuirklBoolean TRUE = new QuirklBoolean(true);
+    public static final QuirklBoolean FALSE = new QuirklBoolean(false);
+
     public QuirklBoolean() {
-        super();
+        super(false);
     }
 
     public QuirklBoolean(Boolean value) {
         super(value);
     }
 
-    public Number parseToNumber() {
-        return this.getValue() ? 1 : 0;
+    @Override
+    public QuirklType<?> cast(Object value) {
+        String valueStr = value.toString().toLowerCase();
+        if (value instanceof Double) return (Double) value == 0 ? FALSE : TRUE;
+        if (value instanceof Function) return valueStr.equals(QuirklFunction.EMPTY.toString()) ? FALSE : TRUE;
+        if (valueStr.isBlank()) return FALSE;
+        return switch (valueStr) {
+            case "false", "null", "0" -> FALSE;
+            default -> TRUE;
+        };
     }
 
-    public QuirklBoolean eq(QuirklBoolean other) {
-        return new QuirklBoolean(this.getValue().equals(other.getValue()));
+    @Override
+    public QuirklVoid toVoid() throws QuirklCastException {
+        return QuirklVoid.VOID;
     }
 
-    public QuirklBoolean neq(QuirklBoolean other) {
-        return new QuirklBoolean(!this.getValue().equals(other.getValue()));
+    @Override
+    public QuirklBoolean toBoolean() throws QuirklCastException {
+        return null;
     }
 
-    public QuirklBoolean and(QuirklBoolean other) {
-        return new QuirklBoolean(this.getValue() && other.getValue());
+    @Override
+    public QuirklLongNumber toLong() throws QuirklCastException {
+        return null;
     }
 
-    public QuirklBoolean or(QuirklBoolean other) {
-        return new QuirklBoolean(this.getValue() || other.getValue());
+    @Override
+    public QuirklDoubleNumber toDouble() throws QuirklCastException {
+        return null;
     }
 
-    public QuirklBoolean not() {
-        return new QuirklBoolean(!this.getValue());
+    @Override
+    public QuirklString toStr() throws QuirklCastException {
+        return null;
     }
 
-    public QuirklBoolean xor(QuirklBoolean other) {
-        return new QuirklBoolean(this.getValue() ^ other.getValue());
+    @Override
+    public QuirklFunction toFunction() throws QuirklCastException {
+        return null;
     }
 
-    public QuirklBoolean gt(QuirklBoolean other) {
-        return new QuirklBoolean(this.getValue().compareTo(other.getValue()) > 0);
+    @Override
+    public int compareTo(QuirklType<?> other) throws QuirklMathException {
+        return 0;
     }
 
-    public QuirklBoolean lt(QuirklBoolean other) {
-        return new QuirklBoolean(this.getValue().compareTo(other.getValue()) < 0);
+    @Override
+    public QuirklType<?> add(QuirklType<?> other) throws QuirklMathException {
+        return null;
     }
 
-    public QuirklBoolean gte(QuirklBoolean other) {
-        return new QuirklBoolean(this.getValue().compareTo(other.getValue()) >= 0);
+    @Override
+    public QuirklType<?> subtract(QuirklType<?> other) throws QuirklMathException {
+        return null;
     }
 
-    public QuirklBoolean lte(QuirklBoolean other) {
-        return new QuirklBoolean(this.getValue().compareTo(other.getValue()) <= 0);
+    @Override
+    public QuirklType<?> multiply(QuirklType<?> other) throws QuirklMathException {
+        return null;
     }
 
-    public QuirklBoolean nand(QuirklBoolean other) {
-        return new QuirklBoolean(!(this.getValue() && other.getValue()));
+    @Override
+    public QuirklType<?> divide(QuirklType<?> other) throws QuirklMathException {
+        return null;
     }
 
-    public QuirklBoolean nor(QuirklBoolean other) {
-        return new QuirklBoolean(!(this.getValue() || other.getValue()));
+    @Override
+    public QuirklType<?> modulus(QuirklType<?> other) throws QuirklMathException {
+        return null;
     }
 
-    public QuirklBoolean xnor(QuirklBoolean other) {
-        return new QuirklBoolean(this.getValue() == other.getValue());
+    @Override
+    public QuirklType<?> power(QuirklType<?> other) throws QuirklMathException {
+        return null;
     }
+
+    @Override
+    public QuirklType<?> root(QuirklType<?> other) throws QuirklMathException {
+        return null;
+    }
+
+
 }

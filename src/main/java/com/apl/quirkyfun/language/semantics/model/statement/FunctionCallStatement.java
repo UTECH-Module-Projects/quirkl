@@ -1,22 +1,20 @@
-package com.apl.quirkyfun.language.semantics.model.expression;
+package com.apl.quirkyfun.language.semantics.model.statement;
 
-import com.apl.quirkyfun.language.semantics.model.coordinate.QuirklCoordinate;
+import com.apl.quirkyfun.language.semantics.model.expression.Expression;
 import com.apl.quirkyfun.language.semantics.model.type.QuirklFunction;
-import com.apl.quirkyfun.language.semantics.model.variable.function.Function;
 import com.apl.quirkyfun.language.semantics.model.type.QuirklType;
+import com.apl.quirkyfun.language.semantics.model.variable.function.Function;
 import com.apl.quirkyfun.language.semantics.visitor.antlr_to_model.error.runtime.QuirklRuntimeException;
 import lombok.Getter;
 
 import java.util.List;
 
 @Getter
-public class FunctionCallExpression extends Expression {
-
+public class FunctionCallStatement extends Statement {
     private final QuirklFunction func;
     private final List<Expression> arguments;
 
-    public FunctionCallExpression(QuirklCoordinate coord, QuirklFunction func, List<Expression> arguments) {
-        super(coord);
+    public FunctionCallStatement(QuirklFunction func, List<Expression> arguments) {
         this.func = func;
         this.arguments = arguments;
     }

@@ -1,8 +1,8 @@
 package com.apl.quirkyfun.language.semantics.model.type.number;
 
-import com.apl.quirkyfun.language.semantics.model.type.QuirklBoolean;
-import com.apl.quirkyfun.language.semantics.model.type.QuirklString;
-import com.apl.quirkyfun.language.semantics.model.type.QuirklType;
+import com.apl.quirkyfun.language.semantics.model.expression.operation.TwoExpOperationExpression;
+import com.apl.quirkyfun.language.semantics.model.expression.operation.bool.TwoExpBooleanExpression;
+import com.apl.quirkyfun.language.semantics.model.type.*;
 import com.apl.quirkyfun.language.semantics.visitor.antlr_to_model.error.runtime.QuirklMathException;
 import com.apl.quirkyfun.language.semantics.visitor.antlr_to_model.error.runtime.QuirklCastException;
 import com.apl.quirkyfun.language.semantics.visitor.antlr_to_model.error.runtime.QuirklOperationException;
@@ -16,111 +16,128 @@ public abstract class QuirklNumber<T extends Number> extends QuirklType<T> {
     }
 
     @Override
-    public void checkIfCompatible(String op, QuirklType<?> other) throws QuirklOperationException {
-        if (!other.isNumberType() || !other.isType(TYPE.STRING))
-            throw QuirklOperationException.notCompatible(op, this.getType(), other.getType());
+    public QuirklVoid toVoid() {
+        return QuirklVoid.VOID;
     }
 
     @Override
-    public QuirklType<?> castToBigger(Object result, QuirklType<?> other) throws QuirklCastException {
-        return this.isSubtype(other) ? other.cast(result) : this.cast(result);
+    public QuirklBoolean toBoolean() {
+        return new QuirklBoolean(this.value.doubleValue() != 0);
     }
 
     @Override
-    public QuirklType<?> add(QuirklType<?> other) throws QuirklCastException, QuirklOperationException {
-        return switch (other.getType()) {
-            case VOID -> this.cast(this.value);
-            case BOOLEAN -> this.cast((double) this.value + (double) ((QuirklBoolean) other).parseToNumber());
-            case LONG_NUMBER, DOUBLE_NUMBER -> this.castToBigger((double) this.value + (double) other.getValue(), other);
-            case STRING -> this.cast((double) this.value + (double) ((QuirklString) other).parseToNumber());
-            default ->
-                    throw QuirklOperationException.notCompatible("+", this.getType(), other.getType());
-        };
+    public QuirklLongNumber toLong() {
+        return new QuirklLongNumber(this.value.longValue());
     }
 
     @Override
-    public QuirklType<?> subtract(QuirklType<?> other) throws QuirklCastException, QuirklOperationException {
-        return switch (other.getType()) {
-            case VOID -> this.cast(this.value);
-            case BOOLEAN -> this.cast((double) this.value - (double) ((QuirklBoolean) other).parseToNumber());
-            case LONG_NUMBER, DOUBLE_NUMBER -> this.castToBigger((double) this.value - (double) other.getValue(), other);
-            case STRING -> this.cast((double) this.value - (double) ((QuirklString) other).parseToNumber());
-            default ->
-                    throw QuirklOperationException.notCompatible("-", this.getType(), other.getType());
-        };
+    public QuirklDoubleNumber toDouble() {
+        return new QuirklDoubleNumber(this.value.doubleValue());
     }
 
     @Override
-    public QuirklType<?> multiply(QuirklType<?> other) throws QuirklCastException, QuirklOperationException {
-        return switch (other.getType()) {
-            case VOID -> this.cast(0D);
-            case BOOLEAN -> this.cast((double) this.value * (double) ((QuirklBoolean) other).parseToNumber());
-            case LONG_NUMBER, DOUBLE_NUMBER -> this.castToBigger((double) this.value * (double) other.getValue(), other);
-            case STRING -> this.cast((double) this.value * (double) ((QuirklString) other).parseToNumber());
-            default ->
-                    throw QuirklOperationException.notCompatible("*", this.getType(), other.getType());
-        };
+    public QuirklString toStr() {
+        return new QuirklString(this.value.toString());
+    }
+
+    @Override
+    public QuirklFunction toFunction() throws QuirklCastException {
+        throw QuirklCastException.notCompatible(this.toString(), TYPE.FUNCTION);
+    }
+
+    @Override
+    public QuirklType<?> add(QuirklType<?> other) throws QuirklOperationException {
+        try {
+            double result = this.toDouble().getValue() + other.toDouble().getValue();
+            return this.castToBigger(result, other);
+        } catch (QuirklCastException e) {
+            throw QuirklOperationException.notCompatible(TwoExpOperationExpression.OP.PLUS.toString(), this.getType(), other.getType());
+        }
+    }
+
+    @Override
+    public QuirklType<?> subtract(QuirklType<?> other) throws QuirklOperationException {
+        try {
+            double result = this.toDouble().getValue() - other.toDouble().getValue();
+            return this.castToBigger(result, other);
+        } catch (QuirklCastException e) {
+            throw QuirklOperationException.notCompatible(TwoExpOperationExpression.OP.MINUS.toString(), this.getType(), other.getType());
+        }
+    }
+
+    @Override
+    public QuirklType<?> multiply(QuirklType<?> other) throws QuirklOperationException {
+        try {
+            double result = this.toDouble().getValue() * other.toDouble().getValue();
+            return this.castToBigger(result, other);
+        } catch (QuirklCastException e) {
+            throw QuirklOperationException.notCompatible(TwoExpOperationExpression.OP.MULTIPLY.toString(), this.getType(), other.getType());
+        }
     }
 
     @Override
     public QuirklType<?> divide(QuirklType<?> other) throws QuirklMathException {
-        if ((other.isNumberType() && (double) other.getValue() == 0D) || other.isType(TYPE.VOID))
-            throw QuirklMathException.divideByZero();
+        try {
+            double otherValue = other.toDouble().getValue();
+            if (otherValue == 0)
+                throw QuirklMathException.divideByZero();
 
-        double otherValue = switch (other.getType()) {
-            case BOOLEAN -> (double) ((QuirklBoolean) other).parseToNumber();
-            case LONG_NUMBER, DOUBLE_NUMBER -> (double) other.getValue();
-            case STRING -> (double) ((QuirklString) other).parseToNumber();
-            default -> throw QuirklOperationException.notCompatible("/", this.getType(), other.getType());
-        };
+            double result = this.toDouble().getValue() / otherValue;
+            return this.castToBigger(result, other);
+        } catch (QuirklCastException e) {
+            throw QuirklOperationException.notCompatible(TwoExpOperationExpression.OP.DIVIDE.toString(), this.getType(), other.getType());
+        }
+    }
 
-        if (otherValue == 0D)
-            throw QuirklMathException.divideByZero();
+    @Override
+    public QuirklType<?> modulus(QuirklType<?> other) throws QuirklMathException {
+        try {
+            double otherValue = other.toDouble().getValue();
+            if (otherValue == 0)
+                throw QuirklMathException.divideByZero();
 
-        double result = (double) this.value / otherValue;
-        if (other.isType(TYPE.DOUBLE_NUMBER))
-            return other.cast(result);
+            double result = this.toDouble().getValue() / otherValue;
+            return this.castToBigger(result, other);
+        } catch (QuirklCastException e) {
+            throw QuirklOperationException.notCompatible(TwoExpOperationExpression.OP.MODULO.toString(), this.getType(), other.getType());
+        }
+    }
+
+    @Override
+    public QuirklType<?> power(QuirklType<?> other) throws QuirklMathException {
+        try {
+            double thisValue = this.toDouble().getValue();
+            double otherValue = other.toDouble().getValue();
+            if (thisValue == 0 && otherValue == 0)
+                throw QuirklMathException.zeroToZeroPower();
+            if (thisValue == 0 && otherValue < 0)
+                throw QuirklMathException.zeroToNegativePower();
+
+            double result = Math.pow(thisValue, otherValue);
+            return this.castToBigger(result, other);
+        } catch (QuirklCastException e) {
+            throw QuirklOperationException.notCompatible(TwoExpOperationExpression.OP.POWER.toString(), this.getType(), other.getType());
+        }
+    }
+
+    @Override
+    public QuirklType<?> root(QuirklType<?> other) throws QuirklMathException {
+        try {
+            double thisValue = this.toDouble().getValue();
+            double otherValue = other.toDouble().getValue();
+            if (otherValue <= 0)
+                throw QuirklMathException.invalidRoot();
+
+            double result = Math.pow(thisValue, 1 / otherValue);
+            return this.castToBigger(result, other);
+        } catch (QuirklCastException e) {
+            throw QuirklOperationException.notCompatible(TwoExpOperationExpression.OP.ROOT.toString(), this.getType(), other.getType());
+        }
+    }
+
+    @Override
+    public QuirklType<?> negate() throws QuirklMathException {
+        double result = -this.toDouble().getValue();
         return this.cast(result);
-    }
-
-    @Override
-    public QuirklType<?> modulus(QuirklType<?> other) throws QuirklCastException, QuirklOperationException {
-        if ((other.isNumberType() && (double) other.getValue() == 0D) || other.isType(TYPE.VOID))
-            throw QuirklMathException.divideByZero();
-
-        double otherValue = switch (other.getType()) {
-            case BOOLEAN -> (double) ((QuirklBoolean) other).parseToNumber();
-            case LONG_NUMBER, DOUBLE_NUMBER -> (double) other.getValue();
-            case STRING -> (double) ((QuirklString) other).parseToNumber();
-            default -> throw QuirklOperationException.notCompatible("%", this.getType(), other.getType());
-        };
-
-        if (otherValue == 0D)
-            throw QuirklMathException.divideByZero();
-
-        double result = (double) this.value % otherValue;
-        if (other.isType(TYPE.DOUBLE_NUMBER))
-            return other.cast(result);
-        return this.cast(result);
-    }
-
-    @Override
-    public QuirklType<?> power(QuirklType<?> other) throws QuirklCastException, QuirklOperationException {
-        if ((double) this.getValue() == 0D)
-        return switch (other.getType()) {
-            case VOID -> this.cast(1D);
-            case BOOLEAN -> this.cast((double) this.value * (double) ((QuirklBoolean) other).parseToNumber());
-            case LONG_NUMBER, DOUBLE_NUMBER -> this.castToBigger((double) this.value * (double) other.getValue(), other);
-            case STRING -> this.cast((double) this.value * (double) ((QuirklString) other).parseToNumber());
-            default ->
-                    throw QuirklOperationException.notCompatible("*", this.getType(), other.getType());
-        };
-    }
-
-    @Override
-    public QuirklNumber<?> root(QuirklNumber<?> other) throws QuirklMathException {
-        if ((double) other.getValue() == 0d)
-            throw new QuirklMathException("Cannot calculate the root of a number by 0");
-        return new QuirklDoubleNumber(Math.pow((double) this.value, 1d / (double) other.getValue()));
     }
 }

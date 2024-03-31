@@ -1,8 +1,8 @@
-package com.apl.quirkyfun.language.semantics.visitor.antlr_to_model.error.compile;
+package com.apl.quirkyfun.language.semantics.visitor.antlr_to_model.error.runtime;
 
 import com.apl.quirkyfun.language.semantics.visitor.antlr_to_model.error.QuirklException;
 
-public class QuirklTypeException extends QuirklException {
+public class QuirklTypeException extends QuirklRuntimeException {
     public QuirklTypeException(String message) {
         super(message);
     }

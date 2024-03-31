@@ -1,5 +1,7 @@
 package com.apl.quirkyfun.language.semantics.visitor.antlr_to_model.error.runtime;
 
+import com.apl.quirkyfun.language.semantics.model.type.QuirklType;
+
 public class QuirklCastException extends QuirklMathException {
     public QuirklCastException(String message) {
         super(message);
@@ -17,11 +19,7 @@ public class QuirklCastException extends QuirklMathException {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 
-    public static QuirklCastException invalidBooleanFormat(String str) {
-        return new QuirklCastException(String.format("Cannot parse %s to a boolean", str));
-    }
-
-    public static QuirklCastException invalidNumberFormat(String str) {
-        return new QuirklCastException(String.format("Cannot parse %s to a number", str));
+    public static QuirklCastException notCompatible(String value, QuirklType.TYPE type) {
+        return new QuirklCastException(String.format("Cannot cast %s to a %s", value, type));
     }
 }

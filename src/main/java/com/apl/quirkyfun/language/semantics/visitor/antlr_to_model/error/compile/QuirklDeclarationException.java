@@ -3,6 +3,7 @@ package com.apl.quirkyfun.language.semantics.visitor.antlr_to_model.error.compil
 import com.apl.quirkyfun.language.parser.QuirklParser;
 import com.apl.quirkyfun.language.semantics.model.coordinate.QuirklCoordinate;
 import com.apl.quirkyfun.language.semantics.model.variable.Variable;
+import com.apl.quirkyfun.language.semantics.visitor.antlr_to_model.error.runtime.QuirklFunctionException;
 
 public class QuirklDeclarationException extends QuirklCompileException {
     public QuirklDeclarationException(String message) {
@@ -21,14 +22,17 @@ public class QuirklDeclarationException extends QuirklCompileException {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 
-    public static QuirklDeclarationException undeclaredVariable(QuirklParser.IdContext idContext) {
-        String varName = idContext.getText();
-        int line = idContext.getStart().getLine();
-        int column = idContext.getStart().getCharPositionInLine();
-        return new QuirklDeclarationException(String.format("Variable %s is not defined. {line: %d, column: %d}", varName, line, column));
+    private static QuirklDeclarationException newInstance(String message, QuirklCoordinate coord) {
+        return new QuirklDeclarationException(message + getCoord(coord));
     }
 
-    public static QuirklDeclarationException variableAlreadyDeclared(Variable var, QuirklCoordinate coord) {
-        return new QuirklDeclarationException(String.format("Variable %s already declared %s. %s", var.getId(), var.getCoord(), coord));
+    public static QuirklDeclarationException undeclaredVariable(QuirklCoordinate coord, String varName) {
+        String msg = String.format("Variable %s is not defined", varName);
+        return newInstance(msg, coord);
+    }
+
+    public static QuirklDeclarationException variableAlreadyDeclared(QuirklCoordinate coord, Variable var) {
+        String msg = String.format("Variable %s already declared", var.getId());
+        return newInstance(msg, coord);
     }
 }
