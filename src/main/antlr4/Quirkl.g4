@@ -5,6 +5,7 @@ program
 : statement+ EOF
 ;
 
+//COMPLETE
 statement
 : declaration SEMICOLON                                                                                                                         # DeclarationStatement
 | assignment SEMICOLON                                                                                                                          # AssignmentStatement
@@ -20,28 +21,35 @@ statement
 | RUN LBRACE statement* RBRACE catchBody                                                                                                        # RunCatch
 ;
 
+
+//COMPLETE
 declaration
 : id COLON variableDataType (ASSIGN expression)?                                                                                                # VariableDeclaration
 | id COLON FUNCTION_TYPE (ASSIGN function)?                                                                                                     # FunctionDeclaration
 ;
 
+//COMPLETE
 assignment
 : id ASSIGN expression
 ;
 
+//COMPLETE
 functionCall
 : id LPAREN (expression (COMMA expression)*)? RPAREN
 ;
 
+//COMPLETE
 ifCondition
 : IF toBool LBRACE statement* RBRACE
 ;
 
+//COMPLETE
 switchCase
 : LBRACE statement* RBRACE                                                                                                                      # SwitchCaseWithBody
-| ARROW expression SEMICOLON                                                                                                                    # SwitchCaseWithLambda
+| ARROW statement SEMICOLON                                                                                                                    # SwitchCaseWithLambda
 ;
 
+//COMPLETE
 expression
 : MINUS? LPAREN expression RPAREN                                                                                                               # BracketExpression
 | INC expression                                                                                                                                # IncrementExpression
@@ -75,48 +83,57 @@ expression
 | functionCall                                                                                                                                  # FunctionCallExpression
 | MINUS? id                                                                                                                                     # VariableExpression
 | number                                                                                                                                        # NumberLiteralExpression
-| MINUS? DIGIT+'.'DIGIT+                                                                                                                        # DecimalLiteralExpression
+| MINUS?DIGIT+'.'DIGIT+                                                                                                                        # DecimalLiteralExpression
 | boolean                                                                                                                                       # BooleanLiteralExpression
 | QUOTE anychar*? QUOTE                                                                                                                         # StringLiteralExpression
 | id INC                                                                                                                                        # LateIncrementExpression
 | id DEC                                                                                                                                        # LateDecrementExpression
 ;
 
+//COMPLETE
 toBool
 : QUESTMARK LPAREN expression RPAREN
 ;
 
+//COMPLETE
 catchBody
 : CATCH LPAREN id RPAREN LBRACE statement* RBRACE
 ;
 
+//COMPLETE
 function
 : functionWithBody
 | functionWithLambda
 ;
 
+//COMPLETE
 functionWithBody
 : PASS LPAREN parameters? RPAREN (TO id)? COLON functionDataType LBRACE statement* (GIVE expression SEMICOLON)? RBRACE
 ;
 
+//COMPLETE
 functionWithLambda
 : PASS LPAREN parameters? RPAREN (TO id)? COLON functionDataType ARROW expression
 ;
 
+//COMPLETE
 parameters
 : parameter (COMMA parameter)*
 ;
 
+//COMPLETE
 parameter
 : id COLON variableDataType
 ;
 
+//COMPLETE
 functionDataType
 : variableDataType
 | FUNCTION_TYPE
 | VOID_TYPE
 ;
 
+//COMPLETE
 variableDataType
 : BOOL_TYPE
 | NUMBER_TYPE
@@ -124,6 +141,7 @@ variableDataType
 | STRING_TYPE
 ;
 
+//EVERYTHING BELOW IS COMPLETE
 //Identifiers
 id                  : LETTER (LETTER | DIGIT)* ;        //IDENTIFIER
 
