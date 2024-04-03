@@ -35,6 +35,11 @@ public class VariableStmt extends Stmt {
     }
 
     @Override
+    public String toString() {
+        return var + (exp != null ? " = " + exp + ";" : ";");
+    }
+
+    @Override
     public QuirklType<?> eval() throws QuirklRuntimeException {
         if (exp != null) {
             var.setValue(exp.eval());

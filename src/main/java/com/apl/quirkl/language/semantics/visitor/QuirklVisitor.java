@@ -1,4 +1,4 @@
-package com.apl.quirkl.language.semantics.visitor;// Generated from Quirkl.g4 by ANTLR 4.13.1
+package com.apl.quirkl.language.semantics.visitor;// Generated from ./src/main/antlr4/Quirkl.g4 by ANTLR 4.13.1
 import com.apl.quirkl.language.parser.QuirklParser;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
@@ -101,19 +101,19 @@ public interface QuirklVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitRunCatch(QuirklParser.RunCatchContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code VariableDeclaration}
-	 * labeled alternative in {@link QuirklParser#declaration}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitVariableDeclaration(QuirklParser.VariableDeclarationContext ctx);
-	/**
 	 * Visit a parse tree produced by the {@code FunctionDeclaration}
 	 * labeled alternative in {@link QuirklParser#declaration}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitFunctionDeclaration(QuirklParser.FunctionDeclarationContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code VariableDeclaration}
+	 * labeled alternative in {@link QuirklParser#declaration}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitVariableDeclaration(QuirklParser.VariableDeclarationContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link QuirklParser#assignment}.
 	 * @param ctx the parse tree

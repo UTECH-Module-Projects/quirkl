@@ -46,6 +46,11 @@ public class TwoExpOpExp extends OpExp {
     }
 
     @Override
+    public String toString() {
+        return this.left + " " + this.operator + " " + this.right;
+    }
+
+    @Override
     public QuirklType<?> eval() throws QuirklRuntimeException {
         return switch (this.operator) {
             case PLUS -> left.eval().add(right.eval());

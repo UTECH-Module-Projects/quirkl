@@ -26,7 +26,7 @@ public class QuirklLongNum extends QuirklNum<Long> {
         if (other instanceof Boolean) return (Boolean) other ? new QuirklLongNum(1L) : new QuirklLongNum(0L);
         String value = other.toString();
         try {
-            return new QuirklLongNum(Long.valueOf(value));
+            return new QuirklLongNum(Double.valueOf(value).longValue());
         } catch (Exception e) {
             throw QuirklCastException.notCompatible(value, TYPE.LONG_NUMBER);
         }

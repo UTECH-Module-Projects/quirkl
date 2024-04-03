@@ -95,7 +95,7 @@ public abstract class QuirklNum<T extends Number> extends QuirklType<T> {
             if (otherValue == 0)
                 throw QuirklMathException.divideByZero();
 
-            double result = this.toDouble().getValue() / otherValue;
+            double result = this.toDouble().getValue() % otherValue;
             return this.castToBigger(result, other);
         } catch (QuirklCastException e) {
             throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.MODULO.toString(), this.getType(), other.getType());

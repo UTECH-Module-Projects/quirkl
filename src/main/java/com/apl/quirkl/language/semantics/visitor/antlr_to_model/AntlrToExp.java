@@ -19,7 +19,6 @@ import com.apl.quirkl.language.semantics.model.type.QuirklString;
 import com.apl.quirkl.language.semantics.model.type.QuirklType;
 import com.apl.quirkl.language.semantics.model.type.number.QuirklDoubleNum;
 import com.apl.quirkl.language.semantics.model.type.number.QuirklLongNum;
-import com.apl.quirkl.language.semantics.model.type.value.function.QuirklFuncValue;
 import com.apl.quirkl.language.semantics.model.util.QuirklList;
 import com.apl.quirkl.language.semantics.model.variable.Var;
 import com.apl.quirkl.language.semantics.visitor.antlr_to_model.error.runtime.QuirklFunctionException;
@@ -28,6 +27,8 @@ import com.apl.quirkl.language.semantics.visitor.antlr_to_model.util.AntlrUtil;
 import lombok.Getter;
 
 import java.util.List;
+
+import static com.apl.quirkl.language.semantics.visitor.antlr_to_model.util.AntlrUtil.isEmpty;
 
 @Getter
 public class AntlrToExp extends AntlrToModel<Exp> {
@@ -202,18 +203,18 @@ public class AntlrToExp extends AntlrToModel<Exp> {
 
     @Override
     public FunctionExp visitFunctionWithBodyExpression(QuirklParser.FunctionWithBodyExpressionContext ctx) {
-        QuirklFuncValue func = ctx.functionWithBody().accept(new AntlrToFunc(this.prog, this.scope));
-        if (func == null) return null;
         QuirklCoord coord = AntlrUtil.getCoord(ctx);
-        return new FunctionExp(coord, this.scope, new QuirklFunc(func));
+        Var<QuirklFunc> quirklFuncVar = new AntlrToVar(this.prog, this.scope).visitFunctionWithBody(ctx.functionWithBody());
+        if (isEmpty(quirklFuncVar)) return null;
+        return new FunctionExp(coord, this.scope, quirklFuncVar.getValue());
     }
 
     @Override
     public FunctionExp visitFunctionWithLambdaExpression(QuirklParser.FunctionWithLambdaExpressionContext ctx) {
-        QuirklFuncValue func = ctx.functionWithLambda().accept(new AntlrToFunc(this.prog, this.scope));
-        if (func == null) return null;
         QuirklCoord coord = AntlrUtil.getCoord(ctx);
-        return new FunctionExp(coord, this.scope, new QuirklFunc(func));
+        Var<QuirklFunc> quirklFuncVar = new AntlrToVar(this.prog, this.scope).visitFunctionWithLambda(ctx.functionWithLambda());
+        if (isEmpty(quirklFuncVar)) return null;
+        return new FunctionExp(coord, this.scope, quirklFuncVar.getValue());
     }
 
     @Override
@@ -222,8 +223,9 @@ public class AntlrToExp extends AntlrToModel<Exp> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public FunctionCallExp visitFunctionCall(QuirklParser.FunctionCallContext ctx) {
-        Var<?> var = AntlrUtil.getVariable(prog, this.scope, ctx.id());
+        Var<?> var = AntlrUtil.getVariable(this, ctx.id());
         if (var == null) return null;
 
         if (!var.getType().equals(QuirklType.TYPE.FUNCTION)) {
@@ -231,31 +233,19 @@ public class AntlrToExp extends AntlrToModel<Exp> {
             return null;
         }
 
-        QuirklFunc func = (QuirklFunc) var.getValue();
-        if (func == null) {
-            this.prog.addError(QuirklFunctionException.functionNotInitialized(AntlrUtil.getCoord(ctx), var));
-            return null;
-        }
-
-        List<QuirklParser.ExpressionContext> expCtxList = ctx.expression();
-        if (func.getTotParam() != expCtxList.size()) {
-            this.prog.addError(QuirklFunctionException.invalidNumberOfArguments(AntlrUtil.getCoord(ctx), func.getValue(), func.getTotParam(), expCtxList.size()));
-            return null;
-        }
-
-        List<Exp> expList = new QuirklList<>();
-        for (QuirklParser.ExpressionContext expCtx : expCtxList) {
+        QuirklList<Exp> expList = new QuirklList<>();
+        for (QuirklParser.ExpressionContext expCtx : ctx.expression()) {
             Exp exp = expCtx.accept(this);
             if (exp == null) return null;
             expList.add(exp);
         }
 
-        return new FunctionCallExp(AntlrUtil.getCoord(ctx), this.scope, func, expList);
+        return new FunctionCallExp(AntlrUtil.getCoord(ctx), this.scope, (Var<QuirklFunc>) var, expList);
     }
 
     @Override
     public Exp visitVariableExpression(QuirklParser.VariableExpressionContext ctx) {
-        Var<?> var = AntlrUtil.getVariable(prog, this.scope, ctx.id());
+        Var<?> var = AntlrUtil.getVariable(this, ctx.id());
         if (var == null) return null;
 
         VariableExp varExp = new VariableExp(AntlrUtil.getCoord(ctx), this.scope, var);
@@ -286,20 +276,20 @@ public class AntlrToExp extends AntlrToModel<Exp> {
 
     @Override
     public StringLit visitStringLiteralExpression(QuirklParser.StringLiteralExpressionContext ctx) {
-        String value = ctx.getText();
+        String value = ctx.getText().substring(1, ctx.getText().length() - 1);
         return new StringLit(AntlrUtil.getCoord(ctx), this.scope, new QuirklString(value));
     }
 
     @Override
     public ShiftExp visitLateIncrementExpression(QuirklParser.LateIncrementExpressionContext ctx) {
-        Var<?> var = AntlrUtil.getVariable(prog, this.scope, ctx.id());
+        Var<?> var = AntlrUtil.getVariable(this, ctx.id());
         if (var == null) return null;
         return new ShiftExp(AntlrUtil.getCoord(ctx), this.scope, new VariableExp(AntlrUtil.getCoord(ctx), this.scope, var), ShiftExp.OP.INC);
     }
 
     @Override
     public ShiftExp visitLateDecrementExpression(QuirklParser.LateDecrementExpressionContext ctx) {
-        Var<?> var = AntlrUtil.getVariable(prog, this.scope, ctx.id());
+        Var<?> var = AntlrUtil.getVariable(this, ctx.id());
         if (var == null) return null;
         return new ShiftExp(AntlrUtil.getCoord(ctx), this.scope, new VariableExp(AntlrUtil.getCoord(ctx), this.scope, var), ShiftExp.OP.DEC);
     }

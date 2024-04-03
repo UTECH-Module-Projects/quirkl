@@ -5,6 +5,7 @@ import com.apl.quirkl.language.semantics.model.expression.Exp;
 import com.apl.quirkl.language.semantics.model.type.QuirklFunc;
 import com.apl.quirkl.language.semantics.model.type.QuirklType;
 import com.apl.quirkl.language.semantics.model.type.number.QuirklLongNum;
+import com.apl.quirkl.language.semantics.model.variable.Var;
 import com.apl.quirkl.language.semantics.visitor.antlr_to_model.error.runtime.QuirklOperationException;
 import com.apl.quirkl.language.semantics.visitor.antlr_to_model.error.runtime.QuirklRuntimeException;
 import lombok.Getter;
@@ -16,7 +17,7 @@ import lombok.Setter;
 public class SumExp extends OpExp {
     private Exp start;
     private Exp end;
-    private QuirklFunc sumFunc;
+    private Var<QuirklFunc> sumFunc;
     private OPERATOR operator;
 
     public enum OPERATOR {
@@ -43,12 +44,17 @@ public class SumExp extends OpExp {
         this.operator = null;
     }
 
-    public SumExp(QuirklCoord coord, String scope, Exp start, Exp end, QuirklFunc sumFunc, OPERATOR operator) {
+    public SumExp(QuirklCoord coord, String scope, Exp start, Exp end, Var<QuirklFunc> sumFunc, OPERATOR operator) {
         super(coord, scope);
         this.start = start;
         this.end = end;
         this.sumFunc = sumFunc;
         this.operator = operator;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s %s %s (%s)", start, operator, end, sumFunc);
     }
 
     @Override
@@ -73,7 +79,7 @@ public class SumExp extends OpExp {
     private QuirklLongNum summ(long startValue, long endValue) throws QuirklRuntimeException {
         long sum = 0;
         for (long i = startValue; i < endValue; i++) {
-            sum += sumFunc.call(new QuirklLongNum(i)).toLong().getValue();
+            sum += sumFunc.getValue().call(new QuirklLongNum(i)).toLong().getValue();
         }
         return new QuirklLongNum(sum);
     }
@@ -81,7 +87,7 @@ public class SumExp extends OpExp {
     private QuirklLongNum prodSumm(long startValue, long endValue) throws QuirklRuntimeException {
         long sum = 1;
         for (long i = startValue; i < endValue; i++) {
-            sum *= sumFunc.call(new QuirklLongNum(i)).toLong().getValue();
+            sum *= sumFunc.getValue().call(new QuirklLongNum(i)).toLong().getValue();
         }
         return new QuirklLongNum(sum);
     }

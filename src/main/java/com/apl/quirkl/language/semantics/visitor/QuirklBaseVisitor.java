@@ -1,4 +1,6 @@
-package com.apl.quirkl.language.semantics.visitor;// Generated from Quirkl.g4 by ANTLR 4.13.1
+// Generated from ./src/main/antlr4/Quirkl.g4 by ANTLR 4.13.1
+package com.apl.quirkl.language.semantics.visitor;
+
 import com.apl.quirkl.language.parser.QuirklParser;
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 
@@ -109,14 +111,14 @@ public class QuirklBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitVariableDeclaration(QuirklParser.VariableDeclarationContext ctx) { return visitChildren(ctx); }
+	@Override public T visitFunctionDeclaration(QuirklParser.FunctionDeclarationContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitFunctionDeclaration(QuirklParser.FunctionDeclarationContext ctx) { return visitChildren(ctx); }
+	@Override public T visitVariableDeclaration(QuirklParser.VariableDeclarationContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *

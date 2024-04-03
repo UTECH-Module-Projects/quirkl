@@ -38,12 +38,12 @@ public class AntlrToStmtProc extends AntlrToModelProc<Stmt, AntlrToStmt> {
         }
 
         QuirklParser.CatchBodyContext catchCtx = isDoWhile ? ((QuirklParser.WhileLoopContext) ctx).catchBody() : ((QuirklParser.DoWhileLoopContext) ctx).catchBody();
-        if (!catchCtx.isEmpty()) {
+        if (catchCtx != null) {
             catchStmt = this.visitor.visitCatchBody(catchCtx);
             if (catchStmt == null) return null;
         }
         whileLoopStmt.setCatchStatement(catchStmt);
 
-        return AntlrUtil.addToStatementContext(this.prog, whileLoopStmt);
+        return AntlrUtil.addToScopeContext(this.prog, whileLoopStmt);
     }
 }

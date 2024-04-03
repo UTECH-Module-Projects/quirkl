@@ -7,25 +7,25 @@ program
 
 //COMPLETE
 statement
-: declaration SEMICOLON                                                                                                                         # DeclarationStatement
+: PRINT LPAREN expression RPAREN SEMICOLON                                                                                                      # PrintStatement
+| ifCondition (ELSE ifCondition)* (ELSE LBRACE statement* RBRACE)?                                                                              # IfStatement
+| RUN LPAREN (declaration | expression)? SEMICOLON toBool SEMICOLON (assignment | expression)? RPAREN LBRACE statement* RBRACE catchBody?     # ForLoop
+| RUN CHECK toBool LBRACE statement* RBRACE catchBody?                                                                                        # WhileLoop
+| RUN LBRACE statement* RBRACE CHECK toBool (SEMICOLON | catchBody)                                                                           # DoWhileLoop
+| MATCH LPAREN expression RPAREN LBRACE ('is' LPAREN expression RPAREN switchCase)+ (ELSE switchCase)? RBRACE                                   # Switch
+| RUN LBRACE statement* RBRACE catchBody                                                                                                      # RunCatch
+| declaration SEMICOLON                                                                                                                         # DeclarationStatement
 | assignment SEMICOLON                                                                                                                          # AssignmentStatement
 | functionCall SEMICOLON                                                                                                                        # FunctionCallStatement
-| PRINT LPAREN expression RPAREN SEMICOLON                                                                                                      # PrintStatement
 | functionWithBody                                                                                                                              # FunctionWithBodyStatement
 | functionWithLambda SEMICOLON                                                                                                                  # FunctionWithLambdaStatement
-| ifCondition (ELSE ifCondition)* (ELSE LBRACE statement* RBRACE)?                                                                              # IfStatement
-| RUN LPAREN (declaration | expression)? SEMICOLON toBool SEMICOLON (assignment | expression)? RPAREN LBRACE statement* RBRACE catchBody?       # ForLoop
-| RUN CHECK toBool LBRACE statement* RBRACE catchBody?                                                                                          # WhileLoop
-| RUN LBRACE statement* RBRACE CHECK toBool (SEMICOLON | catchBody)                                                                             # DoWhileLoop
-| MATCH LPAREN expression RPAREN LBRACE (IS LPAREN expression RPAREN switchCase)+ (ELSE switchCase)? RBRACE                                     # Switch
-| RUN LBRACE statement* RBRACE catchBody                                                                                                        # RunCatch
 ;
 
 
 //COMPLETE
 declaration
-: id COLON variableDataType (ASSIGN expression)?                                                                                                # VariableDeclaration
-| id COLON FUNCTION_TYPE (ASSIGN function)?                                                                                                     # FunctionDeclaration
+: id COLON FUNCTION_TYPE (ASSIGN function)?                                                                                                     # FunctionDeclaration
+| id COLON variableDataType (ASSIGN expression)?                                                                                                # VariableDeclaration
 ;
 
 //COMPLETE
@@ -51,7 +51,7 @@ switchCase
 
 //COMPLETE
 expression
-: MINUS? LPAREN expression RPAREN                                                                                                               # BracketExpression
+: MINUS?LPAREN expression RPAREN                                                                                                               # BracketExpression
 | INC expression                                                                                                                                # IncrementExpression
 | DEC expression                                                                                                                                # DecrementExpression
 | expression EXP expression                                                                                                                     # ExponentExpression
@@ -61,8 +61,8 @@ expression
 | expression MOD expression                                                                                                                     # ModulusExpression
 | expression PLUS expression                                                                                                                    # AdditionExpression
 | expression MINUS expression                                                                                                                   # SubtractionExpression
-| (number | id) SUMM (number | id) LPAREN (function | id) RPAREN                                                                                # SummationExpression
-| (number | id) PRODSUMM (number | id) LPAREN (function | id) RPAREN                                                                            # ProdSummationExpression
+| (NUMBER | id) SUMM (NUMBER | id) LPAREN (function | id) RPAREN                                                                                # SummationExpression
+| (NUMBER | id) PRODSUMM (NUMBER | id) LPAREN (function | id) RPAREN                                                                            # ProdSummationExpression
 | NOT expression                                                                                                                                # NotBooleanExpression
 | expression EQ expression                                                                                                                      # EqualsBooleanExpression
 | expression NEQ expression                                                                                                                     # NotEqualsBooleanExpression
@@ -81,11 +81,11 @@ expression
 | functionWithBody                                                                                                                              # FunctionWithBodyExpression
 | functionWithLambda                                                                                                                            # FunctionWithLambdaExpression
 | functionCall                                                                                                                                  # FunctionCallExpression
-| MINUS? id                                                                                                                                     # VariableExpression
-| number                                                                                                                                        # NumberLiteralExpression
-| MINUS?DIGIT+'.'DIGIT+                                                                                                                        # DecimalLiteralExpression
-| boolean                                                                                                                                       # BooleanLiteralExpression
-| QUOTE anychar*? QUOTE                                                                                                                         # StringLiteralExpression
+| MINUS?id                                                                                                                                     # VariableExpression
+| NUMBER                                                                                                                                        # NumberLiteralExpression
+| DECIMAL                                                                                                                        # DecimalLiteralExpression
+| BOOLEAN                                                                                                                                       # BooleanLiteralExpression
+| STRING                                                                                                                       # StringLiteralExpression
 | id INC                                                                                                                                        # LateIncrementExpression
 | id DEC                                                                                                                                        # LateDecrementExpression
 ;
@@ -129,7 +129,6 @@ parameter
 //COMPLETE
 functionDataType
 : variableDataType
-| FUNCTION_TYPE
 | VOID_TYPE
 ;
 
@@ -139,30 +138,23 @@ variableDataType
 | NUMBER_TYPE
 | DECIMAL_TYPE
 | STRING_TYPE
+| FUNCTION_TYPE
 ;
 
 //EVERYTHING BELOW IS COMPLETE
 //Identifiers
-id                  : LETTER (LETTER | DIGIT)* ;        //IDENTIFIER
+id                  : ID ;        //IDENTIFIER
 
 //Literals
-boolean             : 'true' | 'false' ;                //BOOLEAN
-number              : MINUS? DIGIT+ ;                          //LONG
+STRING              : '"'(~[\\"])*?'"'   ;              //STRING
+BOOLEAN             : 'true' | 'false' ;                //BOOLEAN
+NUMBER              : '-'?DIGIT+ ;                      //LONG
+DECIMAL             : '-'?DIGIT+'.'DIGIT+ ;             //DECIMAL
 
-anychar
-: LETTER | DIGIT
-| LPAREN | RPAREN | LBRACE | RBRACE | COMMA | COLON | SEMICOLON | QUESTMARK
-| NOT | OR | AND | XOR
-| PLUS | MINUS | MULT | DIV | MOD | SUMM
-| OTHER_SYMBOL
-| '\\"'
-;
+ID                  : LETTER (LETTER|DIGIT)* ;           //ID
 
-LETTER              : [a-zA-Z] ;                        //LETTER
-DIGIT               : [0-9] ;                           //DIGIT
-
-OTHER_SYMBOL        : [@#$`'.] ; //SYMBOL
-QUOTE               : '"' ;                             //QUOTE
+fragment LETTER              : [a-zA-Z] ;                        //LETTER
+fragment DIGIT               : [0-9] ;                           //DIGIT
 
 //Data Types
 BOOL_TYPE           : 'bool' ;                          //BOOLEAN TYPE
@@ -224,7 +216,6 @@ RUN                 : 'run' ;                           //RUN
 CATCH               : 'catch' ;                         //CATCH
 CHECK               : 'check' ;                         //CHECK
 MATCH               : 'match' ;                         //MATCH
-IS                  : 'is' ;                            //IS
 TO                  : 'to' ;                            //TO
 IF                  : 'if' ;                            //IF
 ELSE                : 'else' ;                          //ELSE

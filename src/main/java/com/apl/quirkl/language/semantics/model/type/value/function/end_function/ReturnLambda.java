@@ -17,7 +17,7 @@ public class ReturnLambda extends EndFunc {
 
     @Override
     public String toString() {
-        return this.returnExp.toString();
+        return "-> " + this.returnExp.toString();
     }
 
     @Override

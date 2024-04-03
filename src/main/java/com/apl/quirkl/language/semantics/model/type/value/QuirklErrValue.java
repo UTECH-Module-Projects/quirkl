@@ -1,8 +1,8 @@
 package com.apl.quirkl.language.semantics.model.type.value;
 
+import com.apl.quirkl.language.semantics.model.ProgTerm;
 import com.apl.quirkl.language.semantics.model.coordinate.QuirklCoord;
 import com.apl.quirkl.language.semantics.model.program.Prog;
-import com.apl.quirkl.language.semantics.model.statement.Stmt;
 import com.apl.quirkl.language.semantics.visitor.antlr_to_model.error.QuirklException;
 import com.apl.quirkl.language.semantics.visitor.antlr_to_model.error.runtime.QuirklRuntimeException;
 import lombok.Getter;
@@ -27,12 +27,12 @@ public class QuirklErrValue {
         String curScope = scope;
         StringBuilder str = new StringBuilder(this.errMsg).append("\n");
         do {
-            Stmt stmt = prog.getStatement(curScope);
-            if (stmt != null) {
-                QuirklCoord coord = stmt.getCoord();
+            ProgTerm term = prog.getTerm(curScope);
+            if (term != null) {
+                QuirklCoord coord = term.getCoord();
 
                 str.append("\tat ").append(curScope).append(coord.toString()).append("\n");
-                curScope = stmt.getScope();
+                curScope = term.getScope();
             } else throw new QuirklRuntimeException("No statement found for scope: " + curScope);
         } while (!curScope.equals(Prog.GLOBAL_SCOPE));
         this.trace = str.toString();

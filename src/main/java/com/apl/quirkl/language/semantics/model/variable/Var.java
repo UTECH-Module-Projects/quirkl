@@ -65,7 +65,7 @@ public class Var<T extends QuirklType<?>> extends ProgTerm implements Cloneable 
 
     @Override
     public String toString() {
-        return this.id + ": " + type + (this.isInitialized() ? " = " + this.value.toString() : "");
+        return this.id + ": " + type.getSimpleType() + (this.isInitialized() ? " = " + this.value.toString() : "");
     }
 
     public void updateValue(QuirklType<?> value) throws QuirklCastException {

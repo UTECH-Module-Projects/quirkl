@@ -15,49 +15,31 @@ import lombok.Setter;
 
 import java.util.Objects;
 
+import static com.apl.quirkl.language.semantics.model.program.Prog.GLOBAL_SCOPE;
 
-@Setter
+
+@Getter
 public class QuirklFuncValue extends ProgTerm {
-    @Getter
-    private QuirklList<Var<?>> parameters;
-    @Getter
-    private QuirklType.TYPE type;
-    @Getter
-    private EndFunc body;
-    private String id;
-    @Getter
-    private boolean isAnonymous;
+
+    private final String id;
+    private final QuirklList<Var<?>> parameters;
+    private final QuirklType.TYPE type;
+    private final FuncBody body;
+    private final boolean isAnonymous;
+
+    private final String ANONYMOUS = "anonymous";
 
     public QuirklFuncValue() {
-        super(new QuirklCoord(), "");
-        this.type = QuirklType.TYPE.VOID;
-        this.parameters = new QuirklList<>();
-        this.body = new FuncBody();
-        this.id = null;
+        this(new QuirklCoord(), GLOBAL_SCOPE, "", QuirklType.TYPE.VOID, true);
     }
 
-    public QuirklFuncValue(QuirklCoord coord, String scope) {
+    public QuirklFuncValue(QuirklCoord coord, String scope, String id, QuirklType.TYPE type, boolean isAnonymous) {
         super(coord, scope);
-        this.type = QuirklType.TYPE.VOID;
-        this.parameters = new QuirklList<>();
-        this.body = new FuncBody();
-        this.id = null;
-    }
-
-    public QuirklFuncValue(QuirklCoord coord, String scope, QuirklList<Var<?>> parameters, QuirklType.TYPE type, EndFunc body, String id) {
-        super(coord, scope);
-        this.type = type;
-        this.parameters = parameters;
-        this.body = body;
         this.id = id;
-    }
-
-    public QuirklFuncValue(QuirklCoord coord, String scope, QuirklList<Var<?>> parameters, QuirklType.TYPE type, EndFunc body) {
-        super(coord, scope);
+        this.parameters = new QuirklList<>();
         this.type = type;
-        this.parameters = parameters;
-        this.body = body;
-        this.id = null;
+        this.body = new FuncBody();
+        this.isAnonymous = isAnonymous;
     }
 
     public QuirklType<?> apply(QuirklType<?>...arguments) throws QuirklRuntimeException {
@@ -70,7 +52,7 @@ public class QuirklFuncValue extends ProgTerm {
         }
         QuirklType<?> result = this.body.eval();
         this.reset();
-        if (result.getType().equals(this.type))
+        if (Objects.equals(result.getType(), this.type))
             return result;
         throw QuirklFunctionException.invalidReturnType(this.coord, this, result.getType());
     }
@@ -82,20 +64,20 @@ public class QuirklFuncValue extends ProgTerm {
     }
 
     private String idToString() {
-        return this.id == null ? "" : "to " + this.id;
+        return this.isAnonymous ? "" : " to " + this.id;
     }
 
     @Override
     public String toString() {
-        return String.format("pass (%s) to %s: %s %s",
-                String.join(", ", this.parameters.toStringArr()),
-                this.idToString(), this.type,
+        return String.format("pass (%s)%s: %s %s",
+                this.parameters.toStringBy(", "),
+                this.idToString(), this.type.getSimpleType(),
                 this.body.toString()
         );
     }
 
     public String getId() {
-        return (this.isAnonymous || this.id == null) ? "anonymous" : this.id;
+        return this.isAnonymous ? ANONYMOUS : this.id;
     }
 
     @Override

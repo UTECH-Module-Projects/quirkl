@@ -18,7 +18,9 @@ public class VariableExp extends Exp {
 
     @Override
     public String toString() {
-        return var.eval().toString();
+        if (var.eval() != null)
+            return var.eval().toString();
+        return var.getId();
     }
 
     @Override

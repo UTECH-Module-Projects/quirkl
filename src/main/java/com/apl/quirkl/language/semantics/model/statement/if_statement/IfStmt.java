@@ -11,11 +11,16 @@ import lombok.Setter;
 @Setter
 public class IfStmt extends Stmt {
 
-    private final IfCondition firstCondition;
+    private IfCondition firstCondition;
 
     public IfStmt(QuirklCoord coord, String scope, IfCondition firstCondition) {
         super(coord, scope);
         this.firstCondition = firstCondition;
+    }
+
+    public IfStmt(QuirklCoord coord, String scope) {
+        super(coord, scope);
+        this.firstCondition = new IfCondition(coord, scope);
     }
 
     @Override

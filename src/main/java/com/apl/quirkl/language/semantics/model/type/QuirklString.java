@@ -20,6 +20,11 @@ public class QuirklString extends QuirklType<String> {
     }
 
     @Override
+    public String toString() {
+        return this.value;
+    }
+
+    @Override
     public QuirklString cast(Object value) {
         return new QuirklString(value.toString());
     }

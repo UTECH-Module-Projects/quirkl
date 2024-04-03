@@ -80,12 +80,12 @@ public class IfCondition extends Stmt {
     public String toString() {
         StringBuilder str = new StringBuilder();
         if (this.condition != null)
-            str.append(String.format("if %s {\n\t%s\n}", this.condition, String.join("\n", this.body.toStringArr())));
+            str.append(String.format("if %s { %s }", this.condition, this.body.toStringBy(" ")));
         else
-            str.append(String.format("{\n\t%s\n}", String.join("\n", this.body.toStringArr())));
+            str.append(String.format("{ %s }", this.body.toStringBy(" ")));
 
         if (this.nextCondition != null)
-            str.append(String.format("else %s", this.nextCondition));
+            str.append(String.format(" else %s", this.nextCondition));
         return str.toString();
     }
 }

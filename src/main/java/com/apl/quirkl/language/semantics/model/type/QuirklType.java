@@ -20,9 +20,10 @@ public abstract class QuirklType<T> {
     private static final HashMap<String, TYPE> typeMap;
     private static final HashMap<TYPE, Integer> hierarchy;
     private static final List<TYPE> numberTypes;
+    private static final HashMap<TYPE, String> typeSimpleMap;
 
-    public static enum TYPE {
-        VOID("QuirklVoid"), BOOLEAN("QuirklBoolean"), LONG_NUMBER("QuirklLongNumber"), DOUBLE_NUMBER("QuirklDoubleNumber"), STRING("QuirklString"), FUNCTION("QuirklFunction"), ERROR("QuirklError");
+    public enum TYPE {
+        VOID("QuirklVoid"), BOOLEAN("QuirklBool"), LONG_NUMBER("QuirklLongNum"), DOUBLE_NUMBER("QuirklDoubleNum"), STRING("QuirklString"), FUNCTION("QuirklFunc"), ERROR("QuirklError");
         private final String type;
 
         TYPE(String type) {
@@ -32,6 +33,10 @@ public abstract class QuirklType<T> {
         @Override
         public String toString() {
             return this.type;
+        }
+
+        public String getSimpleType() {
+            return typeSimpleMap.get(this);
         }
     }
 
@@ -54,6 +59,15 @@ public abstract class QuirklType<T> {
         typeMap.put("str", TYPE.STRING);
         typeMap.put("func", TYPE.FUNCTION);
         typeMap.put("err", TYPE.ERROR);
+
+        typeSimpleMap = new HashMap<>();
+        typeSimpleMap.put(TYPE.VOID, "void");
+        typeSimpleMap.put(TYPE.BOOLEAN, "bool");
+        typeSimpleMap.put(TYPE.LONG_NUMBER, "num");
+        typeSimpleMap.put(TYPE.DOUBLE_NUMBER, "dec");
+        typeSimpleMap.put(TYPE.STRING, "str");
+        typeSimpleMap.put(TYPE.FUNCTION, "func");
+        typeSimpleMap.put(TYPE.ERROR, "err");
     }
 
     public QuirklType(T value) {
@@ -78,15 +92,20 @@ public abstract class QuirklType<T> {
     }
 
     public final TYPE getType() {
-        return TYPE.valueOf(this.getClass().getSimpleName());
+        String value = this.getClass().getSimpleName();
+        for(TYPE e: TYPE.values()) {
+            if(e.toString().equals(value)) {
+                return e;
+            }
+        }
+        return null;
     }
 
     public final boolean isType(TYPE type) {
-        return this.getType().equals(type);
-    }
-
-    public final boolean isNumberType() {
-        return isNumberType(this.getType());
+        TYPE thisType = this.getType();
+        if (thisType == null)
+            return false;
+        return thisType.equals(type);
     }
 
     public final boolean isNotNumberType() {
@@ -95,10 +114,6 @@ public abstract class QuirklType<T> {
 
     public final boolean isSubtype(QuirklType<?> type) {
         return isSubtype(this.getType(), type.getType());
-    }
-
-    public final boolean isSameType(QuirklType<?> type) {
-        return isSameType(this.getType(), type.getType());
     }
 
     public final QuirklType<?> castToBigger(Object value, QuirklType<?> other) throws QuirklCastException {
@@ -116,10 +131,6 @@ public abstract class QuirklType<T> {
             return false;
         }
         return hierarchy1 <= hierarchy2;
-    }
-
-    private static boolean isSameType(TYPE type1, TYPE type2) {
-        return type1.equals(type2);
     }
 
     private static boolean isNumberType(TYPE type) {

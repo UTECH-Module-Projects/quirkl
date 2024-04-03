@@ -14,6 +14,10 @@ public class QuirklFunctionException extends QuirklRuntimeException {
         return new QuirklFunctionException(message + getCoord(coord));
     }
 
+    public static QuirklFunctionException cantCreateFunction(QuirklCoord coord) {
+        return newInstance("Cannot create function", coord);
+    }
+
     public static QuirklFunctionException invalidReturnType(QuirklCoord coord, QuirklFuncValue func, QuirklType.TYPE resultType) {
         String msg = String.format("Cannot return %s as %s for anonymous function", resultType, func.getType());
         return newInstance(msg, coord);

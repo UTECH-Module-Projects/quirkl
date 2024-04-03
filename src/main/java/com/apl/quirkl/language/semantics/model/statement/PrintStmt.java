@@ -14,6 +14,11 @@ public class PrintStmt extends Stmt {
     }
 
     @Override
+    public String toString() {
+        return String.format("print(%s);", this.expression);
+    }
+
+    @Override
     public QuirklVoid eval() throws QuirklRuntimeException {
         System.out.println(expression.eval().toStr().getValue());
         return QuirklVoid.VOID;

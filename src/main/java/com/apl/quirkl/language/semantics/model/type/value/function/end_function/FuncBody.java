@@ -37,9 +37,9 @@ public class FuncBody extends EndFunc {
     @Override
     public String toString() {
         if (this.returnExp == null) {
-            return String.join("\n", this.stmts.toStringArr());
+            return "{ " + String.join(" ", this.stmts.toStringArr()) + " }";
         }
-        return String.join("{\n", this.stmts.toStringArr()) + "\ngive " + this.returnExp + ";\n}";
+        return "{ " + String.join(" ", this.stmts.toStringArr()) + " give " + this.returnExp + "; }";
     }
 
     @Override
