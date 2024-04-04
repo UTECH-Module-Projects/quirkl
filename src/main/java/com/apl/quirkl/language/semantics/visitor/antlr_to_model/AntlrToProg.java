@@ -14,6 +14,7 @@ public class AntlrToProg extends AntlrToModel<Prog> {
     @Override
     public Prog visitProgram(QuirklParser.ProgramContext ctx) {
         Prog prog = new Prog();
+        Prog.setProg(prog);
         this.setProg(prog);
         AntlrToStmt antlrToStmt = new AntlrToStmt(prog);
         QuirklList<Stmt> stmts = prog.getStmts();

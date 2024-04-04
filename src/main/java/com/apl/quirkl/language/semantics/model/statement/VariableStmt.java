@@ -47,4 +47,9 @@ public class VariableStmt extends Stmt {
         }
         return var.getValue();
     }
+
+    @Override
+    public void reset() {
+        var.reset();
+    }
 }

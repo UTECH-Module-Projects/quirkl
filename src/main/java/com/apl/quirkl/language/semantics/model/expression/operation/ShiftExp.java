@@ -10,6 +10,7 @@ import com.apl.quirkl.language.semantics.visitor.antlr_to_model.error.runtime.Qu
 public class ShiftExp extends OpExp {
     private final Exp exp;
     private final OP op;
+    private final boolean isLate;
     private final static QuirklLongNum one = new QuirklLongNum(1L);
 
     public enum OP {
@@ -27,18 +28,34 @@ public class ShiftExp extends OpExp {
         }
     }
 
-    public ShiftExp(QuirklCoord coord, String scope, Exp exp, OP op) {
+    public ShiftExp(QuirklCoord coord, String scope, Exp exp, OP op, boolean isLate) {
         super(coord, scope);
         this.exp = exp;
         this.op = op;
+        this.isLate = isLate;
     }
 
     @Override
     public QuirklType<?> eval() throws QuirklRuntimeException {
-        return switch (this.op) {
-            case INC -> increment();
-            case DEC -> decrement();
-        };
+        QuirklType<?> res;
+        if (isLate) {
+            res = exp.eval();
+            switch (this.op) {
+                case INC -> increment();
+                case DEC -> decrement();
+            }
+        } else {
+            res = switch (this.op) {
+                case INC -> increment();
+                case DEC -> decrement();
+            };
+        }
+        return res;
+    }
+
+    @Override
+    public String toString() {
+        return (isLate ? "" : op.toString()) + exp + (isLate ? op.toString() : "");
     }
 
     private QuirklType<?> increment() throws QuirklRuntimeException {

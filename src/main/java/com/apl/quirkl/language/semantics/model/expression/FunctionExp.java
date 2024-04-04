@@ -3,31 +3,27 @@ package com.apl.quirkl.language.semantics.model.expression;
 import com.apl.quirkl.language.semantics.model.coordinate.QuirklCoord;
 import com.apl.quirkl.language.semantics.model.type.QuirklFunc;
 import com.apl.quirkl.language.semantics.model.type.QuirklType;
+import com.apl.quirkl.language.semantics.model.variable.Var;
 import lombok.Getter;
 import lombok.Setter;
 
 @Setter
 @Getter
 public class FunctionExp extends Exp {
-    private QuirklFunc func;
+    private Var<QuirklFunc> varFunc;
 
-    public FunctionExp(QuirklCoord coord, String scope, QuirklFunc func) {
+    public FunctionExp(QuirklCoord coord, String scope, Var<QuirklFunc> varFunc) {
         super(coord, scope);
-        this.func = func;
-    }
-
-    public FunctionExp(QuirklCoord coord, String scope) {
-        super(coord, scope);
-        this.func = null;
+        this.varFunc = varFunc;
     }
 
     @Override
     public String toString() {
-        return func.toString();
+        return varFunc.toString();
     }
 
     @Override
-    public QuirklType<?> eval() {
-        return this.func;
+    public QuirklFunc eval() {
+        return this.varFunc.getValue();
     }
 }

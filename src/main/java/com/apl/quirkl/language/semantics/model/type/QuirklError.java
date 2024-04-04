@@ -12,8 +12,8 @@ import com.apl.quirkl.language.semantics.visitor.antlr_to_model.error.runtime.Qu
 import com.apl.quirkl.language.semantics.visitor.antlr_to_model.error.runtime.QuirklOperationException;
 
 public class QuirklError extends QuirklType<QuirklErrValue> {
-    public QuirklError(QuirklException e, Prog prog, String scope) {
-        super(new QuirklErrValue(e, prog, scope));
+    public QuirklError(QuirklException e, String scope) {
+        super(new QuirklErrValue(e, scope));
     }
 
     public void setError(QuirklException e) {

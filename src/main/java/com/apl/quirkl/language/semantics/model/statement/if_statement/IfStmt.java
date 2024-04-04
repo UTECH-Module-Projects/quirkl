@@ -33,4 +33,9 @@ public class IfStmt extends Stmt {
     public String toString() {
         return this.firstCondition.toString();
     }
+
+    @Override
+    public void reset() {
+        this.firstCondition.reset();
+    }
 }

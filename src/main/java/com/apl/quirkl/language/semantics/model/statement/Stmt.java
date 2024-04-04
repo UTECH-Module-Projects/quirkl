@@ -13,4 +13,5 @@ public abstract class Stmt extends ProgTerm {
     }
 
     public abstract QuirklType<?> eval() throws QuirklRuntimeException;
+    public void reset() {}
 }

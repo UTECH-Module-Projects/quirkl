@@ -17,26 +17,12 @@ public interface QuirklVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitProgram(QuirklParser.ProgramContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code DeclarationStatement}
+	 * Visit a parse tree produced by the {@code ErrorStatement}
 	 * labeled alternative in {@link QuirklParser#statement}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitDeclarationStatement(QuirklParser.DeclarationStatementContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code AssignmentStatement}
-	 * labeled alternative in {@link QuirklParser#statement}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitAssignmentStatement(QuirklParser.AssignmentStatementContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code FunctionCallStatement}
-	 * labeled alternative in {@link QuirklParser#statement}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitFunctionCallStatement(QuirklParser.FunctionCallStatementContext ctx);
+	T visitErrorStatement(QuirklParser.ErrorStatementContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code PrintStatement}
 	 * labeled alternative in {@link QuirklParser#statement}.
@@ -44,20 +30,6 @@ public interface QuirklVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitPrintStatement(QuirklParser.PrintStatementContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code FunctionWithBodyStatement}
-	 * labeled alternative in {@link QuirklParser#statement}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitFunctionWithBodyStatement(QuirklParser.FunctionWithBodyStatementContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code FunctionWithLambdaStatement}
-	 * labeled alternative in {@link QuirklParser#statement}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitFunctionWithLambdaStatement(QuirklParser.FunctionWithLambdaStatementContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code IfStatement}
 	 * labeled alternative in {@link QuirklParser#statement}.
@@ -101,12 +73,40 @@ public interface QuirklVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitRunCatch(QuirklParser.RunCatchContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code FunctionDeclaration}
-	 * labeled alternative in {@link QuirklParser#declaration}.
+	 * Visit a parse tree produced by the {@code DeclarationStatement}
+	 * labeled alternative in {@link QuirklParser#statement}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitFunctionDeclaration(QuirklParser.FunctionDeclarationContext ctx);
+	T visitDeclarationStatement(QuirklParser.DeclarationStatementContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code AssignmentStatement}
+	 * labeled alternative in {@link QuirklParser#statement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitAssignmentStatement(QuirklParser.AssignmentStatementContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code FunctionCallStatement}
+	 * labeled alternative in {@link QuirklParser#statement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFunctionCallStatement(QuirklParser.FunctionCallStatementContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code FunctionWithBodyStatement}
+	 * labeled alternative in {@link QuirklParser#statement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFunctionWithBodyStatement(QuirklParser.FunctionWithBodyStatementContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code FunctionWithLambdaStatement}
+	 * labeled alternative in {@link QuirklParser#statement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFunctionWithLambdaStatement(QuirklParser.FunctionWithLambdaStatementContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code VariableDeclaration}
 	 * labeled alternative in {@link QuirklParser#declaration}.
@@ -448,17 +448,17 @@ public interface QuirklVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitParameter(QuirklParser.ParameterContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link QuirklParser#functionDataType}.
+	 * Visit a parse tree produced by {@link QuirklParser#all_data_types}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitFunctionDataType(QuirklParser.FunctionDataTypeContext ctx);
+	T visitAll_data_types(QuirklParser.All_data_typesContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link QuirklParser#variableDataType}.
+	 * Visit a parse tree produced by {@link QuirklParser#variable_data_type}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitVariableDataType(QuirklParser.VariableDataTypeContext ctx);
+	T visitVariable_data_type(QuirklParser.Variable_data_typeContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link QuirklParser#id}.
 	 * @param ctx the parse tree
@@ -466,21 +466,21 @@ public interface QuirklVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitId(QuirklParser.IdContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link QuirklParser#boolean_()}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitBoolean(QuirklParser.BooleanContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link QuirklParser#number}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitNumber(QuirklParser.NumberContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link QuirklParser#anychar}.
+	 * Visit a parse tree produced by {@link QuirklParser#decimal}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitAnychar(QuirklParser.AnycharContext ctx);
+	T visitDecimal(QuirklParser.DecimalContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link QuirklParser#keywords}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitKeywords(QuirklParser.KeywordsContext ctx);
 }

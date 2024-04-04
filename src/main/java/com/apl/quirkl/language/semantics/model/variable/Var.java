@@ -24,8 +24,11 @@ public class Var<T extends QuirklType<?>> extends ProgTerm implements Cloneable 
     }
 
     @SuppressWarnings("unchecked")
-    public void setValue(QuirklType<?> value) {
-        this.value = (T) value;
+    public void setValue(QuirklType<?> value) throws QuirklCastException {
+        if (this.type != value.getType())
+            this.value = (T) value.toType(this.type);
+        else
+            this.value = (T) value;
     }
 
     @Override
@@ -80,5 +83,9 @@ public class Var<T extends QuirklType<?>> extends ProgTerm implements Cloneable 
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();
         }
+    }
+
+    public void reset() {
+        this.value = null;
     }
 }

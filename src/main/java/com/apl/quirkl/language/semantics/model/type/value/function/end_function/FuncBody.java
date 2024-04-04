@@ -52,4 +52,9 @@ public class FuncBody extends EndFunc {
 
         return returnExp.eval();
     }
+
+    public void reset() {
+        for (Stmt stmt : this.stmts)
+            stmt.reset();
+    }
 }

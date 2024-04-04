@@ -28,7 +28,7 @@ public class AntlrToVar extends AntlrToModel<Var<?>> {
 
     @Override
     public Var<?> visitParameter(QuirklParser.ParameterContext ctx) {
-        return newVariable(this, getCoord(ctx), ctx.variableDataType().getText(), ctx.id());
+        return newVariable(this, getCoord(ctx), ctx.variable_data_type().getText(), ctx.id());
     }
 
     @Override
@@ -51,7 +51,7 @@ public class AntlrToVar extends AntlrToModel<Var<?>> {
         addToScopeContext(this.prog, variable);
 
         //Return Function Variable
-        return this.proc.getFuncVar(variable, parametersCtx, idCtx, ctx.functionDataType().getText(), statementsCtx, returnExpCtx);
+        return this.proc.getFuncVar(variable, parametersCtx, idCtx, ctx.all_data_types().getText(), statementsCtx, returnExpCtx);
     }
 
     @Override
@@ -67,6 +67,6 @@ public class AntlrToVar extends AntlrToModel<Var<?>> {
         if (isEmpty(variable)) return null;
 
         //Return Function Variable
-        return this.proc.getFuncVar(variable, parametersCtx, idCtx, ctx.functionDataType().getText(), null, returnExpCtx);
+        return this.proc.getFuncVar(variable, parametersCtx, idCtx, ctx.all_data_types().getText(), null, returnExpCtx);
     }
 }

@@ -21,7 +21,7 @@ public abstract class QuirklNum<T extends Number> extends QuirklType<T> {
 
     @Override
     public QuirklBool toBoolean() {
-        return new QuirklBool(this.value.doubleValue() != 0);
+        return new QuirklBool(this.value.doubleValue() != 0.0D);
     }
 
     @Override

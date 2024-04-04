@@ -7,24 +7,30 @@ import com.apl.quirkl.language.semantics.model.type.QuirklVoid;
 import com.apl.quirkl.language.semantics.model.util.QuirklList;
 import com.apl.quirkl.language.semantics.model.variable.Var;
 import com.apl.quirkl.language.semantics.visitor.antlr_to_model.error.QuirklException;
+import com.apl.quirkl.language.semantics.visitor.antlr_to_model.error.runtime.QuirklCastException;
 import com.apl.quirkl.language.semantics.visitor.antlr_to_model.error.runtime.QuirklRuntimeException;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 public class CatchStmt extends Stmt {
-    private final Prog prog;
-    private final Var<QuirklError> errVar;
+    private Var<QuirklError> errVar;
     private final QuirklList<Stmt> body;
 
-    public CatchStmt(QuirklCoord coord, String scope, Prog prog, Var<QuirklError> errVar) {
+    public CatchStmt(QuirklCoord coord, String scope) {
         super(coord, scope);
-        this.prog = prog;
-        this.errVar = errVar;
+        this.errVar = null;
         this.body = new QuirklList<>();
     }
 
-    public void setError(QuirklException e, String scope) {
-        errVar.setValue(new QuirklError(e, this.prog, scope));
+    public void setError(QuirklException e, String scope) throws QuirklCastException {
+        errVar.setValue(new QuirklError(e, scope));
+    }
+
+    @Override
+    public String toString() {
+        return "catch (e) { " + body.toStringBy(" ") + " }";
     }
 
     @Override
@@ -33,5 +39,12 @@ public class CatchStmt extends Stmt {
             stmt.eval();
         }
         return QuirklVoid.VOID;
+    }
+
+    @Override
+    public void reset() {
+        for (Stmt stmt : body) {
+            stmt.reset();
+        }
     }
 }

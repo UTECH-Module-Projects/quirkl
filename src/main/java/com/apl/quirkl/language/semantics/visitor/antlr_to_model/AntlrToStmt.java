@@ -22,7 +22,7 @@ import com.apl.quirkl.language.semantics.visitor.antlr_to_model.processor.AntlrT
 import com.apl.quirkl.language.semantics.visitor.antlr_to_model.util.AntlrUtil;
 import lombok.Getter;
 
-import static com.apl.quirkl.language.semantics.visitor.antlr_to_model.util.AntlrUtil.isEmpty;
+import static com.apl.quirkl.language.semantics.visitor.antlr_to_model.util.AntlrUtil.*;
 
 @Getter
 public class AntlrToStmt extends AntlrToModel<Stmt> {
@@ -50,15 +50,12 @@ public class AntlrToStmt extends AntlrToModel<Stmt> {
         final QuirklCoord coord = AntlrUtil.getCoord(ctx);
 
         //Define Variable Statement
-        VariableStmt variableStmt = AntlrUtil.addToScopeContext(this.prog, new VariableStmt(coord, this.scope));
+        VariableStmt variableStmt = addToScopeContext(this.prog, new VariableStmt(coord, this.scope));
         final String varScope = AntlrUtil.getObjAddress(variableStmt);
 
-        Var<?> var = AntlrUtil.newVariable(this, coord, ctx.variableDataType().getText(), ctx.id());
+        Var<?> var = newVariable(this, coord, ctx.variable_data_type().getText(), ctx.id());
         if (var == null) return null;
         variableStmt.setVar(var);
-
-        QuirklType.TYPE varType = QuirklType.toQuirklType(ctx.variableDataType().getText());
-        var.setType(varType);
 
         Exp exp = null;
         QuirklParser.ExpressionContext expCtx = ctx.expression();
@@ -70,30 +67,6 @@ public class AntlrToStmt extends AntlrToModel<Stmt> {
         return variableStmt;
     }
 
-
-    @Override
-    public VariableStmt visitFunctionDeclaration(QuirklParser.FunctionDeclarationContext ctx) {
-        //Get Coordinate
-        final QuirklCoord coord = AntlrUtil.getCoord(ctx);
-
-        //Define Variable Statement
-        VariableStmt variableStmt = AntlrUtil.addToScopeContext(this.prog, new VariableStmt(coord, this.scope));
-
-        //Get Variable ID
-        Var<?> varID = AntlrUtil.newVariable(this, coord, QuirklType.TYPE.FUNCTION.getSimpleType(), ctx.id());
-        if (isEmpty(varID)) return null;
-        variableStmt.setVar(varID);
-
-        //Check if Variable is Initialized to a Function
-        if (!isEmpty(ctx.function())) {
-            AntlrToVar antlrToVar = new AntlrToVar(this.prog, this.scope);
-            Var<QuirklFunc> varFunc = antlrToVar.visitFunction(ctx.function());
-            if (isEmpty(varFunc)) return null;
-            varID.setValue(varFunc.getValue());
-        }
-        return variableStmt;
-    }
-
     @Override
     public Stmt visitAssignmentStatement(QuirklParser.AssignmentStatementContext ctx) {
         return ctx.assignment().accept(this);
@@ -101,35 +74,35 @@ public class AntlrToStmt extends AntlrToModel<Stmt> {
 
     @Override
     public VariableStmt visitAssignment(QuirklParser.AssignmentContext ctx) {
-        Var<?> var = AntlrUtil.getVariable(this, ctx.id());
+        Var<?> var = getVariable(this, ctx.id());
         if (var == null) return null;
 
         QuirklParser.ExpressionContext expCtx = ctx.expression();
         Exp exp = expCtx.accept(new AntlrToExp(this.prog, this.scope));
         if (exp == null) return null;
 
-        return AntlrUtil.addToScopeContext(this.prog, new VariableStmt(AntlrUtil.getCoord(ctx), this.scope, var, exp));
+        return addToScopeContext(this.prog, new VariableStmt(AntlrUtil.getCoord(ctx), this.scope, var, exp));
     }
 
     @Override
     public FuncCallStmt visitFunctionCallStatement(QuirklParser.FunctionCallStatementContext ctx) {
         FunctionCallExp exp = new AntlrToExp(this.prog, this.scope).visitFunctionCall(ctx.functionCall());
         if (exp == null) return null;
-        return AntlrUtil.addToScopeContext(this.prog, new FuncCallStmt(AntlrUtil.getCoord(ctx), this.scope, exp.getVarFunc(), exp.getArguments()));
+        return addToScopeContext(this.prog, new FuncCallStmt(AntlrUtil.getCoord(ctx), this.scope, exp.getVarFunc(), exp.getArguments()));
     }
 
     @Override
     public PrintStmt visitPrintStatement(QuirklParser.PrintStatementContext ctx) {
         Exp exp = ctx.expression().accept(new AntlrToExp(prog, this.scope));
         if (exp == null) return null;
-        return AntlrUtil.addToScopeContext(this.prog, new PrintStmt(AntlrUtil.getCoord(ctx), this.scope, exp));
+        return addToScopeContext(this.prog, new PrintStmt(AntlrUtil.getCoord(ctx), this.scope, exp));
     }
 
     @Override
     public VariableStmt visitFunctionWithBodyStatement(QuirklParser.FunctionWithBodyStatementContext ctx) {
         final QuirklCoord coord = AntlrUtil.getCoord(ctx);
 
-        VariableStmt variableStmt = AntlrUtil.addToScopeContext(this.prog, new VariableStmt(coord, this.scope));
+        VariableStmt variableStmt = addToScopeContext(this.prog, new VariableStmt(coord, this.scope));
 
         AntlrToVar antlrToVar = new AntlrToVar(this.prog, this.scope);
         Var<QuirklFunc> varFunc = antlrToVar.visitFunctionWithBody(ctx.functionWithBody());
@@ -143,7 +116,7 @@ public class AntlrToStmt extends AntlrToModel<Stmt> {
     public Stmt visitFunctionWithLambdaStatement(QuirklParser.FunctionWithLambdaStatementContext ctx) {
         final QuirklCoord coord = AntlrUtil.getCoord(ctx);
 
-        VariableStmt variableStmt = AntlrUtil.addToScopeContext(this.prog, new VariableStmt(coord, this.scope));
+        VariableStmt variableStmt = addToScopeContext(this.prog, new VariableStmt(coord, this.scope));
 
         AntlrToVar antlrToVar = new AntlrToVar(this.prog, this.scope);
         Var<QuirklFunc> varFunc = antlrToVar.visitFunctionWithLambda(ctx.functionWithLambda());
@@ -158,7 +131,7 @@ public class AntlrToStmt extends AntlrToModel<Stmt> {
         IfCondition curCond = null;
         IfCondition firstCond = null;
         boolean flag = true;
-        IfStmt ifStmt = AntlrUtil.addToScopeContext(this.prog, new IfStmt(AntlrUtil.getCoord(ctx), this.scope));
+        IfStmt ifStmt = addToScopeContext(this.prog, new IfStmt(AntlrUtil.getCoord(ctx), this.scope));
         for (QuirklParser.IfConditionContext ifCtx : ctx.ifCondition()) {
             IfCondition ifCond = this.visitIfCondition(ifCtx);
             if (ifCond == null) return null;
@@ -173,8 +146,8 @@ public class AntlrToStmt extends AntlrToModel<Stmt> {
         }
         ifStmt.setFirstCondition(firstCond);
 
-        if (ctx.statement() != null) {
-            IfCondition lastCond = AntlrUtil.addToScopeContext(this.prog, new IfCondition(AntlrUtil.getCoord(ctx), this.scope));
+        if (!ctx.statement().isEmpty()) {
+            IfCondition lastCond = addToScopeContext(this.prog, new IfCondition(AntlrUtil.getCoord(ctx), this.scope));
             QuirklList<Stmt> body = lastCond.getBody();
             AntlrToStmt antlrToStmt = new AntlrToStmt(this.prog, AntlrUtil.getObjAddress(lastCond));
             for (QuirklParser.StatementContext stmtCtx : ctx.statement()) {
@@ -184,9 +157,6 @@ public class AntlrToStmt extends AntlrToModel<Stmt> {
             }
             assert curCond != null;
             curCond.setNextCondition(lastCond);
-        } else if (ctx.LBRACE().getText() != null) {
-            assert curCond != null;
-            curCond.setNextCondition(AntlrUtil.addToScopeContext(this.prog, new IfCondition(AntlrUtil.getCoord(ctx), this.scope)));
         }
         return ifStmt;
     }
@@ -195,7 +165,7 @@ public class AntlrToStmt extends AntlrToModel<Stmt> {
     public IfCondition visitIfCondition(QuirklParser.IfConditionContext ctx) {
         ToBoolExp cond = new AntlrToExp(prog, this.scope).visitToBool(ctx.toBool());
         if (cond == null) return null;
-        IfCondition ifCond = AntlrUtil.addToScopeContext(this.prog, new IfCondition(AntlrUtil.getCoord(ctx), this.scope, cond));
+        IfCondition ifCond = addToScopeContext(this.prog, new IfCondition(AntlrUtil.getCoord(ctx), this.scope, cond));
 
         QuirklList<Stmt> body = ifCond.getBody();
 
@@ -214,13 +184,11 @@ public class AntlrToStmt extends AntlrToModel<Stmt> {
         Stmt update = null;
         CatchStmt catchStmt = null;
 
-        AntlrToExp expVisitor = new AntlrToExp(prog, this.scope);
-        ToBoolExp cond = expVisitor.visitToBool(ctx.toBool());
-        if (cond == null) return null;
-        ForLoopStmt forLoopStmt = AntlrUtil.addToScopeContext(this.prog, new ForLoopStmt(AntlrUtil.getCoord(ctx), this.scope, cond));
+        ForLoopStmt forLoopStmt = addToScopeContext(this.prog, new ForLoopStmt(AntlrUtil.getCoord(ctx), this.scope));
+        AntlrToExp expVisitor = new AntlrToExp(prog, getObjAddress(forLoopStmt));
 
         if (ctx.declaration() != null) {
-            init = ctx.declaration().accept(this);
+            init = ctx.declaration().accept(new AntlrToStmt(this.prog, expVisitor.getScope()));
             if (init == null) return null;
         } else if (ctx.getChild(2) instanceof QuirklParser.ExpressionContext expCtx) {
             Exp exp = expCtx.accept(expVisitor);
@@ -228,6 +196,10 @@ public class AntlrToStmt extends AntlrToModel<Stmt> {
             init = new ExpStmt(AntlrUtil.getCoord(expCtx), this.scope, exp);
         }
         forLoopStmt.setInit(init);
+
+        ToBoolExp cond = expVisitor.visitToBool(ctx.toBool());
+        if (cond == null) return null;
+        forLoopStmt.setCondition(cond);
 
         if (ctx.assignment() != null) {
             update = ctx.assignment().accept(this);
@@ -264,11 +236,13 @@ public class AntlrToStmt extends AntlrToModel<Stmt> {
     @SuppressWarnings("unchecked")
     public CatchStmt visitCatchBody(QuirklParser.CatchBodyContext ctx) {
         final QuirklCoord coord = AntlrUtil.getCoord(ctx);
-        Var<QuirklError> errVar = (Var<QuirklError>) AntlrUtil.newVariable(this, coord, QuirklType.TYPE.ERROR.toString(), ctx.id());
-        if (errVar == null) return null;
-        CatchStmt catchStmt = AntlrUtil.addToScopeContext(this.prog, new CatchStmt(coord, this.scope, this.prog, errVar));
+        CatchStmt catchStmt = addToScopeContext(this.prog, new CatchStmt(coord, this.scope));
+        AntlrToStmt antlrToStmt = new AntlrToStmt(prog, catchStmt.getMyScope());
 
-        AntlrToStmt antlrToStmt = new AntlrToStmt(prog, AntlrUtil.getObjAddress(catchStmt));
+        Var<QuirklError> errVar = (Var<QuirklError>) newVariable(antlrToStmt, coord, QuirklType.TYPE.ERROR.getSimpleType(), ctx.id());
+        if (errVar == null) return null;
+        catchStmt.setErrVar(errVar);
+
         QuirklList<Stmt> body = catchStmt.getBody();
         for (QuirklParser.StatementContext stmtCtx : ctx.statement()) {
             Stmt stmt = stmtCtx.accept(antlrToStmt);
@@ -276,6 +250,13 @@ public class AntlrToStmt extends AntlrToModel<Stmt> {
             body.add(stmt);
         }
         return catchStmt;
+    }
+
+    @Override
+    public Stmt visitErrorStatement(QuirklParser.ErrorStatementContext ctx) {
+        Exp exp = ctx.expression().accept(new AntlrToExp(prog, this.scope));
+        if (exp == null) return null;
+        return addToScopeContext(this.prog, new ErrorStmt(AntlrUtil.getCoord(ctx), this.scope, exp));
     }
 
     @Override
@@ -294,7 +275,7 @@ public class AntlrToStmt extends AntlrToModel<Stmt> {
         Exp key = ctx.expression(0).accept(new AntlrToExp(prog, this.scope));
         if (key == null) return null;
 
-        SwitchStmt switchStmt = AntlrUtil.addToScopeContext(this.prog, new SwitchStmt(AntlrUtil.getCoord(ctx), this.scope, key));
+        SwitchStmt switchStmt = addToScopeContext(this.prog, new SwitchStmt(AntlrUtil.getCoord(ctx), this.scope, key));
 
         QuirklList<SwitchCaseStatement> cases = switchStmt.getCases();
         AntlrToStmt antlrToStmt = new AntlrToStmt(prog, AntlrUtil.getObjAddress(switchStmt));
@@ -319,7 +300,7 @@ public class AntlrToStmt extends AntlrToModel<Stmt> {
 
     @Override
     public SwitchCaseStatement visitSwitchCaseWithBody(QuirklParser.SwitchCaseWithBodyContext ctx) {
-        SwitchCaseStatement switchCase = AntlrUtil.addToScopeContext(this.prog, new SwitchCaseStatement(AntlrUtil.getCoord(ctx), this.scope));
+        SwitchCaseStatement switchCase = addToScopeContext(this.prog, new SwitchCaseStatement(AntlrUtil.getCoord(ctx), this.scope));
 
         AntlrToStmt antlrToStmt = new AntlrToStmt(prog, AntlrUtil.getObjAddress(switchCase));
         QuirklList<Stmt> body = switchCase.getBody();
@@ -333,7 +314,7 @@ public class AntlrToStmt extends AntlrToModel<Stmt> {
 
     @Override
     public Stmt visitSwitchCaseWithLambda(QuirklParser.SwitchCaseWithLambdaContext ctx) {
-        SwitchCaseStatement switchCase = AntlrUtil.addToScopeContext(this.prog, new SwitchCaseStatement(AntlrUtil.getCoord(ctx), this.scope));
+        SwitchCaseStatement switchCase = addToScopeContext(this.prog, new SwitchCaseStatement(AntlrUtil.getCoord(ctx), this.scope));
 
         AntlrToStmt antlrToStmt = new AntlrToStmt(prog, AntlrUtil.getObjAddress(switchCase));
         QuirklList<Stmt> body = switchCase.getBody();
@@ -348,7 +329,7 @@ public class AntlrToStmt extends AntlrToModel<Stmt> {
         CatchStmt catchStmt = this.visitCatchBody(ctx.catchBody());
         if (catchStmt == null) return null;
 
-        RunCatchStmt runCatchStmt = AntlrUtil.addToScopeContext(this.prog, new RunCatchStmt(AntlrUtil.getCoord(ctx), this.scope, catchStmt));
+        RunCatchStmt runCatchStmt = addToScopeContext(this.prog, new RunCatchStmt(AntlrUtil.getCoord(ctx), this.scope, catchStmt));
         QuirklList<Stmt> body = runCatchStmt.getBody();
         AntlrToStmt antlrToStmt = new AntlrToStmt(prog, AntlrUtil.getObjAddress(runCatchStmt));
         for (QuirklParser.StatementContext stmtCtx : ctx.statement()) {

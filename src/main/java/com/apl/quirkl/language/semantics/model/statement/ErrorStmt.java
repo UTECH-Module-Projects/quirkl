@@ -4,23 +4,27 @@ import com.apl.quirkl.language.semantics.model.coordinate.QuirklCoord;
 import com.apl.quirkl.language.semantics.model.expression.Exp;
 import com.apl.quirkl.language.semantics.model.type.QuirklType;
 import com.apl.quirkl.language.semantics.visitor.antlr_to_model.error.runtime.QuirklRuntimeException;
+import lombok.Getter;
+import lombok.Setter;
 
-public class ExpStmt extends Stmt {
+@Getter
+@Setter
+public class ErrorStmt extends Stmt {
 
-    private final Exp exp;
+    private Exp exp;
 
-    public ExpStmt(QuirklCoord coord, String scope, Exp exp) {
+    public ErrorStmt(QuirklCoord coord, String scope, Exp exp) {
         super(coord, scope);
         this.exp = exp;
     }
 
     @Override
-    public QuirklType<?> eval() throws QuirklRuntimeException {
-        return exp.eval();
+    public String toString() {
+        return "err: " + exp + ";";
     }
 
     @Override
-    public String toString() {
-        return exp.toString();
+    public QuirklType<?> eval() throws QuirklRuntimeException {
+        throw new QuirklRuntimeException(exp.eval().toStr().getValue());
     }
 }

@@ -18,13 +18,19 @@ public class RunCatchStmt extends Stmt {
     }
 
     @Override
+    public String toString() {
+        return "run { " + this.body.toStringBy(" ") + " } " + this.catchStmt;
+    }
+
+    @Override
     public QuirklVoid eval() throws QuirklRuntimeException {
+        int i = 0;
         try {
-            for (Stmt stmt : body) {
-                stmt.eval();
+            for (; i < this.body.size(); i++) {
+                this.body.get(i).eval();
             }
         } catch (QuirklRuntimeException e) {
-            catchStmt.setError(e, this.getScope());
+            catchStmt.setError(e, this.body.get(i).getMyScope());
             catchStmt.eval();
         }
         return QuirklVoid.VOID;

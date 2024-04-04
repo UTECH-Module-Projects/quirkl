@@ -37,4 +37,13 @@ public class SwitchStmt extends Stmt {
             defaultCase.eval();
         return null;
     }
+
+    @Override
+    public void reset() {
+        for (SwitchCaseStatement switchCase : cases) {
+            switchCase.reset();
+        }
+        if (defaultCase != null)
+            defaultCase.reset();
+    }
 }

@@ -17,13 +17,14 @@ public class QuirklErrValue {
     private String trace;
 
     @SneakyThrows
-    public QuirklErrValue(QuirklException e, Prog prog, String scope) {
+    public QuirklErrValue(QuirklException e, String scope) {
         this.errMsg = e.getMessage();
         this.errType = e.getErrorType();
-        this.parseTrace(prog, scope);
+        this.parseTrace(scope);
     }
 
-    private void parseTrace(Prog prog, String scope) throws QuirklRuntimeException {
+    private void parseTrace(String scope) {
+        Prog prog = Prog.INSTANCE;
         String curScope = scope;
         StringBuilder str = new StringBuilder(this.errMsg).append("\n");
         do {
@@ -31,9 +32,9 @@ public class QuirklErrValue {
             if (term != null) {
                 QuirklCoord coord = term.getCoord();
 
-                str.append("\tat ").append(curScope).append(coord.toString()).append("\n");
+                str.append("\tat ").append(term.getSimpleName()).append(":").append(coord.toString()).append("\n");
                 curScope = term.getScope();
-            } else throw new QuirklRuntimeException("No statement found for scope: " + curScope);
+            } else break;
         } while (!curScope.equals(Prog.GLOBAL_SCOPE));
         this.trace = str.toString();
     }

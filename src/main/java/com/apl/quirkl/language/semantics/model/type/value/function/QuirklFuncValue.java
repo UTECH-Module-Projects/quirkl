@@ -59,8 +59,9 @@ public class QuirklFuncValue extends ProgTerm {
 
     public void reset() {
         for (Var<?> parameter : this.parameters) {
-            parameter.setValue(null);
+            parameter.reset();
         }
+        body.reset();
     }
 
     private String idToString() {

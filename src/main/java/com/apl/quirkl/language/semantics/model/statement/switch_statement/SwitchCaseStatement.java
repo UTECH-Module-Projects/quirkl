@@ -29,4 +29,11 @@ public class SwitchCaseStatement extends Stmt {
         }
         return QuirklVoid.VOID;
     }
+
+    @Override
+    public void reset() {
+        for (Stmt stmt : body) {
+            stmt.reset();
+        }
+    }
 }

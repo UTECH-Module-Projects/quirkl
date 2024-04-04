@@ -14,25 +14,44 @@ public class Main {
                 """
                         a: num = -2;
                         b: num = 4;
-                        
+                        **--
                         pass (a: num, b: num, fun: func) to sumWithFunc: num {
                             give a ~* b (fun);
                         }
                         
                         pass (x: num) to squared: num {
-                            runZero: bool = ?(x);
+                            isZero: bool = !?(x);
                             result: num;
+                            result = x * x;
+                            **--
                             if ?(isZero) {
                                 result = -34;
                             } else {
-                                result: num = x * x;
+                                result = x * x;
                             }
+                            --**
                             
                             print("" + x + " * " + x + " = " + result);
                             give result;
                         }
                         
-                        print("squared sum from " + a + " to " + b + " = " + sumWithFunc(a, b, squared));
+                        myResult: dec = sumWithFunc(a, b, squared);
+                        print("squared sum from " + a + " to " + b + " = " + myResult);
+                        --**
+                        
+                        run (x: num = 3; ?(x < 13); x++) {
+                            if ?(x == 3) {
+                                err: "No Number 3!!!";
+                            }
+                        } catch (e) {
+                            print(e);
+                        }
+                        
+                        run {
+                            test: func = 5;
+                        } catch (e) {
+                            print(e);
+                        }
                         """;
 
         /*
@@ -60,14 +79,16 @@ public class Main {
         AntlrToProg visitor = new AntlrToProg();
         Prog prog = visitor.visitProgram(parser.program());
 
-//        prog.printState();
 
         if (prog.hasError()) {
             prog.getErrors().getFirst().printStackTrace();
             return;
         }
 
+        prog.printState();
+
         try {
+            System.out.println(prog);
             prog.eval();
         } catch (QuirklRuntimeException e) {
             e.printStackTrace();

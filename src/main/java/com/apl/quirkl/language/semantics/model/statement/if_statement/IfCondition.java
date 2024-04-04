@@ -23,20 +23,6 @@ public class IfCondition extends Stmt {
         this.nextCondition = null;
     }
 
-    public IfCondition(QuirklCoord coord, String scope, ToBoolExp condition, QuirklList<Stmt> body, IfCondition nextCondition) {
-        super(coord, scope);
-        this.condition = condition;
-        this.body = body;
-        this.nextCondition = nextCondition;
-    }
-
-    public IfCondition(QuirklCoord coord, String scope, QuirklList<Stmt> body, IfCondition nextCondition) {
-        super(coord, scope);
-        this.body = body;
-        this.nextCondition = nextCondition;
-        this.condition = null;
-    }
-
     public IfCondition(QuirklCoord coord, String scope, QuirklList<Stmt> body) {
         super(coord, scope);
         this.body = body;
@@ -58,21 +44,17 @@ public class IfCondition extends Stmt {
         this.nextCondition = null;
     }
 
-    public boolean hasCondition() {
-        return this.condition != null;
-    }
-
-    public boolean hasNext() {
-        return this.nextCondition != null;
-    }
-
     public QuirklVoid eval() throws QuirklRuntimeException {
-        if (this.condition != null && this.condition.eval().getValue()) {
+        if (this.condition == null) {
+            for (Stmt stmt : body)
+                stmt.eval();
+        } else if (this.condition.eval().getValue()) {
             for (Stmt stmt : body)
                 stmt.eval();
         } else if (this.nextCondition != null) {
             this.nextCondition.eval();
         }
+
         return QuirklVoid.VOID;
     }
 
@@ -87,5 +69,13 @@ public class IfCondition extends Stmt {
         if (this.nextCondition != null)
             str.append(String.format(" else %s", this.nextCondition));
         return str.toString();
+    }
+
+    @Override
+    public void reset() {
+        for (Stmt stmt : body)
+            stmt.reset();
+        if (this.nextCondition != null)
+            this.nextCondition.reset();
     }
 }

@@ -247,6 +247,18 @@ public abstract class QuirklType<T> {
         }
     }
 
+    public QuirklType<?> toType(TYPE type) throws QuirklCastException {
+        return switch (type) {
+            case VOID -> this.toVoid();
+            case BOOLEAN -> this.toBoolean();
+            case LONG_NUMBER -> this.toLong();
+            case DOUBLE_NUMBER -> this.toDouble();
+            case STRING -> this.toStr();
+            case FUNCTION -> this.toFunction();
+            default -> throw QuirklCastException.notCompatible(this.toString(), type);
+        };
+    }
+
     public abstract QuirklType<?> cast(Object value) throws QuirklCastException;
 
     public abstract QuirklVoid toVoid() throws QuirklCastException;

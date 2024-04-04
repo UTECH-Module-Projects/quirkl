@@ -18,7 +18,7 @@ public class QuirklDeclarationException extends QuirklCompileException {
     }
 
     public static QuirklDeclarationException variableAlreadyDeclared(QuirklCoord coord, Var<?> var) {
-        String msg = String.format("Variable %s already declared at %s", var.getId(), var.getCoord());
+        String msg = String.format("Variable %s already declared", var.getId());
         return newInstance(msg, coord);
     }
 }

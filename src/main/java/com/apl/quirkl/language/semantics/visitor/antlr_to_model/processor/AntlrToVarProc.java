@@ -15,6 +15,7 @@ import com.apl.quirkl.language.semantics.model.variable.Var;
 import com.apl.quirkl.language.semantics.visitor.antlr_to_model.AntlrToExp;
 import com.apl.quirkl.language.semantics.visitor.antlr_to_model.AntlrToStmt;
 import com.apl.quirkl.language.semantics.visitor.antlr_to_model.AntlrToVar;
+import lombok.SneakyThrows;
 
 import java.util.List;
 
@@ -27,6 +28,7 @@ public class AntlrToVarProc extends AntlrToModelProc<Var<?>, AntlrToVar> {
         super(prog, visitor);
     }
 
+    @SneakyThrows
     public Var<QuirklFunc> getFuncVar(Var<QuirklFunc> funcVar, ParametersContext parametersCtx, IdContext idCtx, String type, List<StatementContext> statementsCtx, ExpressionContext returnExpCtx) {
         String varScope = getObjAddress(funcVar);
 

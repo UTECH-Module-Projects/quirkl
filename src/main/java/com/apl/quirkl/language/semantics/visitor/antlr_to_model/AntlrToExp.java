@@ -26,8 +26,6 @@ import com.apl.quirkl.language.semantics.visitor.antlr_to_model.processor.AntlrT
 import com.apl.quirkl.language.semantics.visitor.antlr_to_model.util.AntlrUtil;
 import lombok.Getter;
 
-import java.util.List;
-
 import static com.apl.quirkl.language.semantics.visitor.antlr_to_model.util.AntlrUtil.isEmpty;
 
 @Getter
@@ -56,14 +54,14 @@ public class AntlrToExp extends AntlrToModel<Exp> {
     public ShiftExp visitIncrementExpression(QuirklParser.IncrementExpressionContext ctx) {
         Exp result = ctx.expression().accept(this);
         if (result == null) return null;
-        return new ShiftExp(AntlrUtil.getCoord(ctx), this.scope, result, ShiftExp.OP.INC);
+        return new ShiftExp(AntlrUtil.getCoord(ctx), this.scope, result, ShiftExp.OP.INC, false);
     }
 
     @Override
     public ShiftExp visitDecrementExpression(QuirklParser.DecrementExpressionContext ctx) {
         Exp result = ctx.expression().accept(this);
         if (result == null) return null;
-        return new ShiftExp(AntlrUtil.getCoord(ctx), this.scope, result, ShiftExp.OP.DEC);
+        return new ShiftExp(AntlrUtil.getCoord(ctx), this.scope, result, ShiftExp.OP.DEC, false);
     }
 
     @Override
@@ -206,7 +204,7 @@ public class AntlrToExp extends AntlrToModel<Exp> {
         QuirklCoord coord = AntlrUtil.getCoord(ctx);
         Var<QuirklFunc> quirklFuncVar = new AntlrToVar(this.prog, this.scope).visitFunctionWithBody(ctx.functionWithBody());
         if (isEmpty(quirklFuncVar)) return null;
-        return new FunctionExp(coord, this.scope, quirklFuncVar.getValue());
+        return new FunctionExp(coord, this.scope, quirklFuncVar);
     }
 
     @Override
@@ -214,7 +212,7 @@ public class AntlrToExp extends AntlrToModel<Exp> {
         QuirklCoord coord = AntlrUtil.getCoord(ctx);
         Var<QuirklFunc> quirklFuncVar = new AntlrToVar(this.prog, this.scope).visitFunctionWithLambda(ctx.functionWithLambda());
         if (isEmpty(quirklFuncVar)) return null;
-        return new FunctionExp(coord, this.scope, quirklFuncVar.getValue());
+        return new FunctionExp(coord, this.scope, quirklFuncVar);
     }
 
     @Override
@@ -284,13 +282,13 @@ public class AntlrToExp extends AntlrToModel<Exp> {
     public ShiftExp visitLateIncrementExpression(QuirklParser.LateIncrementExpressionContext ctx) {
         Var<?> var = AntlrUtil.getVariable(this, ctx.id());
         if (var == null) return null;
-        return new ShiftExp(AntlrUtil.getCoord(ctx), this.scope, new VariableExp(AntlrUtil.getCoord(ctx), this.scope, var), ShiftExp.OP.INC);
+        return new ShiftExp(AntlrUtil.getCoord(ctx), this.scope, new VariableExp(AntlrUtil.getCoord(ctx), this.scope, var), ShiftExp.OP.INC, true);
     }
 
     @Override
     public ShiftExp visitLateDecrementExpression(QuirklParser.LateDecrementExpressionContext ctx) {
         Var<?> var = AntlrUtil.getVariable(this, ctx.id());
         if (var == null) return null;
-        return new ShiftExp(AntlrUtil.getCoord(ctx), this.scope, new VariableExp(AntlrUtil.getCoord(ctx), this.scope, var), ShiftExp.OP.DEC);
+        return new ShiftExp(AntlrUtil.getCoord(ctx), this.scope, new VariableExp(AntlrUtil.getCoord(ctx), this.scope, var), ShiftExp.OP.DEC, true);
     }
 }

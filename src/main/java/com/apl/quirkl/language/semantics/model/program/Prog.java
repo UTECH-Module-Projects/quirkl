@@ -4,6 +4,7 @@ import com.apl.quirkl.language.semantics.model.ProgTerm;
 import com.apl.quirkl.language.semantics.model.coordinate.QuirklCoord;
 import com.apl.quirkl.language.semantics.model.statement.Stmt;
 import com.apl.quirkl.language.semantics.model.type.QuirklType;
+import com.apl.quirkl.language.semantics.model.type.QuirklVoid;
 import com.apl.quirkl.language.semantics.model.util.QuirklList;
 import com.apl.quirkl.language.semantics.model.variable.Var;
 import com.apl.quirkl.language.semantics.visitor.antlr_to_model.error.QuirklException;
@@ -16,11 +17,8 @@ import java.util.List;
 import java.util.Map;
 
 @Getter
-public class Prog {
+public class Prog extends ProgTerm {
 
-    public static Prog INSTANCE;
-
-    private final QuirklCoord coord;
     private final QuirklList<Stmt> stmts;
 
     public static final String GLOBAL_SCOPE = "global";
@@ -28,25 +26,19 @@ public class Prog {
     private final Map<String, ProgTerm> scopeTable = new HashMap<>();
     private final List<QuirklException> errors = new ArrayList<>();
 
+    public static Prog INSTANCE = null;
+
     public Prog() {
-        this.coord = new QuirklCoord(0, 0);
+        super(new QuirklCoord(0, 0), "null");
         this.stmts = new QuirklList<>();
     }
 
-    public void setINSTANCE(Prog prog) {
+    public static void setProg(Prog prog) {
         INSTANCE = prog;
-    }
-
-    public boolean hasVariable(String name, String scope) {
-        return this.symbolTable.containsKey(getVarKey(name, scope));
     }
 
     public boolean hasError() {
         return !this.errors.isEmpty();
-    }
-
-    public boolean hasStatement(String name) {
-        return this.scopeTable.containsKey(name);
     }
 
     private String getVarKey(String name, String scope) {
@@ -88,10 +80,18 @@ public class Prog {
         this.errors.add(error);
     }
 
-    public void eval() throws QuirklRuntimeException {
+    public QuirklType<?> eval() throws QuirklRuntimeException {
         for (Stmt stmt : this.stmts) {
             stmt.eval();
         }
+        return QuirklVoid.VOID;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder strBuilder = new StringBuilder();
+        this.stmts.forEach(stmt -> strBuilder.append(stmt.toString()).append("\n"));
+        return strBuilder.toString();
     }
 
     public void printState() {
