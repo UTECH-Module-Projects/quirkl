@@ -1,0 +1,63 @@
+a: num = 3;
+b: num = 4;
+
+function: func = pass (x: num): num {
+    print(a);
+    print(b);
+};
+
+function(6);
+
+**--
+run check ?(a == 3) {
+    print("a is 3");
+}
+--**
+
+
+
+**--
+print(a ~* b (pass (x: num) to squared: num {
+    result: num = x * x;
+    print("" + x + " * " + x + " = " + result);
+    give result;
+}));
+
+print("Hello World!");
+
+run (x: num = 5; ?(x < 10); ++x) {
+    **--
+    if ?(x == 5) {
+        err: "x is 5!";
+    }
+    print("x = " + x / 0);
+    --**
+
+    a: num = ?(x == 7) -> 999 : 0;
+
+    print(a);
+
+    match (x) {
+        is (5) {
+            print("x is 5!");
+        }
+        is (6) {
+            print("x is 6!");
+        }
+
+        is (7) -> print("x is 7!");;
+
+        else {
+            print("x is not 5, 6, or 7!");
+        }
+    }
+} catch (e) {
+    print(e);
+}
+
+squared(5);
+
+print("HELLO");
+--**
+
+

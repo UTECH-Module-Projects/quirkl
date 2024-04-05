@@ -6,8 +6,9 @@
 
 ### Group Members:
 - Rushawn White (2002469)
-- 
--
+- Monique Levy (1603342)
+- Khalin Cheverria (1501396)
+- Ojay Pottinger (1903965)
 
 **Design a programming language that interfaces with a large language (LLM) model
 like OpenAI’s ChatGPT or Google’s Bard, etc, is deployed on a cloud platform such as
@@ -53,7 +54,7 @@ To complete this project successfully, you should:
 
 At a minimum, the **syntax** for your programming language must allow programmers to write
 source code that assigns values to identifiers, computes arithmetic expressions, performs
-conditional branching or conditional execution of statements depending on the value of
+conditional branching or conditional execution of stmts depending on the value of
 identifiers, and displays the value of identifiers.
 
 The **semantics** for your programming language must include appropriate interpretation of
