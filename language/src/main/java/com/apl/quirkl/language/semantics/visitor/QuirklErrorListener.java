@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.apl.quirkl.language.semantics.visitor.antlr_to_model.util.AntlrUtil.getCoord;
+import static com.apl.quirkl.language.semantics.visitor.antlr_to_model.util.AntlrUtil.isEmpty;
 
 public class QuirklErrorListener extends BaseErrorListener {
 
@@ -22,8 +23,8 @@ public class QuirklErrorListener extends BaseErrorListener {
         hasError = true;
 
         ParserRuleContext ctx = ((Parser) recognizer).getRuleContext();
-        StringBuilder str = new StringBuilder(String.format("QuirklSyntaxErrorException: %s", msg)).append("\n");
-        while (!(ctx.getParent() instanceof QuirklParser.ProgramContext)) {
+        StringBuilder str = new StringBuilder(String.format("QuirklSyntaxErrorException: %s->%s", msg, new QuirklCoord(line, charPositionInLine))).append("\n");
+        while (!isEmpty(ctx) && !(ctx.getParent() instanceof QuirklParser.ProgramContext)) {
             String name = ctx.getClass().getSimpleName();
             str.append("\tat ").append(name, 0, name.length() - 7).append("->").append(getCoord(ctx)).append("\n");
             ctx = ctx.getParent();

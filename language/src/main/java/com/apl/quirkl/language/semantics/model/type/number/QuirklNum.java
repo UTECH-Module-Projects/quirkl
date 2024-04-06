@@ -42,12 +42,12 @@ public abstract class QuirklNum<T extends Number> extends QuirklType<T> {
 
     @Override
     public QuirklFunc toFunction() throws QuirklCastException {
-        throw QuirklCastException.notCompatible(this.toString(), TYPE.FUNCTION, this.getMyScope());
+        throw QuirklCastException.notCompatible(this.toString(), TYPE.FUNCTION, this.getScope(), this.getCoord());
     }
 
     @Override
     public QuirklErr toError() throws QuirklCastException {
-        throw QuirklCastException.notCompatible(this.toString(), TYPE.ERROR, this.getMyScope());
+        throw QuirklCastException.notCompatible(this.toString(), TYPE.ERROR, this.getScope(), this.getCoord());
     }
 
     @Override
@@ -56,7 +56,7 @@ public abstract class QuirklNum<T extends Number> extends QuirklType<T> {
             double result = this.toDouble().getValue() + other.toDouble().getValue();
             return this.castToBigger(result, other);
         } catch (QuirklCastException e) {
-            throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.PLUS.toString(), this.getType(), other.getType(), this.getMyScope());
+            throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.PLUS.toString(), this.getType(), other.getType(), this.getScope(), this.getCoord());
         }
     }
 
@@ -66,7 +66,7 @@ public abstract class QuirklNum<T extends Number> extends QuirklType<T> {
             double result = this.toDouble().getValue() - other.toDouble().getValue();
             return this.castToBigger(result, other);
         } catch (QuirklCastException e) {
-            throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.MINUS.toString(), this.getType(), other.getType(), this.getMyScope());
+            throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.MINUS.toString(), this.getType(), other.getType(), this.getScope(), this.getCoord());
         }
     }
 
@@ -76,7 +76,7 @@ public abstract class QuirklNum<T extends Number> extends QuirklType<T> {
             double result = this.toDouble().getValue() * other.toDouble().getValue();
             return this.castToBigger(result, other);
         } catch (QuirklCastException e) {
-            throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.MULTIPLY.toString(), this.getType(), other.getType(), this.getMyScope());
+            throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.MULTIPLY.toString(), this.getType(), other.getType(), this.getScope(), this.getCoord());
         }
     }
 
@@ -85,12 +85,12 @@ public abstract class QuirklNum<T extends Number> extends QuirklType<T> {
         try {
             double otherValue = other.toDouble().getValue();
             if (otherValue == 0)
-                throw QuirklMathException.divideByZero(this.getMyScope());
+                throw QuirklMathException.divideByZero(this.getTerm().getScope(), this.getCoord());
 
             double result = this.toDouble().getValue() / otherValue;
             return this.castToBigger(result, other);
         } catch (QuirklCastException e) {
-            throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.DIVIDE.toString(), this.getType(), other.getType(), this.getMyScope());
+            throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.DIVIDE.toString(), this.getType(), other.getType(), this.getScope(), this.getCoord());
         }
     }
 
@@ -99,12 +99,12 @@ public abstract class QuirklNum<T extends Number> extends QuirklType<T> {
         try {
             double otherValue = other.toDouble().getValue();
             if (otherValue == 0)
-                throw QuirklMathException.divideByZero(this.getMyScope());
+                throw QuirklMathException.modByZero(this.getTerm().getScope(), this.getCoord());
 
             double result = this.toDouble().getValue() % otherValue;
             return this.castToBigger(result, other);
         } catch (QuirklCastException e) {
-            throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.MODULO.toString(), this.getType(), other.getType(), this.getMyScope());
+            throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.MODULO.toString(), this.getType(), other.getType(), this.getScope(), this.getCoord());
         }
     }
 
@@ -114,14 +114,14 @@ public abstract class QuirklNum<T extends Number> extends QuirklType<T> {
             double thisValue = this.toDouble().getValue();
             double otherValue = other.toDouble().getValue();
             if (thisValue == 0 && otherValue == 0)
-                throw QuirklMathException.zeroToZeroPower(this.getMyScope());
+                throw QuirklMathException.zeroToZeroPower(this.getScope(), this.getCoord());
             if (thisValue == 0 && otherValue < 0)
-                throw QuirklMathException.zeroToNegativePower(this.getMyScope());
+                throw QuirklMathException.zeroToNegativePower(this.getScope(), this.getCoord());
 
             double result = Math.pow(thisValue, otherValue);
             return this.castToBigger(result, other);
         } catch (QuirklCastException e) {
-            throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.POWER.toString(), this.getType(), other.getType(), this.getMyScope());
+            throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.POWER.toString(), this.getType(), other.getType(), this.getScope(), this.getCoord());
         }
     }
 
@@ -131,15 +131,15 @@ public abstract class QuirklNum<T extends Number> extends QuirklType<T> {
             double thisValue = this.toDouble().getValue();
             double otherValue = other.toDouble().getValue();
             if (thisValue < 0)
-                throw QuirklMathException.rootOfNegativeNumber(this.getMyScope());
+                throw QuirklMathException.rootOfNegativeNumber(this.getScope(), this.getCoord());
 
             if (otherValue == 0)
-                throw QuirklMathException.zeroRoot(this.getMyScope());
+                throw QuirklMathException.zeroRoot(this.getScope(), this.getCoord());
 
             double result = Math.pow(thisValue, 1 / otherValue);
             return this.castToBigger(result, other);
         } catch (QuirklCastException e) {
-            throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.ROOT.toString(), this.getType(), other.getType(), this.getMyScope());
+            throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.ROOT.toString(), this.getType(), other.getType(), this.getScope(), this.getCoord());
         }
     }
 

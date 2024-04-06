@@ -37,6 +37,28 @@ public class AntlrToExp extends AntlrToModel<Exp> {
         this.processor = new AntlrToExpProc(this);
     }
 
+    @Override
+    public Exp visitInputExpression(QuirklParser.InputExpressionContext ctx) {
+        InputExp inputExp = addToScopeContext(new InputExp(AntlrUtil.getCoord(ctx), this.scope));
+        if (!isEmpty(ctx.STRING())) {
+            String msgFull = ctx.STRING().getText();
+            inputExp.setMsg(msgFull.substring(1, msgFull.length() - 1));
+        }
+
+        return inputExp;
+    }
+
+    @Override
+    public Exp visitTypeCastExpression(QuirklParser.TypeCastExpressionContext ctx) {
+        CastExp castExp = addToScopeContext(new CastExp(AntlrUtil.getCoord(ctx), this.scope));
+        castExp.setType(QuirklType.toQuirklType(ctx.variable_data_type().getText()));
+
+        Exp exp = ctx.expression().accept(this);
+        if (exp == null) return null;
+        castExp.setExp(exp);
+
+        return castExp;
+    }
 
     @Override
     public Exp visitBracketExpression(QuirklParser.BracketExpressionContext ctx) {
@@ -245,7 +267,7 @@ public class AntlrToExp extends AntlrToModel<Exp> {
         if (var == null) return null;
 
         if (!var.getType().equals(QuirklType.TYPE.FUNCTION)) {
-            Prog.INSTANCE.addError(QuirklFunctionException.notAFunction(AntlrUtil.getCoord(ctx), var, this.scope));
+            Prog.INSTANCE.addError(QuirklFunctionException.notAFunction(var, this.scope, AntlrUtil.getCoord(ctx)));
             return null;
         }
         functionCallExp.setVarFunc((Var<QuirklFunc>) var);
@@ -262,7 +284,7 @@ public class AntlrToExp extends AntlrToModel<Exp> {
 
     @Override
     public Exp visitVariableExpression(QuirklParser.VariableExpressionContext ctx) {
-        VariableExp varExp = addToScopeContext(new VariableExp(AntlrUtil.getCoord(ctx), this.scope));
+        VarExp varExp = addToScopeContext(new VarExp(AntlrUtil.getCoord(ctx), this.scope));
 
         Var<?> var = getVariable(varExp, ctx.id());
         if (var == null) return null;
@@ -309,21 +331,21 @@ public class AntlrToExp extends AntlrToModel<Exp> {
 
     @Override
     public ShiftExp visitLateIncrementExpression(QuirklParser.LateIncrementExpressionContext ctx) {
-        VariableExp variableExp = addToScopeContext(new VariableExp(AntlrUtil.getCoord(ctx), this.scope));
-        Var<?> var = getVariable(variableExp, ctx.id());
+        VarExp varExp = addToScopeContext(new VarExp(AntlrUtil.getCoord(ctx), this.scope));
+        Var<?> var = getVariable(varExp, ctx.id());
         if (var == null) return null;
-        variableExp.setVar(var);
+        varExp.setVar(var);
 
-        return addToScopeContext(new ShiftExp(AntlrUtil.getCoord(ctx), this.scope, variableExp, ShiftExp.OP.INC, true));
+        return addToScopeContext(new ShiftExp(AntlrUtil.getCoord(ctx), this.scope, varExp, ShiftExp.OP.INC, true));
     }
 
     @Override
     public ShiftExp visitLateDecrementExpression(QuirklParser.LateDecrementExpressionContext ctx) {
-        VariableExp variableExp = addToScopeContext(new VariableExp(AntlrUtil.getCoord(ctx), this.scope));
-        Var<?> var = getVariable(variableExp, ctx.id());
+        VarExp varExp = addToScopeContext(new VarExp(AntlrUtil.getCoord(ctx), this.scope));
+        Var<?> var = getVariable(varExp, ctx.id());
         if (var == null) return null;
-        variableExp.setVar(var);
+        varExp.setVar(var);
 
-        return addToScopeContext(new ShiftExp(AntlrUtil.getCoord(ctx), this.scope, variableExp, ShiftExp.OP.INC, true));
+        return addToScopeContext(new ShiftExp(AntlrUtil.getCoord(ctx), this.scope, varExp, ShiftExp.OP.INC, true));
     }
 }

@@ -8,20 +8,24 @@ import lombok.Setter;
 public class QuirklException extends Exception {
 
     protected final String scope;
+    protected final QuirklCoord coord;
 
-    public QuirklException(String message, String scope) {
+    public QuirklException(String message, String scope, QuirklCoord coord) {
         super(message);
         this.scope = scope;
+        this.coord = coord;
     }
 
     public QuirklException(QuirklException e) {
         super(e.getMessage());
         this.scope = e.scope;
+        this.coord = e.coord;
     }
 
-    public QuirklException(Throwable cause, String scope) {
+    public QuirklException(Throwable cause, String scope, QuirklCoord coord) {
         super(cause);
         this.scope = scope;
+        this.coord = coord;
     }
 
     public String getErrorType() {

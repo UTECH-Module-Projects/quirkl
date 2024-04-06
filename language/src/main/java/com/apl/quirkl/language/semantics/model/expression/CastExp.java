@@ -1,29 +1,25 @@
-package com.apl.quirkl.language.semantics.model.statement;
+package com.apl.quirkl.language.semantics.model.expression;
 
 import com.apl.quirkl.language.semantics.model.coordinate.QuirklCoord;
-import com.apl.quirkl.language.semantics.model.expression.Exp;
 import com.apl.quirkl.language.semantics.model.type.QuirklType;
+import com.apl.quirkl.language.semantics.model.type.QuirklType.TYPE;
 import com.apl.quirkl.language.semantics.visitor.antlr_to_model.error.runtime.QuirklRuntimeException;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class ErrorStmt extends Stmt {
-
+public class CastExp extends Exp {
     private Exp exp;
+    private TYPE type;
 
-    public ErrorStmt(QuirklCoord coord, String scope) {
+    public CastExp(QuirklCoord coord, String scope) {
         super(coord, scope);
     }
 
     @Override
-    public String toString() {
-        return "err: " + exp + ";";
+    public QuirklType<?> eval() throws QuirklRuntimeException {
+        return exp.eval().toType(type);
     }
 
-    @Override
-    public QuirklType<?> eval() throws QuirklRuntimeException {
-        throw new QuirklRuntimeException(exp.eval().toStr().getValue(), this.getMyScope(), this.getCoord());
-    }
 }

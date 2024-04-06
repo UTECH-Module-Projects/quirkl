@@ -2,6 +2,7 @@ package com.apl.quirkl.language.semantics.model.statement;
 
 import com.apl.quirkl.language.semantics.model.coordinate.QuirklCoord;
 import com.apl.quirkl.language.semantics.model.expression.Exp;
+import com.apl.quirkl.language.semantics.model.type.QuirklFunc;
 import com.apl.quirkl.language.semantics.model.type.QuirklType;
 import com.apl.quirkl.language.semantics.model.type.QuirklVoid;
 import com.apl.quirkl.language.semantics.model.variable.Var;
@@ -15,23 +16,20 @@ public class VariableStmt extends Stmt {
 
     private Var<?> var;
     private Exp exp;
+    private final boolean isDeclaration;
 
-    public VariableStmt(QuirklCoord coord, String scope, Var<?> var, Exp exp) {
+    public VariableStmt(QuirklCoord coord, String scope, Var<?> var, Exp exp, boolean isDeclaration) {
         super(coord, scope);
         this.var = var;
         this.exp = exp;
+        this.isDeclaration = isDeclaration;
     }
 
-    public VariableStmt(QuirklCoord coord, String scope, Var<?> var) {
-        super(coord, scope);
-        this.var = var;
-        this.exp = null;
-    }
-
-    public VariableStmt(QuirklCoord coord, String scope) {
+    public VariableStmt(QuirklCoord coord, String scope, boolean isDeclaration) {
         super(coord, scope);
         this.var = null;
         this.exp = null;
+        this.isDeclaration = isDeclaration;
     }
 
     @Override
@@ -41,15 +39,27 @@ public class VariableStmt extends Stmt {
 
     @Override
     public QuirklType<?> eval() throws QuirklRuntimeException {
+        System.out.println(this);
         if (exp != null) {
-            var.setValue(exp.eval());
+            QuirklType<?> res = exp.eval();
+            res.setTerm(this);
+
+            if (res instanceof QuirklFunc resFunc) {
+                resFunc.getValue().setId(var.getId());
+                resFunc.getValue().setAnonymous(false);
+            }
+
+            var.setValue(res);
             return QuirklVoid.VOID;
+        } else {
+            var.setDefault();
         }
         return var.getValue();
     }
 
     @Override
     public void reset() {
-        var.reset();
+        if (isDeclaration)
+            var.reset();
     }
 }

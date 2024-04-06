@@ -56,7 +56,7 @@ public class QuirklVoid extends QuirklType<Void> {
 
     @Override
     public QuirklErr toError() throws QuirklCastException {
-        throw QuirklCastException.notCompatible(this.toString(), TYPE.ERROR, this.getMyScope());
+        throw QuirklCastException.notCompatible(this.toString(), TYPE.ERROR, this.getScope(), this.getCoord());
     }
 
     @Override

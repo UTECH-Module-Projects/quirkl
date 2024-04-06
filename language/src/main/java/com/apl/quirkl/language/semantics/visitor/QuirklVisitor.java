@@ -24,6 +24,20 @@ public interface QuirklVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitErrorStatement(QuirklParser.ErrorStatementContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code IncrementStatement}
+	 * labeled alternative in {@link QuirklParser#statement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitIncrementStatement(QuirklParser.IncrementStatementContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code DecrementStatement}
+	 * labeled alternative in {@link QuirklParser#statement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDecrementStatement(QuirklParser.DecrementStatementContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code PrintStatement}
 	 * labeled alternative in {@link QuirklParser#statement}.
 	 * @param ctx the parse tree
@@ -167,6 +181,13 @@ public interface QuirklVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitStringLiteralExpression(QuirklParser.StringLiteralExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code TypeCastExpression}
+	 * labeled alternative in {@link QuirklParser#expression()}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitTypeCastExpression(QuirklParser.TypeCastExpressionContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code LessThanBooleanExpression}
 	 * labeled alternative in {@link QuirklParser#expression()}.
@@ -342,6 +363,13 @@ public interface QuirklVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitLateIncrementExpression(QuirklParser.LateIncrementExpressionContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code InputExpression}
+	 * labeled alternative in {@link QuirklParser#expression()}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitInputExpression(QuirklParser.InputExpressionContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code XorBooleanExpression}
 	 * labeled alternative in {@link QuirklParser#expression()}.

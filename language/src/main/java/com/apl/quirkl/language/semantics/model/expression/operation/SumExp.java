@@ -44,14 +44,6 @@ public class SumExp extends OpExp {
         this.operator = null;
     }
 
-    public SumExp(QuirklCoord coord, String scope, Exp start, Exp end, Var<QuirklFunc> sumFunc, OPERATOR operator) {
-        super(coord, scope);
-        this.start = start;
-        this.end = end;
-        this.sumFunc = sumFunc;
-        this.operator = operator;
-    }
-
     @Override
     public String toString() {
         return String.format("%s %s %s (%s)", start, operator, end, sumFunc);
@@ -61,11 +53,11 @@ public class SumExp extends OpExp {
     public QuirklLongNum eval() throws QuirklRuntimeException {
         QuirklType<?> startResult = start.eval();
         if (startResult.isNotNumberType())
-            throw QuirklOperationException.notCompatible(this.operator.symbol, startResult.getType(), this.getMyScope());
+            throw QuirklOperationException.notCompatible(this.operator.symbol, startResult.getType(), this.getMyScope(), this.getCoord());
 
         QuirklType<?> endResult = end.eval();
         if (endResult.isNotNumberType())
-            throw QuirklOperationException.notCompatible(this.operator.symbol, endResult.getType(), this.getScope());
+            throw QuirklOperationException.notCompatible(this.operator.symbol, endResult.getType(), this.getScope(), this.getCoord());
 
         long startValue = startResult.toLong().getValue();
         long endValue = endResult.toLong().getValue();

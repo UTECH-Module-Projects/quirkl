@@ -6,7 +6,7 @@ import com.apl.quirkl.language.semantics.model.ProgTerm;
 import com.apl.quirkl.language.semantics.model.coordinate.QuirklCoord;
 import com.apl.quirkl.language.semantics.model.expression.Exp;
 import com.apl.quirkl.language.semantics.model.expression.FunctionCallExp;
-import com.apl.quirkl.language.semantics.model.expression.VariableExp;
+import com.apl.quirkl.language.semantics.model.expression.VarExp;
 import com.apl.quirkl.language.semantics.model.expression.operation.TwoExpOpExp;
 import com.apl.quirkl.language.semantics.model.program.Prog;
 import com.apl.quirkl.language.semantics.model.statement.FuncCallStmt;
@@ -41,10 +41,8 @@ public class QuirklFunc extends QuirklType<QuirklFuncValue> {
         super(value, term);
     }
 
-    @Override
-    public QuirklFunc cast(Object value) throws QuirklCastException {
-        System.out.println("HELLO");
-        if (value instanceof QuirklFuncValue) return new QuirklFunc((QuirklFuncValue) value, this.getTerm());
+    public static QuirklFunc cast(Object value, ProgTerm term) throws QuirklCastException {
+        if (value instanceof QuirklFuncValue) return new QuirklFunc((QuirklFuncValue) value, term);
         String valueStr = value.toString();
 
         QuirklLexer lexer = new QuirklLexer(CharStreams.fromString(valueStr));
@@ -54,14 +52,19 @@ public class QuirklFunc extends QuirklType<QuirklFuncValue> {
         parser.removeErrorListeners();
         parser.addErrorListener(new QuirklErrorListener());
 
-        AntlrToVar antlrToVar = new AntlrToVar(this.getValue().getScope());
+        AntlrToVar antlrToVar = new AntlrToVar(term.getScope());
         Var<QuirklFunc> varFunc = antlrToVar.visitFunction(parser.function());
 
         if (isEmpty(varFunc))
-            throw QuirklCastException.notCompatible(valueStr, QuirklType.TYPE.FUNCTION, this.getMyScope());
+            throw QuirklCastException.notCompatible(valueStr, QuirklType.TYPE.FUNCTION, term.getMyScope(), term.getCoord());
 
         QuirklFuncValue quirklFuncValue = varFunc.getValue().getValue();
-        return new QuirklFunc(quirklFuncValue, this.getTerm());
+        return new QuirklFunc(quirklFuncValue, term);
+    }
+
+    @Override
+    public QuirklFunc cast(Object value) throws QuirklCastException {
+        return cast(value, this.getTerm());
     }
 
     @Override
@@ -76,12 +79,12 @@ public class QuirklFunc extends QuirklType<QuirklFuncValue> {
 
     @Override
     public QuirklLongNum toLong() throws QuirklCastException {
-        throw QuirklCastException.notCompatible(this.toString(), QuirklType.TYPE.LONG_NUMBER, this.getMyScope());
+        throw QuirklCastException.notCompatible(this.toString(), QuirklType.TYPE.LONG_NUMBER, this.getScope(), this.getCoord());
     }
 
     @Override
     public QuirklDoubleNum toDouble() throws QuirklCastException {
-        throw QuirklCastException.notCompatible(this.toString(), QuirklType.TYPE.DOUBLE_NUMBER, this.getMyScope());
+        throw QuirklCastException.notCompatible(this.toString(), QuirklType.TYPE.DOUBLE_NUMBER, this.getScope(), this.getCoord());
     }
 
     @Override
@@ -96,89 +99,100 @@ public class QuirklFunc extends QuirklType<QuirklFuncValue> {
 
     @Override
     public QuirklErr toError() throws QuirklCastException {
-        throw QuirklCastException.notCompatible(this.toString(), TYPE.ERROR, this.getMyScope());
+        throw QuirklCastException.notCompatible(this.toString(), TYPE.ERROR, this.getScope(), this.getCoord());
     }
 
     @Override
     public int compareTo(QuirklType<?> other) throws QuirklMathException {
-        throw QuirklMathException.notComparable(this.getType(), other.getType(), this.getMyScope());
+        throw QuirklMathException.notComparable(this.getType(), other.getType(), this.getScope(), this.getCoord());
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public QuirklType<?> add(QuirklType<?> other) throws QuirklMathException, QuirklFunctionException {
         //Get This Function Value
         QuirklFuncValue thisFuncValue = this.value;
 
         //Check if Other is Function
-        if (other instanceof QuirklFunc otherFunction) {
+        if (other instanceof QuirklFunc otherFunc) {
+            QuirklFuncValue otherFuncValue = otherFunc.getValue();
+
             //Check if Return Types are Compatible
-            if (!thisFuncValue.getType().equals(otherFunction.getType()))
-                throw QuirklFunctionException.incompatibleReturnTypes(thisFuncValue, otherFunction.getValue(), this.getMyScope());
+            if (!otherFuncValue.getParameters().isEmpty() && !thisFuncValue.getType().equals(otherFuncValue.getParameters().getFirst().getType()))
+                throw QuirklFunctionException.incompatibleParameter(thisFuncValue, otherFuncValue, this.getScope(), this.getCoord());
 
             //Create Temp Program and Scope
             QuirklCoord tempCoord = this.getValue().getCoord();
             String tempScope = this.getValue().getScope();
 
-            int otherFunctionSize = otherFunction.getValue().getParameters().size();
+            int otherFunctionSize = otherFuncValue.getParameters().size();
             if (otherFunctionSize > 1)
-                throw QuirklFunctionException.tooManyArguments(this.getValue(), otherFunctionSize, 1, this.getMyScope());
+                throw QuirklFunctionException.invalidNumberOfArguments(this.getValue(), otherFunctionSize, 1, this.getScope(), this.getCoord());
 
-            QuirklFuncValue newFunc = new QuirklFuncValue(tempCoord, tempScope, null, this.getValue().getType(), true);
+            QuirklFuncValue newFunc = new QuirklFuncValue(this.getTerm().getCoord(), this.getTerm().getScope(), null, otherFuncValue.getType(), true);
 
-            QuirklList<Var<?>> newParameters = this.value.getParameters().stream().map(Var::clone).collect(Collectors.toCollection(QuirklList::new));
+            QuirklList<Exp> varArguments = this.value.getParameters().stream().map(param -> new VarExp(param.getCoord(), param.getScope(), param)).collect(Collectors.toCollection(QuirklList::new));
+            newFunc.setParameters(this.value.getParameters());
 
-            QuirklList<Exp> varArguments = newParameters.stream().map(param -> new VariableExp(param.getCoord(), param.getScope(), param)).collect(Collectors.toCollection(QuirklList::new));
+            Var<QuirklFunc> thisVarFunc = (Var<QuirklFunc>) Prog.INSTANCE.getVarAllScope(thisFuncValue.getId(), thisFuncValue.getScope());
+            Var<QuirklFunc> otherVarFunc = (Var<QuirklFunc>) Prog.INSTANCE.getVarAllScope(otherFuncValue.getId(), otherFuncValue.getScope());
+
+            System.out.println(thisVarFunc);
+            System.out.println(otherVarFunc + ": " + otherFuncValue.getId() + ", " + otherFuncValue.getScope() + "\n\n");
+
+
+
 
             if (otherFunctionSize == 0) {
                 FuncBody functionBody = newFunc.getBody();
-                functionBody.addStatement(new FuncCallStmt(tempCoord, tempScope, new Var<>(tempCoord, tempScope, TYPE.FUNCTION, "anonymous", new QuirklFunc(newFunc, this.getTerm())), varArguments));
-                if (Objects.equals(otherFunction.getType(), TYPE.VOID)) {
-                    functionBody.addStatement(new FuncCallStmt(tempCoord, tempScope, new Var<>(tempCoord, tempScope, TYPE.FUNCTION, "anonymous", new QuirklFunc(newFunc, this.getTerm())), new QuirklList<>()));
+                functionBody.addStatement(new FuncCallStmt(tempCoord, tempScope, thisVarFunc, varArguments));
+                if (Objects.equals(otherFuncValue.getType(), TYPE.VOID)) {
+                    functionBody.addStatement(new FuncCallStmt(tempCoord, tempScope, otherVarFunc, new QuirklList<>()));
                 } else {
-                    functionBody.setReturnExp(new FunctionCallExp(tempCoord, tempScope, new Var<>(tempCoord, tempScope, TYPE.FUNCTION, "anonymous", otherFunction), new QuirklList<>()));
+                    functionBody.setReturnExp(new FunctionCallExp(tempCoord, tempScope, otherVarFunc, new QuirklList<>()));
                 }
             } else {
-                FunctionCallExp smallFunctionCall = new FunctionCallExp(tempCoord, tempScope, new Var<>(tempCoord, tempScope, TYPE.FUNCTION, "anonymous", this), varArguments);
-                FunctionCallExp bigFunctionCall = new FunctionCallExp(tempCoord, tempScope, new Var<>(tempCoord, tempScope, TYPE.FUNCTION, "anonymous", otherFunction), new QuirklList<>(List.of(smallFunctionCall)));
+                FunctionCallExp smallFunctionCall = new FunctionCallExp(tempCoord, tempScope, thisVarFunc, varArguments);
+                FunctionCallExp bigFunctionCall = new FunctionCallExp(tempCoord, tempScope, otherVarFunc, new QuirklList<>(List.of(smallFunctionCall)));
                 newFunc.getBody().setReturnExp(bigFunctionCall);
             }
             return new QuirklFunc(newFunc, this.getTerm());
-        } else return this.add(other.toFunction());
+        } else return this.add(this.cast(other.getValue()));
     }
 
     @Override
     public QuirklType<?> subtract(QuirklType<?> other) throws QuirklMathException {
-        throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.MINUS.toString(), this.getType(), other.getType(), this.getMyScope());
+        throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.MINUS.toString(), this.getType(), other.getType(), this.getScope(), this.getCoord());
     }
 
     @Override
     public QuirklType<?> multiply(QuirklType<?> other) throws QuirklMathException {
-        throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.MULTIPLY.toString(), this.getType(), other.getType(), this.getMyScope());
+        throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.MULTIPLY.toString(), this.getType(), other.getType(), this.getScope(), this.getCoord());
     }
 
     @Override
     public QuirklType<?> divide(QuirklType<?> other) throws QuirklMathException {
-        throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.DIVIDE.toString(), this.getType(), other.getType(), this.getMyScope());
+        throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.DIVIDE.toString(), this.getType(), other.getType(), this.getScope(), this.getCoord());
     }
 
     @Override
     public QuirklType<?> modulus(QuirklType<?> other) throws QuirklMathException {
-        throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.MODULO.toString(), this.getType(), other.getType(), this.getMyScope());
+        throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.MODULO.toString(), this.getType(), other.getType(), this.getScope(), this.getCoord());
     }
 
     @Override
     public QuirklType<?> power(QuirklType<?> other) throws QuirklMathException {
-        throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.POWER.toString(), this.getType(), other.getType(), this.getMyScope());
+        throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.POWER.toString(), this.getType(), other.getType(), this.getScope(), this.getCoord());
     }
 
     @Override
     public QuirklType<?> root(QuirklType<?> other) throws QuirklMathException {
-        throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.ROOT.toString(), this.getType(), other.getType(), this.getMyScope());
+        throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.ROOT.toString(), this.getType(), other.getType(), this.getScope(), this.getCoord());
     }
 
     @Override
     public QuirklType<?> negate() throws QuirklMathException {
-        throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.MINUS.toString(), this.getType(), this.getMyScope());
+        throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.MINUS.toString(), this.getType(), this.getScope(), this.getCoord());
     }
 
     public QuirklType<?> call(QuirklType<?>... args) throws QuirklRuntimeException {

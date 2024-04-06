@@ -18,8 +18,8 @@ public class TwoExpOpExp extends OpExp {
         MULTIPLY("*"),
         DIVIDE("/"),
         MODULO("%"),
-        POWER("^"),
-        ROOT("/\\");
+        POWER("/\\"),
+        ROOT("\\/");
 
         private final String symbol;
 

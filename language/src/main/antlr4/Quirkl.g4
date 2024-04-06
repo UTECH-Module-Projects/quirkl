@@ -8,7 +8,9 @@ program
 //COMPLETE
 statement
 : ERROR_TYPE COLON expression SEMICOLON                                                                                                         # ErrorStatement
-| PRINT LPAREN expression RPAREN SEMICOLON                                                                                                      # PrintStatement
+| INC id SEMICOLON                                                                                                                              # IncrementStatement
+| DEC id SEMICOLON                                                                                                                              # DecrementStatement
+| PRINT LPAREN expression (COMMA expression)* RPAREN SEMICOLON                                                                                  # PrintStatement
 | ifCondition (ELSE ifCondition)* (ELSE LBRACE statement* RBRACE)?                                                                              # IfStatement
 | RUN LPAREN (declaration | expression)? SEMICOLON toBool SEMICOLON (assignment | expression)? RPAREN LBRACE statement* RBRACE catchBody?       # ForLoop
 | RUN CHECK toBool LBRACE statement* RBRACE catchBody?                                                                                          # WhileLoop
@@ -24,7 +26,7 @@ statement
 
 //COMPLETE
 declaration
-: id COLON variable_data_type (ASSIGN expression)?                                                                                                # VariableDeclaration
+: id COLON variable_data_type (ASSIGN expression)?                                                                                              # VariableDeclaration
 ;
 
 //COMPLETE
@@ -45,12 +47,14 @@ ifCondition
 //COMPLETE
 switchCase
 : LBRACE statement* RBRACE                                                                                                                      # SwitchCaseWithBody
-| ARROW statement                                                                                                                    # SwitchCaseWithLambda
+| ARROW statement                                                                                                                               # SwitchCaseWithLambda
 ;
 
 //COMPLETE
 expression
-: MINUS?LPAREN expression RPAREN                                                                                                               # BracketExpression
+: INPUT LPAREN STRING? RPAREN                                                                                                                   # InputExpression
+| variable_data_type LPAREN expression RPAREN                                                                                                   # TypeCastExpression
+| MINUS?LPAREN expression RPAREN                                                                                                                # BracketExpression
 | INC expression                                                                                                                                # IncrementExpression
 | DEC expression                                                                                                                                # DecrementExpression
 | expression EXP expression                                                                                                                     # ExponentExpression
@@ -80,11 +84,11 @@ expression
 | functionWithBody                                                                                                                              # FunctionWithBodyExpression
 | functionWithLambda                                                                                                                            # FunctionWithLambdaExpression
 | functionCall                                                                                                                                  # FunctionCallExpression
-| MINUS?id                                                                                                                                     # VariableExpression
+| MINUS?id                                                                                                                                      # VariableExpression
 | number                                                                                                                                        # NumberLiteralExpression
-| decimal                                                                                                                        # DecimalLiteralExpression
+| decimal                                                                                                                                       # DecimalLiteralExpression
 | BOOLEAN                                                                                                                                       # BooleanLiteralExpression
-| STRING                                                                                                                       # StringLiteralExpression
+| STRING                                                                                                                                        # StringLiteralExpression
 | id INC                                                                                                                                        # LateIncrementExpression
 | id DEC                                                                                                                                        # LateDecrementExpression
 ;
@@ -146,7 +150,7 @@ variable_data_type
 id                  : (LETTER | (keywords (LETTER | DIGIT))) (keywords | LETTER | DIGIT)* ;        //IDENTIFIER
 
 //Literals
-STRING              : '"'(~[\\"])*?'"'   ;              //STRING
+STRING              : '"'(~[\\"] | '\\n' | '\\t')*'"' | '\''(~[\\"] | '\\n' | '\\t')*'\'' ; //STRING
 BOOLEAN             : 'true' | 'false' ;                //BOOLEAN
 number              : '-'?DIGIT+ ;                      //LONG
 decimal             : '-'?DIGIT+'.'DIGIT+ ;             //DECIMAL
@@ -178,6 +182,7 @@ keywords
 | IS
 | PRINT
 | ERROR_TYPE
+| INPUT
 ;
 
 //Operators
@@ -237,6 +242,7 @@ IF                  : 'if' ;                            //IF
 ELSE                : 'else' ;                          //ELSE
 IS                  : 'is' ;                            //IS
 PRINT               : 'print' ;                         //PRINT
+INPUT               : 'input' ;                         //INPUT
 
 //Whitespace
 WS                  : [ \t\r\n]+ -> skip ;              //SKIP WHITESPACE

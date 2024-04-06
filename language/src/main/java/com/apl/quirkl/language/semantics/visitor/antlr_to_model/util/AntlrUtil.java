@@ -5,7 +5,6 @@ import com.apl.quirkl.language.semantics.model.ProgTerm;
 import com.apl.quirkl.language.semantics.model.coordinate.QuirklCoord;
 import com.apl.quirkl.language.semantics.model.program.Prog;
 import com.apl.quirkl.language.semantics.model.variable.Var;
-import com.apl.quirkl.language.semantics.visitor.antlr_to_model.AntlrToModel;
 import com.apl.quirkl.language.semantics.visitor.antlr_to_model.error.compile.QuirklDeclarationException;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.openjdk.jol.vm.VM;
@@ -56,7 +55,7 @@ public class AntlrUtil {
 
         //Check if Variable is not declared
         if (isEmpty(var)) {
-            Prog.INSTANCE.addError(QuirklDeclarationException.undeclaredVariable(varName, scope));
+            Prog.INSTANCE.addError(QuirklDeclarationException.undeclaredVariable(varName, scope, getCoord(ctx)));
             return null;
         }
 
@@ -77,8 +76,7 @@ public class AntlrUtil {
 
             //Check if Variable is declared
             if (!isEmpty(var)) {
-                Prog.INSTANCE.addError(QuirklDeclarationException.variableAlreadyDeclared(var, scope));
-                System.err.println(coord);
+                Prog.INSTANCE.addError(QuirklDeclarationException.variableAlreadyDeclared(var, scope, coord));
                 return null;
             }
         }

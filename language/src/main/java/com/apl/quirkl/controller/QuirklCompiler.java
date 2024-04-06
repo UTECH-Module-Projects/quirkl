@@ -9,6 +9,8 @@ import com.apl.quirkl.language.semantics.visitor.antlr_to_model.AntlrToProg;
 import com.apl.quirkl.language.semantics.visitor.antlr_to_model.error.runtime.QuirklRuntimeException;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.apache.commons.io.input.CharSequenceInputStream;
+import org.openjdk.jol.vm.VM;
 import picocli.CommandLine;
 import picocli.CommandLine.Option;
 
@@ -17,9 +19,9 @@ import java.util.concurrent.Callable;
 
 public class QuirklCompiler implements Callable<Integer> {
     @Option(names = {"-f", "--file"}, description = "Quirkl file to compile")
-    private String file;
+    private String path;
 
-    @Option(names = {"-d", "--debug"}, defaultValue = "true", description = "Enable debug mode")
+    @Option(names = {"-d", "--debug"}, description = "Enable debug mode")
     private boolean debug;
 
     public static void main(String[] args) {
@@ -29,8 +31,8 @@ public class QuirklCompiler implements Callable<Integer> {
     @Override
     public Integer call() throws Exception {
         StringBuilder str = new StringBuilder();
-        if (file != null) {
-            try (var reader = new FileReader(file)) {
+        if (path != null) {
+            try (var reader = new FileReader(path)) {
                 str.append(String.join("\n", new BufferedReader(reader).lines().toList()));
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -60,21 +62,27 @@ public class QuirklCompiler implements Callable<Integer> {
 
         if (prog.hasError()) {
             System.err.println(new QuirklErrValue(prog.getErrors().getFirst()));
-            prog.getErrors().getFirst().printStackTrace();
             prog.printState();
             return -1;
         }
 
         try {
-            prog.eval();
-            prog.printState();
-        } catch (QuirklRuntimeException e) {
-            System.err.println(new QuirklErrValue(e));
-            prog.printState();
-            if (debug)
+            try {
+                prog.eval();
                 prog.printState();
-            return -1;
+            } catch (QuirklRuntimeException e) {
+                System.err.println(new QuirklErrValue(e));
+                e.printStackTrace();
+                if (debug)
+                    prog.printState();
+                return -1;
+            }
+        } catch (Exception e) {
+            prog.printState();
+            e.printStackTrace();
         }
+
+
         return 0;
     }
 }

@@ -11,21 +11,22 @@ import com.apl.quirkl.language.semantics.model.variable.Var;
 import com.apl.quirkl.language.semantics.visitor.antlr_to_model.error.runtime.QuirklFunctionException;
 import com.apl.quirkl.language.semantics.visitor.antlr_to_model.error.runtime.QuirklRuntimeException;
 import lombok.Getter;
+import lombok.Setter;
 
-import java.util.Arrays;
 import java.util.Objects;
 
 import static com.apl.quirkl.language.semantics.model.program.Prog.GLOBAL_SCOPE;
 
 
 @Getter
+@Setter
 public class QuirklFuncValue extends ProgTerm {
 
-    private final String id;
-    private final QuirklList<Var<?>> parameters;
+    private String id;
+    private QuirklList<Var<?>> parameters;
     private final QuirklType.TYPE type;
     private final FuncBody body;
-    private final boolean isAnonymous;
+    private boolean isAnonymous;
 
     private final String ANONYMOUS = "anonymous";
 
@@ -44,7 +45,7 @@ public class QuirklFuncValue extends ProgTerm {
 
     public QuirklType<?> apply(QuirklType<?>...arguments) throws QuirklRuntimeException {
         if (arguments.length != this.parameters.size())
-            throw QuirklFunctionException.invalidNumberOfArguments(this, this.parameters.size(), arguments.length, this.getMyScope());
+            throw QuirklFunctionException.invalidNumberOfArguments(this, this.parameters.size(), arguments.length, this.getMyScope(), this.getCoord());
 
         for (int i = 0; i < arguments.length; i++) {
             QuirklType<?> quirkyType = arguments[i];
@@ -54,7 +55,7 @@ public class QuirklFuncValue extends ProgTerm {
         this.reset();
         if (Objects.equals(result.getType(), this.type))
             return result;
-        throw QuirklFunctionException.invalidReturnType(this, result.getType(), this.getMyScope());
+        throw QuirklFunctionException.invalidReturnType(this, result.getType(), this.getMyScope(), this.getCoord());
     }
 
     public void reset() {
@@ -77,12 +78,25 @@ public class QuirklFuncValue extends ProgTerm {
         );
     }
 
-    public String getId() {
+
+    public String getIdDisplay() {
         return this.isAnonymous ? ANONYMOUS : this.id;
     }
 
     @Override
     public QuirklType<?> eval() throws QuirklRuntimeException {
         return new QuirklFunc(this, Prog.INSTANCE);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof QuirklFuncValue that)) return false;
+        return isAnonymous == that.isAnonymous && Objects.equals(id, that.id) && Objects.equals(parameters, that.parameters) && type == that.type && Objects.equals(body, that.body);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, parameters, type, body, isAnonymous);
     }
 }

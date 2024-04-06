@@ -1,6 +1,7 @@
 package com.apl.quirkl.language.semantics.model.type;
 
 import com.apl.quirkl.language.semantics.model.ProgTerm;
+import com.apl.quirkl.language.semantics.model.coordinate.QuirklCoord;
 import com.apl.quirkl.language.semantics.model.expression.operation.bool.NotBoolExp;
 import com.apl.quirkl.language.semantics.model.expression.operation.bool.TwoExpBoolExp;
 import com.apl.quirkl.language.semantics.visitor.antlr_to_model.error.runtime.QuirklFunctionException;
@@ -10,15 +11,17 @@ import com.apl.quirkl.language.semantics.model.type.number.QuirklLongNum;
 import com.apl.quirkl.language.semantics.visitor.antlr_to_model.error.runtime.QuirklCastException;
 import com.apl.quirkl.language.semantics.visitor.antlr_to_model.error.runtime.QuirklOperationException;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
 @Getter
+@Setter
 public abstract class QuirklType<T> {
     protected T value;
-    protected final ProgTerm term;
+    protected ProgTerm term;
     private static final HashMap<String, TYPE> typeMap;
     private static final HashMap<TYPE, Integer> hierarchy;
     private static final List<TYPE> numberTypes;
@@ -76,9 +79,35 @@ public abstract class QuirklType<T> {
         this.value = value;
         this.term = term;
     }
+
+    public static QuirklType<?> getDefault(TYPE type) {
+        return switch (type) {
+            case VOID -> new QuirklVoid();
+            case BOOLEAN -> new QuirklBool();
+            case LONG_NUMBER -> new QuirklLongNum();
+            case DOUBLE_NUMBER -> new QuirklDoubleNum();
+            case STRING -> new QuirklString();
+            case FUNCTION -> new QuirklFunc();
+            case ERROR -> new QuirklErr();
+            case null -> null;
+        };
+    }
+
+    @SuppressWarnings("unchecked")
+    public void setDefault() throws QuirklCastException {
+        this.value = (T) getDefault(this.getType());
+    }
     
     public String getMyScope() {
         return this.term.getMyScope();
+    }
+
+    public String getScope() {
+        return this.term.getScope();
+    }
+
+    public QuirklCoord getCoord() {
+        return this.term.getCoord();
     }
 
     @SuppressWarnings("unchecked")
@@ -86,7 +115,7 @@ public abstract class QuirklType<T> {
         try {
             this.value = (T) value;
         } catch (Exception e) {
-            throw QuirklCastException.notCompatible(value.toString(), this.getType(), this.getMyScope());
+            throw QuirklCastException.notCompatible(value.toString(), this.getType(), this.getScope(), this.term.getCoord());
         }
     }
 
@@ -94,7 +123,7 @@ public abstract class QuirklType<T> {
         try {
             this.value = value.getValue();
         } catch (Exception e) {
-            throw QuirklCastException.notCompatible(value.getValue().toString(), this.getType(), this.getMyScope());
+            throw QuirklCastException.notCompatible(value.getValue().toString(), this.getType(), this.getScope(), this.term.getCoord());
         }
     }
 
@@ -194,7 +223,7 @@ public abstract class QuirklType<T> {
         try {
             return new QuirklBool(this.toBoolean().getValue() && other.toBoolean().getValue(), this.getTerm());
         } catch (QuirklCastException e) {
-            throw QuirklOperationException.notCompatible(TwoExpBoolExp.OP.AND.toString(), this.getType(), other.getType(), this.getMyScope());
+            throw QuirklOperationException.notCompatible(TwoExpBoolExp.OP.AND.toString(), this.getType(), other.getType(), this.getScope(), this.getCoord());
         }
     }
 
@@ -202,7 +231,7 @@ public abstract class QuirklType<T> {
         try {
             return new QuirklBool(this.toBoolean().getValue() || other.toBoolean().getValue(), this.getTerm());
         } catch (QuirklCastException e) {
-            throw QuirklOperationException.notCompatible(TwoExpBoolExp.OP.OR.toString(), this.getType(), other.getType(), this.getMyScope());
+            throw QuirklOperationException.notCompatible(TwoExpBoolExp.OP.OR.toString(), this.getType(), other.getType(), this.getScope(), this.getCoord());
         }
     }
 
@@ -210,7 +239,7 @@ public abstract class QuirklType<T> {
         try {
             return new QuirklBool(this.toBoolean().getValue() ^ other.toBoolean().getValue(), this.getTerm());
         } catch (QuirklCastException e) {
-            throw QuirklOperationException.notCompatible(TwoExpBoolExp.OP.XOR.toString(), this.getType(), other.getType(), this.getMyScope());
+            throw QuirklOperationException.notCompatible(TwoExpBoolExp.OP.XOR.toString(), this.getType(), other.getType(), this.getScope(), this.getCoord());
         }
     }
 
@@ -218,7 +247,7 @@ public abstract class QuirklType<T> {
         try {
             return new QuirklBool(!(this.toBoolean().getValue() && other.toBoolean().getValue()), this.getTerm());
         } catch (QuirklCastException e) {
-            throw QuirklOperationException.notCompatible(TwoExpBoolExp.OP.NAND.toString(), this.getType(), other.getType(), this.getMyScope());
+            throw QuirklOperationException.notCompatible(TwoExpBoolExp.OP.NAND.toString(), this.getType(), other.getType(), this.getScope(), this.getCoord());
         }
     }
 
@@ -226,7 +255,7 @@ public abstract class QuirklType<T> {
         try {
             return new QuirklBool(!(this.toBoolean().getValue() || other.toBoolean().getValue()), this.getTerm());
         } catch (QuirklCastException e) {
-            throw QuirklOperationException.notCompatible(TwoExpBoolExp.OP.NOR.toString(), this.getType(), other.getType(), this.getMyScope());
+            throw QuirklOperationException.notCompatible(TwoExpBoolExp.OP.NOR.toString(), this.getType(), other.getType(), this.getScope(), this.getCoord());
         }
 
     }
@@ -235,7 +264,7 @@ public abstract class QuirklType<T> {
         try {
             return new QuirklBool(this.toBoolean().getValue() == other.toBoolean().getValue(), this.getTerm());
         } catch (QuirklCastException e) {
-            throw QuirklOperationException.notCompatible(TwoExpBoolExp.OP.XNOR.toString(), this.getType(), other.getType(), this.getMyScope());
+            throw QuirklOperationException.notCompatible(TwoExpBoolExp.OP.XNOR.toString(), this.getType(), other.getType(), this.getScope(), this.getCoord());
         }
     }
 
@@ -243,7 +272,7 @@ public abstract class QuirklType<T> {
         try {
             return new QuirklBool(!this.toBoolean().getValue(), this.getTerm());
         } catch (QuirklCastException e) {
-            throw QuirklOperationException.notCompatible(NotBoolExp.NOT, this.getType(), this.getMyScope());
+            throw QuirklOperationException.notCompatible(NotBoolExp.NOT, this.getType(), this.getScope(), this.getCoord());
         }
     }
 

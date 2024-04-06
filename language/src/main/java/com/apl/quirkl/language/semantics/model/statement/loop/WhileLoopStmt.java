@@ -25,27 +25,20 @@ public class WhileLoopStmt extends LoopStmt {
     @Override
     protected void runLoop() throws QuirklRuntimeException {
         int iterations = 0;
-        if (this.isDoWhile) {
-            System.out.println(this.condition.eval().getValue());
-            do {
-                if (iterations++ > MAX_RUN)
-                    throw QuirklLoopException.exceededLoopLimit(this.getMyScope());
+        while (true) {
+            if (!this.isDoWhile)
+                if (this.condition.eval().getValue()) break;
 
-                for (Stmt stmt : this.body) {
-                    stmt.eval();
-                }
-                this.reset();
-            } while (this.condition.eval().getValue());
-        } else {
-            System.out.println(this.condition.eval().getValue());
-            while (this.condition.eval().getValue()) {
-                if (iterations++ > MAX_RUN)
-                    throw QuirklLoopException.exceededLoopLimit(this.getMyScope());
-                for (Stmt stmt : this.body) {
-                    stmt.eval();
-                }
-                this.reset();
+            if (iterations++ > MAX_RUN)
+                throw QuirklLoopException.exceededLoopLimit(this.getMyScope(), this.getCoord());
+
+            for (Stmt stmt : this.body) {
+                stmt.eval();
             }
+            this.reset();
+
+            if (this.isDoWhile)
+                if (!this.condition.eval().getValue()) break;
         }
     }
 }

@@ -9,15 +9,15 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class VariableExp extends Exp {
+public class VarExp extends Exp {
 
     private Var<?> var;
 
-    public VariableExp(QuirklCoord coord, String scope) {
+    public VarExp(QuirklCoord coord, String scope) {
         super(coord, scope);
     }
 
-    public VariableExp(QuirklCoord coord, String scope, Var<?> var) {
+    public VarExp(QuirklCoord coord, String scope, Var<?> var) {
         super(coord, scope);
         this.var = var;
     }
