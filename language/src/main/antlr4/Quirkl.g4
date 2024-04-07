@@ -7,7 +7,8 @@ program
 
 //COMPLETE
 statement
-: ERROR_TYPE COLON expression SEMICOLON                                                                                                         # ErrorStatement
+: RUN LBRACE statement* RBRACE catchBody                                                                                                        # RunCatch
+| ERROR_TYPE COLON expression SEMICOLON                                                                                                         # ErrorStatement
 | INC id SEMICOLON                                                                                                                              # IncrementStatement
 | DEC id SEMICOLON                                                                                                                              # DecrementStatement
 | PRINT LPAREN expression (COMMA expression)* RPAREN SEMICOLON                                                                                  # PrintStatement
@@ -16,7 +17,6 @@ statement
 | RUN CHECK toBool LBRACE statement* RBRACE catchBody?                                                                                          # WhileLoop
 | RUN LBRACE statement* RBRACE CHECK toBool (SEMICOLON | catchBody)                                                                             # DoWhileLoop
 | MATCH LPAREN expression RPAREN LBRACE (IS LPAREN expression RPAREN switchCase)+ (ELSE switchCase)? RBRACE                                     # Switch
-| RUN LBRACE statement* RBRACE catchBody                                                                                                        # RunCatch
 | declaration SEMICOLON                                                                                                                         # DeclarationStatement
 | assignment SEMICOLON                                                                                                                          # AssignmentStatement
 | functionCall SEMICOLON                                                                                                                        # FunctionCallStatement
@@ -151,9 +151,9 @@ id                  : (LETTER | (keywords (LETTER | DIGIT))) (keywords | LETTER 
 
 //Literals
 STRING              : '"'(~[\\"] | '\\n' | '\\t')*'"' | '\''(~[\\"] | '\\n' | '\\t')*'\'' ; //STRING
-BOOLEAN             : 'true' | 'false' ;                //BOOLEAN
-number              : '-'?DIGIT+ ;                      //LONG
-decimal             : '-'?DIGIT+'.'DIGIT+ ;             //DECIMAL
+BOOLEAN             : 'true' | 'false' ;
+number              : MINUS?DIGIT+ ;
+decimal             : MINUS?DIGIT+'.'DIGIT+ ;
 
 LETTER              : [a-zA-Z] ;                        //LETTER
 DIGIT               : [0-9] ;                           //DIGIT
@@ -245,7 +245,7 @@ PRINT               : 'print' ;                         //PRINT
 INPUT               : 'input' ;                         //INPUT
 
 //Whitespace
-WS                  : [ \t\r\n]+ -> skip ;              //SKIP WHITESPACE
+WS                  : [\t\r\n]+ -> skip ;              //SKIP WHITESPACE
 
 //Comments
 COMMENT             : '*--' ~[\r\n]* -> skip ;          //SKIP COMMENTS

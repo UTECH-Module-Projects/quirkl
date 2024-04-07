@@ -23,7 +23,7 @@ public class QuirklErrorListener extends BaseErrorListener {
         hasError = true;
 
         ParserRuleContext ctx = ((Parser) recognizer).getRuleContext();
-        StringBuilder str = new StringBuilder(String.format("QuirklSyntaxErrorException: %s->%s", msg, new QuirklCoord(line, charPositionInLine))).append("\n");
+        StringBuilder str = new StringBuilder(String.format("QuirklSyntaxErrorException: %s->%s", msg, new QuirklCoord(line, charPositionInLine+1))).append("\n");
         while (!isEmpty(ctx) && !(ctx.getParent() instanceof QuirklParser.ProgramContext)) {
             String name = ctx.getClass().getSimpleName();
             str.append("\tat ").append(name, 0, name.length() - 7).append("->").append(getCoord(ctx)).append("\n");

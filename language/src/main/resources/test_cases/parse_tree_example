@@ -1,0 +1,6 @@
+a: num = 5;
+b: dec = 10;
+
+pass (a: num, b: dec) to add: dec -> a + b;
+
+print(a, " + ", b, " = ", add(a, b));

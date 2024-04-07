@@ -70,7 +70,7 @@ public class SumExp extends OpExp {
 
     private QuirklLongNum summ(long startValue, long endValue) throws QuirklRuntimeException {
         long sum = 0;
-        for (long i = startValue; i < endValue; i++) {
+        for (long i = startValue; i <= endValue; i++) {
             sum += sumFunc.getValue().call(new QuirklLongNum(i, this)).toLong().getValue();
         }
         return new QuirklLongNum(sum, this);
@@ -78,7 +78,7 @@ public class SumExp extends OpExp {
 
     private QuirklLongNum prodSumm(long startValue, long endValue) throws QuirklRuntimeException {
         long sum = 1;
-        for (long i = startValue; i < endValue; i++) {
+        for (long i = startValue; i <= endValue; i++) {
             sum *= sumFunc.getValue().call(new QuirklLongNum(i, this)).toLong().getValue();
         }
         return new QuirklLongNum(sum, this);

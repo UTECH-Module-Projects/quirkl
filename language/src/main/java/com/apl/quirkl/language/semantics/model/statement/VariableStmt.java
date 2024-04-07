@@ -16,20 +16,17 @@ public class VariableStmt extends Stmt {
 
     private Var<?> var;
     private Exp exp;
-    private final boolean isDeclaration;
 
-    public VariableStmt(QuirklCoord coord, String scope, Var<?> var, Exp exp, boolean isDeclaration) {
+    public VariableStmt(QuirklCoord coord, String scope, Var<?> var, Exp exp) {
         super(coord, scope);
         this.var = var;
         this.exp = exp;
-        this.isDeclaration = isDeclaration;
     }
 
-    public VariableStmt(QuirklCoord coord, String scope, boolean isDeclaration) {
+    public VariableStmt(QuirklCoord coord, String scope) {
         super(coord, scope);
         this.var = null;
         this.exp = null;
-        this.isDeclaration = isDeclaration;
     }
 
     @Override
@@ -39,7 +36,6 @@ public class VariableStmt extends Stmt {
 
     @Override
     public QuirklType<?> eval() throws QuirklRuntimeException {
-        System.out.println(this);
         if (exp != null) {
             QuirklType<?> res = exp.eval();
             res.setTerm(this);
@@ -51,7 +47,7 @@ public class VariableStmt extends Stmt {
 
             var.setValue(res);
             return QuirklVoid.VOID;
-        } else {
+        } else if (var.getValue() == null) {
             var.setDefault();
         }
         return var.getValue();
@@ -59,7 +55,6 @@ public class VariableStmt extends Stmt {
 
     @Override
     public void reset() {
-        if (isDeclaration)
-            var.reset();
+        var.reset();
     }
 }

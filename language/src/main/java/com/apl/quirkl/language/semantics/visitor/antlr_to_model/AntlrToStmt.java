@@ -91,7 +91,7 @@ public class AntlrToStmt extends AntlrToModel<Stmt> {
 
     @Override
     public VariableStmt visitVariableDeclaration(QuirklParser.VariableDeclarationContext ctx) {
-        VariableStmt variableStmt = addToScopeContext(new VariableStmt(getCoord(ctx), this.scope, true));
+        VariableStmt variableStmt = addToScopeContext(new VariableStmt(getCoord(ctx), this.scope));
 
         Var<?> var = newVariable(this.scope, variableStmt.getCoord(), ctx.variable_data_type().getText(), ctx.id());
         if (var == null) return null;
@@ -114,7 +114,7 @@ public class AntlrToStmt extends AntlrToModel<Stmt> {
 
     @Override
     public VariableStmt visitAssignment(QuirklParser.AssignmentContext ctx) {
-        VariableStmt variableStmt = addToScopeContext(new VariableStmt(getCoord(ctx), this.scope, false));
+        VariableStmt variableStmt = addToScopeContext(new VariableStmt(getCoord(ctx), this.scope));
 
         Var<?> var = getVariable(variableStmt, ctx.id());
         if (var == null) return null;
@@ -144,7 +144,7 @@ public class AntlrToStmt extends AntlrToModel<Stmt> {
     public VariableStmt visitFunctionWithBodyStatement(QuirklParser.FunctionWithBodyStatementContext ctx) {
         final QuirklCoord coord = getCoord(ctx);
 
-        VariableStmt variableStmt = addToScopeContext(new VariableStmt(coord, this.scope, true));
+        VariableStmt variableStmt = addToScopeContext(new VariableStmt(coord, this.scope));
 
         AntlrToVar antlrToVar = new AntlrToVar(this.scope);
         Var<QuirklFunc> varFunc = antlrToVar.visitFunctionWithBody(ctx.functionWithBody());
@@ -156,7 +156,7 @@ public class AntlrToStmt extends AntlrToModel<Stmt> {
 
     @Override
     public Stmt visitFunctionWithLambdaStatement(QuirklParser.FunctionWithLambdaStatementContext ctx) {
-        VariableStmt variableStmt = addToScopeContext(new VariableStmt(getCoord(ctx), this.scope, true));
+        VariableStmt variableStmt = addToScopeContext(new VariableStmt(getCoord(ctx), this.scope));
 
         AntlrToVar antlrToVar = new AntlrToVar(this.scope);
         Var<QuirklFunc> varFunc = antlrToVar.visitFunctionWithLambda(ctx.functionWithLambda());
@@ -296,8 +296,6 @@ public class AntlrToStmt extends AntlrToModel<Stmt> {
 
     @Override
     public Stmt visitWhileLoop(QuirklParser.WhileLoopContext ctx) {
-        System.out.println(ctx.getText());
-
         return this.proc.getWhileLoopStmt(ctx, false);
     }
 

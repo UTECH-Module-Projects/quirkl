@@ -17,6 +17,13 @@ public interface QuirklVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitProgram(QuirklParser.ProgramContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code RunCatch}
+	 * labeled alternative in {@link QuirklParser#statement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitRunCatch(QuirklParser.RunCatchContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code ErrorStatement}
 	 * labeled alternative in {@link QuirklParser#statement}.
 	 * @param ctx the parse tree
@@ -79,13 +86,6 @@ public interface QuirklVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitSwitch(QuirklParser.SwitchContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code RunCatch}
-	 * labeled alternative in {@link QuirklParser#statement}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitRunCatch(QuirklParser.RunCatchContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code DeclarationStatement}
 	 * labeled alternative in {@link QuirklParser#statement}.

@@ -1,5 +1,6 @@
 package com.apl.quirkl.language.semantics.model.expression;
 
+import com.apl.quirkl.controller.QuirklCompiler;
 import com.apl.quirkl.language.semantics.model.coordinate.QuirklCoord;
 import com.apl.quirkl.language.semantics.model.type.QuirklString;
 import com.apl.quirkl.language.semantics.model.type.QuirklType;
@@ -9,6 +10,8 @@ import lombok.Setter;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+
+import static com.apl.quirkl.controller.QuirklCompiler.reader;
 
 @Getter
 @Setter
@@ -22,10 +25,11 @@ public class InputExp extends Exp {
     @Override
     public QuirklString eval() throws QuirklRuntimeException {
         try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
             if (msg != null)
                 System.out.print(msg);
-            return new QuirklString(reader.readLine(), this);
+            String input = reader.readLine();
+            System.out.println(input);
+            return new QuirklString(input, this);
         } catch (Exception e) {
             throw new QuirklRuntimeException(e.getMessage(), this.getScope(), this.getCoord());
         }
