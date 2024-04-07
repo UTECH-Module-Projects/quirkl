@@ -4,15 +4,17 @@ import com.apl.quirkl.controller.QuirklCompiler;
 import com.apl.quirkl.language.semantics.model.program.Prog;
 import org.junit.jupiter.api.Test;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 
 public class TestQuirkl {
 
     @Test
     public void testFileQuirkl() {
-        File file = new File("src/main/resources/test_cases/test_3.qkl");
-        try {
-            QuirklCompiler.main(new String[]{"-f", file.getPath(), "-d"});
+        File file = new File("src/main/resources/test_cases/scope_and_binding_example.qkl");
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            QuirklCompiler.main(new String[]{"-d", String.join("\n", reader.lines().toList()), "0", "10", "SUM", "sads"});
         } catch (Exception e) {
             e.printStackTrace();
         }

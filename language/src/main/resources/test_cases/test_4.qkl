@@ -1,0 +1,35 @@
+a: num;
+b: num = 4;
+
+print(a + b);
+
+**--
+test1: func = (pass (x: num, y: num) to add: num -> x + y) + (pass (n: num) to squared: num -> n * n);
+print("(", 3, " + ", 4, ")^2 = ", test1(3, 4), "\n");
+
+test2: func = add + (pass () to printer: void { print("Hello\n"); });
+
+test3: func = add + (pass (n: num) to printNum: void { print(n, "\n"); });
+
+test4: func;
+
+run {
+    test4 = add + (pass (n: bool) to isTrue: bool -> n);
+} catch(e) {
+    print(e);
+}
+
+test5: func = test1 + (pass (n: num): num -> n \/ 2);
+
+print("Test 1: ", test1(2, 3), "\n");
+print("Test 2: ", test2(2, 3), "\n");
+print("Test 3: ", test3(2, 3), "\n");
+print("Test 5: ", test5(2, 3), "\n");
+
+run {
+    print("Test 4: ", test4(2, 3));
+} catch(e) {
+    print(e);
+}
+
+--**

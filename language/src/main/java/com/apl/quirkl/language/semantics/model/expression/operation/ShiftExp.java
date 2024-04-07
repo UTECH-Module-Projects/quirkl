@@ -2,7 +2,7 @@ package com.apl.quirkl.language.semantics.model.expression.operation;
 
 import com.apl.quirkl.language.semantics.model.coordinate.QuirklCoord;
 import com.apl.quirkl.language.semantics.model.expression.Exp;
-import com.apl.quirkl.language.semantics.model.expression.VariableExp;
+import com.apl.quirkl.language.semantics.model.expression.VarExp;
 import com.apl.quirkl.language.semantics.model.type.QuirklType;
 import com.apl.quirkl.language.semantics.model.type.number.QuirklLongNum;
 import com.apl.quirkl.language.semantics.visitor.antlr_to_model.error.runtime.QuirklRuntimeException;
@@ -59,14 +59,14 @@ public class ShiftExp extends OpExp {
 
     private QuirklType<?> increment() throws QuirklRuntimeException {
         QuirklType<?> res = exp.eval().add(QuirklLongNum.ONE);
-        if (exp instanceof VariableExp varExp)
+        if (exp instanceof VarExp varExp)
             varExp.getVar().updateValue(res);
         return res;
     }
 
     private QuirklType<?> decrement() throws QuirklRuntimeException {
         QuirklType<?> res = exp.eval().subtract(QuirklLongNum.ONE);
-        if (exp instanceof VariableExp varExp)
+        if (exp instanceof VarExp varExp)
             varExp.getVar().updateValue(res);
         return res;
     }

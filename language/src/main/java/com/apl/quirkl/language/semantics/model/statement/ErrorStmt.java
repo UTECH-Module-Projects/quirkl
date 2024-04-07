@@ -24,6 +24,6 @@ public class ErrorStmt extends Stmt {
 
     @Override
     public QuirklType<?> eval() throws QuirklRuntimeException {
-        throw new QuirklRuntimeException(exp.eval().toStr().getValue(), this.getMyScope());
+        throw new QuirklRuntimeException(exp.eval().toStr().getValue(), this.getMyScope(), this.getCoord());
     }
 }

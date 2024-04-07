@@ -7,19 +7,11 @@ import static com.apl.quirkl.language.semantics.model.statement.loop.LoopStmt.MA
 
 public class QuirklLoopException extends QuirklRuntimeException {
 
-    public QuirklLoopException(String message, String scope) {
-        super(message, scope);
+    public QuirklLoopException(String message, String scope, QuirklCoord coord) {
+        super(message, scope, coord);
     }
 
-    public QuirklLoopException(QuirklException e) {
-        super(e);
-    }
-
-    public QuirklLoopException(Throwable cause, String scope) {
-        super(cause, scope);
-    }
-
-    public static QuirklLoopException exceededLoopLimit(String scope) {
-        return new QuirklLoopException("Exceeded loop limit of " + MAX_RUN + " runs", scope);
+    public static QuirklLoopException exceededLoopLimit(String scope, QuirklCoord coord) {
+        return new QuirklLoopException("Exceeded loop limit of " + MAX_RUN + " runs", scope, coord);
     }
 }

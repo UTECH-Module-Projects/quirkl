@@ -11,41 +11,36 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import picocli.CommandLine;
 import picocli.CommandLine.Option;
+import picocli.CommandLine.Parameters;
 
 import java.io.*;
+import java.util.Arrays;
 import java.util.concurrent.Callable;
 
 public class QuirklCompiler implements Callable<Integer> {
-    @Option(names = {"-f", "--file"}, description = "Quirkl file to compile")
-    private String file;
-
-    @Option(names = {"-d", "--debug"}, defaultValue = "true", description = "Enable debug mode")
+    @Option(names = {"-d", "--debug"}, description = "Enable debug mode")
     private boolean debug;
+
+    @Parameters(index = "0", description = "The program to run as a string")
+    private String program;
+
+    @Parameters(index = "1..*", description = "The user input for the program")
+    private String[] input;
+
+    public static BufferedReader reader;
 
     public static void main(String[] args) {
         System.out.println("return " + new CommandLine(new QuirklCompiler()).execute(args));
     }
 
     @Override
-    public Integer call() throws Exception {
-        StringBuilder str = new StringBuilder();
-        if (file != null) {
-            try (var reader = new FileReader(file)) {
-                str.append(String.join("\n", new BufferedReader(reader).lines().toList()));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
-                String line;
-                while ((line = reader.readLine()) != null)
-                    str.append(line);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
+    public Integer call() {
+        if (input == null)
+            input = new String[0];
 
-        QuirklLexer lexer = new QuirklLexer(CharStreams.fromString(str.toString()));
+        reader = new BufferedReader(new StringReader(String.join("\n", input)));
+
+        QuirklLexer lexer = new QuirklLexer(CharStreams.fromString(program));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         QuirklParser parser = new QuirklParser(tokens);
 
@@ -60,21 +55,20 @@ public class QuirklCompiler implements Callable<Integer> {
 
         if (prog.hasError()) {
             System.err.println(new QuirklErrValue(prog.getErrors().getFirst()));
-            prog.getErrors().getFirst().printStackTrace();
-            prog.printState();
+            if (debug) prog.printState();
             return -1;
         }
 
         try {
             prog.eval();
             prog.printState();
+            return 0;
         } catch (QuirklRuntimeException e) {
             System.err.println(new QuirklErrValue(e));
-            prog.printState();
-            if (debug)
-                prog.printState();
-            return -1;
+            if (debug) prog.printState();
+        } catch (Exception e) {
+            System.err.println(e.getClass().getSimpleName() + ": " + e.getMessage() + "\n\tcaused by " + e.getCause());
         }
-        return 0;
+        return -1;
     }
 }

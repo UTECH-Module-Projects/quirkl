@@ -95,6 +95,6 @@ public class Prog extends ProgTerm {
         this.symbolTable.forEach((k, v) -> System.out.printf("%31s -> %s%n", k, v.toString()));
 
         System.out.println("\nScope Table:");
-        this.scopeTable.forEach((k, v) -> System.out.printf("%31s -> %15s:%s%n", k, v.getSimpleName(), v.getScope()));
+        this.scopeTable.forEach((k, v) -> System.out.printf("%31s -> %23s:%s%n", k, v.getSimpleName(), v.getScope()));
     }
 }

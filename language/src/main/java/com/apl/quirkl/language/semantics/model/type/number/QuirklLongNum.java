@@ -31,7 +31,7 @@ public class QuirklLongNum extends QuirklNum<Long> {
         try {
             return new QuirklLongNum(Double.valueOf(value).longValue(), this.getTerm());
         } catch (Exception e) {
-            throw QuirklCastException.notCompatible(value, TYPE.LONG_NUMBER, this.getMyScope());
+            throw QuirklCastException.notCompatible(value, TYPE.LONG_NUMBER, this.getMyScope(), this.getTerm().getCoord());
         }
     }
 

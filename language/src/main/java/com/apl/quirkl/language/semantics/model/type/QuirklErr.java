@@ -12,6 +12,11 @@ import com.apl.quirkl.language.semantics.visitor.antlr_to_model.error.runtime.Qu
 import com.apl.quirkl.language.semantics.visitor.antlr_to_model.error.runtime.QuirklOperationException;
 
 public class QuirklErr extends QuirklType<QuirklErrValue> {
+
+    public QuirklErr() {
+        super(new QuirklErrValue(), Prog.INSTANCE);
+    }
+
     public QuirklErr(QuirklException e) {
         super(new QuirklErrValue(e), Prog.INSTANCE);
     }
@@ -27,26 +32,26 @@ public class QuirklErr extends QuirklType<QuirklErrValue> {
 
     @Override
     public QuirklType<?> cast(Object value) throws QuirklCastException {
-        throw QuirklCastException.notCompatible(value.toString(), this.getType(), this.getMyScope());
+        throw QuirklCastException.notCompatible(value.toString(), this.getType(), this.getScope(), this.getCoord());
     }
 
     @Override
-    public QuirklVoid toVoid() throws QuirklCastException {
+    public QuirklVoid toVoid() {
         return QuirklVoid.VOID;
     }
 
     @Override
-    public QuirklBool toBoolean() throws QuirklCastException {
+    public QuirklBool toBoolean() {
         return QuirklBool.FALSE;
     }
 
     @Override
-    public QuirklLongNum toLong() throws QuirklCastException {
+    public QuirklLongNum toLong() {
         return QuirklLongNum.ZERO;
     }
 
     @Override
-    public QuirklDoubleNum toDouble() throws QuirklCastException {
+    public QuirklDoubleNum toDouble() {
         return QuirklDoubleNum.ZERO;
     }
 
@@ -57,7 +62,7 @@ public class QuirklErr extends QuirklType<QuirklErrValue> {
 
     @Override
     public QuirklFunc toFunction() throws QuirklCastException {
-        throw QuirklCastException.notCompatible(this.value.toString(), TYPE.FUNCTION, this.getMyScope());
+        throw QuirklCastException.notCompatible(this.value.toString(), TYPE.FUNCTION, this.getScope(), this.getCoord());
     }
 
     @Override
@@ -67,46 +72,46 @@ public class QuirklErr extends QuirklType<QuirklErrValue> {
 
     @Override
     public int compareTo(QuirklType<?> other) throws QuirklMathException {
-        throw QuirklMathException.notComparable(this.getType(), other.getType(), this.getMyScope());
+        throw QuirklMathException.notComparable(this.getType(), other.getType(), this.getScope(), this.getCoord());
     }
 
     @Override
     public QuirklType<?> add(QuirklType<?> other) throws QuirklMathException, QuirklFunctionException {
-        throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.PLUS.toString(), this.getType(), other.getType(), this.getMyScope());
+        throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.PLUS.toString(), this.getType(), other.getType(), this.getScope(), this.getCoord());
     }
 
     @Override
     public QuirklType<?> subtract(QuirklType<?> other) throws QuirklMathException {
-        throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.MINUS.toString(), this.getType(), other.getType(), this.getMyScope());
+        throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.MINUS.toString(), this.getType(), other.getType(), this.getScope(), this.getCoord());
     }
 
     @Override
     public QuirklType<?> multiply(QuirklType<?> other) throws QuirklMathException {
-        throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.MULTIPLY.toString(), this.getType(), other.getType(), this.getMyScope());
+        throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.MULTIPLY.toString(), this.getType(), other.getType(), this.getScope(), this.getCoord());
     }
 
     @Override
     public QuirklType<?> divide(QuirklType<?> other) throws QuirklMathException {
-        throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.DIVIDE.toString(), this.getType(), other.getType(), this.getMyScope());
+        throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.DIVIDE.toString(), this.getType(), other.getType(), this.getScope(), this.getCoord());
     }
 
     @Override
     public QuirklType<?> modulus(QuirklType<?> other) throws QuirklMathException {
-        throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.MODULO.toString(), this.getType(), other.getType(), this.getMyScope());
+        throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.MODULO.toString(), this.getType(), other.getType(), this.getScope(), this.getCoord());
     }
 
     @Override
     public QuirklType<?> power(QuirklType<?> other) throws QuirklMathException {
-        throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.POWER.toString(), this.getType(), other.getType(), this.getMyScope());
+        throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.POWER.toString(), this.getType(), other.getType(), this.getScope(), this.getCoord());
     }
 
     @Override
     public QuirklType<?> root(QuirklType<?> other) throws QuirklMathException {
-        throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.ROOT.toString(), this.getType(), other.getType(), this.getMyScope());
+        throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.ROOT.toString(), this.getType(), other.getType(), this.getScope(), this.getCoord());
     }
 
     @Override
     public QuirklType<?> negate() throws QuirklMathException {
-        throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.MINUS.toString(), this.getType(), this.getMyScope());
+        throw QuirklOperationException.notCompatible(TwoExpOpExp.OP.MINUS.toString(), this.getType(), this.getScope(), this.getCoord());
     }
 }

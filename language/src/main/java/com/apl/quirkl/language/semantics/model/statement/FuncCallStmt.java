@@ -18,7 +18,7 @@ import java.util.List;
 @Getter
 @Setter
 public class FuncCallStmt extends Stmt {
-    protected Var<QuirklFunc> varFunc;
+    private Var<QuirklFunc> varFunc;
     private QuirklList<Exp> arguments;
 
     public FuncCallStmt(QuirklCoord coord, String scope) {

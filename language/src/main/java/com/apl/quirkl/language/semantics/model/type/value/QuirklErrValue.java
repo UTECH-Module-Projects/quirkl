@@ -14,19 +14,28 @@ import lombok.SneakyThrows;
 public class QuirklErrValue {
     private String errMsg;
     private String errType;
+    private QuirklCoord coord;
     private String trace;
+
+    public QuirklErrValue() {
+        this.errMsg = "";
+        this.errType = "";
+        this.coord = new QuirklCoord();
+        this.trace = "";
+    }
 
     @SneakyThrows
     public QuirklErrValue(QuirklException e) {
         this.errMsg = e.getMessage();
         this.errType = e.getErrorType();
+        this.coord = e.getCoord();
         this.parseTrace(e.getScope());
     }
 
     private void parseTrace(String scope) {
         Prog prog = Prog.INSTANCE;
         String curScope = scope;
-        StringBuilder str = new StringBuilder(this.errMsg).append("\n");
+        StringBuilder str = new StringBuilder(this.errMsg).append(":").append(this.coord).append("\n");
         do {
             ProgTerm term = prog.getTerm(curScope);
             if (term != null) {

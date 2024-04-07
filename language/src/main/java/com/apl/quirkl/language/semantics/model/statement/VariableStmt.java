@@ -2,6 +2,7 @@ package com.apl.quirkl.language.semantics.model.statement;
 
 import com.apl.quirkl.language.semantics.model.coordinate.QuirklCoord;
 import com.apl.quirkl.language.semantics.model.expression.Exp;
+import com.apl.quirkl.language.semantics.model.type.QuirklFunc;
 import com.apl.quirkl.language.semantics.model.type.QuirklType;
 import com.apl.quirkl.language.semantics.model.type.QuirklVoid;
 import com.apl.quirkl.language.semantics.model.variable.Var;
@@ -22,12 +23,6 @@ public class VariableStmt extends Stmt {
         this.exp = exp;
     }
 
-    public VariableStmt(QuirklCoord coord, String scope, Var<?> var) {
-        super(coord, scope);
-        this.var = var;
-        this.exp = null;
-    }
-
     public VariableStmt(QuirklCoord coord, String scope) {
         super(coord, scope);
         this.var = null;
@@ -42,8 +37,18 @@ public class VariableStmt extends Stmt {
     @Override
     public QuirklType<?> eval() throws QuirklRuntimeException {
         if (exp != null) {
-            var.setValue(exp.eval());
+            QuirklType<?> res = exp.eval();
+            res.setTerm(this);
+
+            if (res instanceof QuirklFunc resFunc) {
+                resFunc.getValue().setId(var.getId());
+                resFunc.getValue().setAnonymous(false);
+            }
+
+            var.setValue(res);
             return QuirklVoid.VOID;
+        } else if (var.getValue() == null) {
+            var.setDefault();
         }
         return var.getValue();
     }

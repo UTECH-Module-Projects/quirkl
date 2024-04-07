@@ -7,14 +7,16 @@ program
 
 //COMPLETE
 statement
-: ERROR_TYPE COLON expression SEMICOLON                                                                                                         # ErrorStatement
-| PRINT LPAREN expression RPAREN SEMICOLON                                                                                                      # PrintStatement
+: RUN LBRACE statement* RBRACE catchBody                                                                                                        # RunCatch
+| ERROR_TYPE COLON expression SEMICOLON                                                                                                         # ErrorStatement
+| INC id SEMICOLON                                                                                                                              # IncrementStatement
+| DEC id SEMICOLON                                                                                                                              # DecrementStatement
+| PRINT LPAREN expression (COMMA expression)* RPAREN SEMICOLON                                                                                  # PrintStatement
 | ifCondition (ELSE ifCondition)* (ELSE LBRACE statement* RBRACE)?                                                                              # IfStatement
 | RUN LPAREN (declaration | expression)? SEMICOLON toBool SEMICOLON (assignment | expression)? RPAREN LBRACE statement* RBRACE catchBody?       # ForLoop
 | RUN CHECK toBool LBRACE statement* RBRACE catchBody?                                                                                          # WhileLoop
 | RUN LBRACE statement* RBRACE CHECK toBool (SEMICOLON | catchBody)                                                                             # DoWhileLoop
 | MATCH LPAREN expression RPAREN LBRACE (IS LPAREN expression RPAREN switchCase)+ (ELSE switchCase)? RBRACE                                     # Switch
-| RUN LBRACE statement* RBRACE catchBody                                                                                                        # RunCatch
 | declaration SEMICOLON                                                                                                                         # DeclarationStatement
 | assignment SEMICOLON                                                                                                                          # AssignmentStatement
 | functionCall SEMICOLON                                                                                                                        # FunctionCallStatement
@@ -24,7 +26,7 @@ statement
 
 //COMPLETE
 declaration
-: id COLON variable_data_type (ASSIGN expression)?                                                                                                # VariableDeclaration
+: id COLON variable_data_type (ASSIGN expression)?                                                                                              # VariableDeclaration
 ;
 
 //COMPLETE
@@ -45,12 +47,14 @@ ifCondition
 //COMPLETE
 switchCase
 : LBRACE statement* RBRACE                                                                                                                      # SwitchCaseWithBody
-| ARROW statement                                                                                                                    # SwitchCaseWithLambda
+| ARROW statement                                                                                                                               # SwitchCaseWithLambda
 ;
 
 //COMPLETE
 expression
-: MINUS?LPAREN expression RPAREN                                                                                                               # BracketExpression
+: INPUT LPAREN STRING? RPAREN                                                                                                                   # InputExpression
+| variable_data_type LPAREN expression RPAREN                                                                                                   # TypeCastExpression
+| MINUS?LPAREN expression RPAREN                                                                                                                # BracketExpression
 | INC expression                                                                                                                                # IncrementExpression
 | DEC expression                                                                                                                                # DecrementExpression
 | expression EXP expression                                                                                                                     # ExponentExpression
@@ -80,11 +84,11 @@ expression
 | functionWithBody                                                                                                                              # FunctionWithBodyExpression
 | functionWithLambda                                                                                                                            # FunctionWithLambdaExpression
 | functionCall                                                                                                                                  # FunctionCallExpression
-| MINUS?id                                                                                                                                     # VariableExpression
+| MINUS?id                                                                                                                                      # VariableExpression
 | number                                                                                                                                        # NumberLiteralExpression
-| decimal                                                                                                                        # DecimalLiteralExpression
+| decimal                                                                                                                                       # DecimalLiteralExpression
 | BOOLEAN                                                                                                                                       # BooleanLiteralExpression
-| STRING                                                                                                                       # StringLiteralExpression
+| STRING                                                                                                                                        # StringLiteralExpression
 | id INC                                                                                                                                        # LateIncrementExpression
 | id DEC                                                                                                                                        # LateDecrementExpression
 ;
@@ -146,10 +150,10 @@ variable_data_type
 id                  : (LETTER | (keywords (LETTER | DIGIT))) (keywords | LETTER | DIGIT)* ;        //IDENTIFIER
 
 //Literals
-STRING              : '"'(~[\\"])*?'"'   ;              //STRING
-BOOLEAN             : 'true' | 'false' ;                //BOOLEAN
-number              : '-'?DIGIT+ ;                      //LONG
-decimal             : '-'?DIGIT+'.'DIGIT+ ;             //DECIMAL
+STRING              : '"'(~[\\"] | '\\n' | '\\t')*'"' | '\''(~[\\"] | '\\n' | '\\t')*'\'' ; //STRING
+BOOLEAN             : 'true' | 'false' ;
+number              : MINUS?DIGIT+ ;
+decimal             : MINUS?DIGIT+'.'DIGIT+ ;
 
 LETTER              : [a-zA-Z] ;                        //LETTER
 DIGIT               : [0-9] ;                           //DIGIT
@@ -178,6 +182,7 @@ keywords
 | IS
 | PRINT
 | ERROR_TYPE
+| INPUT
 ;
 
 //Operators
@@ -237,9 +242,10 @@ IF                  : 'if' ;                            //IF
 ELSE                : 'else' ;                          //ELSE
 IS                  : 'is' ;                            //IS
 PRINT               : 'print' ;                         //PRINT
+INPUT               : 'input' ;                         //INPUT
 
 //Whitespace
-WS                  : [ \t\r\n]+ -> skip ;              //SKIP WHITESPACE
+WS                  : [\t\r\n]+ -> skip ;              //SKIP WHITESPACE
 
 //Comments
 COMMENT             : '*--' ~[\r\n]* -> skip ;          //SKIP COMMENTS

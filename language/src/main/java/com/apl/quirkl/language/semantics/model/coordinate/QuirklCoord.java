@@ -1,9 +1,10 @@
 package com.apl.quirkl.language.semantics.model.coordinate;
 
+import com.apl.quirkl.language.semantics.visitor.antlr_to_model.error.runtime.QuirklRuntimeException;
 import lombok.Getter;
 
 @Getter
-public class QuirklCoord {
+public class QuirklCoord implements Cloneable {
     private final int row;
     private final int column;
 
@@ -24,13 +25,12 @@ public class QuirklCoord {
         return String.format("%d:%d", row, column);
     }
 
-    @Override
     public QuirklCoord clone() {
         try {
             super.clone();
             return new QuirklCoord(this.row, this.column);
         } catch (CloneNotSupportedException e) {
-            throw new AssertionError();
+            throw new RuntimeException(e);
         }
     }
 }

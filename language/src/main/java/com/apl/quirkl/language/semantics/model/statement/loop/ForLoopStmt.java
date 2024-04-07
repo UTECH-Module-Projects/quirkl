@@ -40,7 +40,7 @@ public class ForLoopStmt extends LoopStmt {
         if (this.init != null) this.init.eval();
         while (this.condition.eval().getValue()) {
             if (iterations++ > MAX_RUN)
-                throw QuirklLoopException.exceededLoopLimit(this.getMyScope());
+                throw QuirklLoopException.exceededLoopLimit(this.getMyScope(), this.getCoord());
 
             for (Stmt stmt : this.body) {
                 stmt.eval();

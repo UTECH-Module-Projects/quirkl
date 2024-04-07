@@ -6,11 +6,14 @@ import com.apl.quirkl.language.semantics.model.type.value.function.QuirklFuncVal
 import com.apl.quirkl.language.semantics.model.type.QuirklType;
 import com.apl.quirkl.language.semantics.model.util.QuirklList;
 import com.apl.quirkl.language.semantics.model.variable.Var;
+import com.apl.quirkl.language.semantics.visitor.antlr_to_model.error.runtime.QuirklFunctionException;
 import com.apl.quirkl.language.semantics.visitor.antlr_to_model.error.runtime.QuirklRuntimeException;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Arrays;
+
+import static com.apl.quirkl.language.semantics.visitor.antlr_to_model.util.AntlrUtil.isEmpty;
 
 @Getter
 @Setter
@@ -41,7 +44,13 @@ public class FunctionCallExp extends Exp {
         for (int i = 0; i < arguments.size(); i++) {
             values[i] = arguments.get(i).eval();
         }
-        QuirklFuncValue func = this.varFunc.getValue().getValue();
+        QuirklFunc varQuirklFunc = this.varFunc.getValue();
+        if (isEmpty(varQuirklFunc))
+            throw QuirklFunctionException.functionNotInitialized(this.varFunc, this.scope, this.coord);
+
+        QuirklFuncValue func = varQuirklFunc.getValue();
+        func.setCoord(this.getCoord());
+        func.setScope(this.getScope());
         return func.apply(values);
     }
 }

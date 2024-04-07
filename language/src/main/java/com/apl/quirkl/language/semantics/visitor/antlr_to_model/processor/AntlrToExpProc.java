@@ -3,7 +3,7 @@ package com.apl.quirkl.language.semantics.visitor.antlr_to_model.processor;
 import com.apl.quirkl.language.parser.QuirklParser;
 import com.apl.quirkl.language.semantics.model.coordinate.QuirklCoord;
 import com.apl.quirkl.language.semantics.model.expression.Exp;
-import com.apl.quirkl.language.semantics.model.expression.VariableExp;
+import com.apl.quirkl.language.semantics.model.expression.VarExp;
 import com.apl.quirkl.language.semantics.model.expression.operation.SumExp;
 import com.apl.quirkl.language.semantics.model.expression.operation.bool.TwoExpBoolExp;
 import com.apl.quirkl.language.semantics.model.expression.operation.literal.NumberLit;
@@ -19,8 +19,7 @@ import com.apl.quirkl.language.semantics.visitor.antlr_to_model.error.compile.Qu
 import com.apl.quirkl.language.semantics.visitor.antlr_to_model.error.runtime.QuirklSummationException;
 import com.apl.quirkl.language.semantics.visitor.antlr_to_model.util.AntlrUtil;
 
-import static com.apl.quirkl.language.semantics.visitor.antlr_to_model.util.AntlrUtil.addToScopeContext;
-import static com.apl.quirkl.language.semantics.visitor.antlr_to_model.util.AntlrUtil.isEmpty;
+import static com.apl.quirkl.language.semantics.visitor.antlr_to_model.util.AntlrUtil.*;
 
 public class AntlrToExpProc extends AntlrToModelProc<Exp, AntlrToExp> {
 
@@ -45,7 +44,7 @@ public class AntlrToExpProc extends AntlrToModelProc<Exp, AntlrToExp> {
         } else {
             var res = this.checkVarExistsForSumExpression(param.getText(), ctx, op, idCount);
             if (res == null) return null;
-            start = new VariableExp(res.getCoord(), this.visitor.getScope(), res);
+            start = new VarExp(res.getCoord(), this.visitor.getScope(), res);
             idCount++;
         }
         sumExp.setStart(start);
@@ -58,7 +57,7 @@ public class AntlrToExpProc extends AntlrToModelProc<Exp, AntlrToExp> {
         } else {
             var res = this.checkVarExistsForSumExpression(param.getText(), ctx, op, idCount);
             if (res == null) return null;
-            end = new VariableExp(res.getCoord(), this.visitor.getScope(), res);
+            end = new VarExp(res.getCoord(), this.visitor.getScope(), res);
             idCount++;
         }
         sumExp.setEnd(end);
@@ -73,7 +72,7 @@ public class AntlrToExpProc extends AntlrToModelProc<Exp, AntlrToExp> {
             var res = this.checkVarExistsForSumExpression(param.getText(), ctx, op, idCount);
             if (res == null) return null;
             if (!res.getType().equals(QuirklType.TYPE.FUNCTION)) {
-                Prog.INSTANCE.addError(QuirklSummationException.notAFunction(res, this.visitor.getScope()));
+                Prog.INSTANCE.addError(QuirklSummationException.notAFunction(res, this.visitor.getScope(), res.getCoord()));
                 return null;
             }
             varFunc = (Var<QuirklFunc>) res;
@@ -90,7 +89,7 @@ public class AntlrToExpProc extends AntlrToModelProc<Exp, AntlrToExp> {
                 case SUMM -> ((QuirklParser.SummationExpressionContext) ctx).id(idCount);
                 case PRODSUMM -> ((QuirklParser.ProdSummationExpressionContext) ctx).id(idCount);
             };
-            Prog.INSTANCE.addError(QuirklDeclarationException.undeclaredVariable(idCtx.getText(), this.visitor.getScope()));
+            Prog.INSTANCE.addError(QuirklDeclarationException.undeclaredVariable(idCtx.getText(), this.visitor.getScope(), getCoord(ctx)));
             return null;
         }
         return varFunc;

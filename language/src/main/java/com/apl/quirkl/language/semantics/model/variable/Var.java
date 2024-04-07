@@ -7,6 +7,8 @@ import com.apl.quirkl.language.semantics.visitor.antlr_to_model.error.runtime.Qu
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Objects;
+
 @Getter
 public class Var<T extends QuirklType<?>> extends ProgTerm implements Cloneable {
 
@@ -81,11 +83,28 @@ public class Var<T extends QuirklType<?>> extends ProgTerm implements Cloneable 
             super.clone();
             return new Var<>(this.coord.clone(), this.scope, this.type, this.id, this.value);
         } catch (CloneNotSupportedException e) {
-            throw new AssertionError();
+            throw new RuntimeException(e);
         }
     }
 
     public void reset() {
         this.value = null;
+    }
+
+    @SuppressWarnings("unchecked")
+    public void setDefault() {
+        this.value = (T) QuirklType.getDefault(this.type);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Var<?> var)) return false;
+        return type == var.type && Objects.equals(id, var.id) && Objects.equals(value, var.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type, id, value);
     }
 }
