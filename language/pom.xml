@@ -49,12 +49,6 @@
             <version>1.18.32</version>
             <scope>compile</scope>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.openjdk.jol/jol-core -->
-        <dependency>
-            <groupId>org.openjdk.jol</groupId>
-            <artifactId>jol-core</artifactId>
-            <version>0.17</version>
-        </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
@@ -76,6 +70,7 @@
     </dependencies>
 
     <build>
+        <finalName>quirkl</finalName>
         <plugins>
             <plugin>
                 <groupId>org.antlr</groupId>
@@ -90,20 +85,26 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>com.yegor256</groupId>
-                <artifactId>antlr2ebnf-maven-plugin</artifactId>
-                <version>0.0.7</version>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>com.apl.quirkl.controller.QuirklCompiler</mainClass>
+                        </manifest>
+                    </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
                 <executions>
                     <execution>
-                        <phase>initialize</phase>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
                         <goals>
-                            <goal>generate</goal>
+                            <goal>single</goal>
                         </goals>
                     </execution>
                 </executions>
-                <configuration>
-                    <skipLatex></skipLatex>
-                </configuration>
             </plugin>
         </plugins>
     </build>

@@ -14,7 +14,6 @@ import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
 import java.io.*;
-import java.util.Arrays;
 import java.util.concurrent.Callable;
 
 public class QuirklCompiler implements Callable<Integer> {
@@ -61,10 +60,10 @@ public class QuirklCompiler implements Callable<Integer> {
 
         try {
             prog.eval();
-            prog.printState();
+            if (debug) prog.printState();
             return 0;
         } catch (QuirklRuntimeException e) {
-            System.err.println(new QuirklErrValue(e));
+            System.err.println(new QuirklErrValue(e) + "\n");
             if (debug) prog.printState();
         } catch (Exception e) {
             System.err.println(e.getClass().getSimpleName() + ": " + e.getMessage() + "\n\tcaused by " + e.getCause());

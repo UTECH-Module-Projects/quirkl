@@ -7,7 +7,6 @@ import com.apl.quirkl.language.semantics.model.program.Prog;
 import com.apl.quirkl.language.semantics.model.variable.Var;
 import com.apl.quirkl.language.semantics.visitor.antlr_to_model.error.compile.QuirklDeclarationException;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.openjdk.jol.vm.VM;
 
 import static com.apl.quirkl.language.semantics.model.type.QuirklType.toQuirklType;
 
@@ -19,7 +18,7 @@ public class AntlrUtil {
     }
 
     public static String getObjAddress(Object obj) {
-        return String.valueOf(VM.current().addressOf(obj));
+        return String.valueOf(System.identityHashCode(obj));
     }
 
     public static QuirklCoord getCoord(ParserRuleContext ctx) {
