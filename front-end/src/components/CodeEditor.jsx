@@ -5,7 +5,7 @@ import Output from "./Output.jsx";
 
 const CodeEditor = () => {
     const editorRef = useRef(null);
-    const [value, setValue] = useState("");
+    const [, setValue] = useState("");
 
     const onMount = (editor) => {
         editorRef.current = editor;
