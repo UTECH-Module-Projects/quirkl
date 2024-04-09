@@ -1,4 +1,4 @@
-// Generated from ./src/main/antlr4/Quirkl.g4 by ANTLR 4.13.1
+// Generated from ./src/main/antlr4/Quirkl_TEMP.g4 by ANTLR 4.13.1
 package com.apl.quirkl.language.parser;
 
 import com.apl.quirkl.language.semantics.visitor.QuirklVisitor;
@@ -103,7 +103,7 @@ public class QuirklParser extends Parser {
 	}
 
 	@Override
-	public String getGrammarFileName() { return "Quirkl.g4"; }
+	public String getGrammarFileName() { return "Quirkl_TEMP.g4"; }
 
 	@Override
 	public String[] getRuleNames() { return ruleNames; }

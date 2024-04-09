@@ -14,17 +14,13 @@
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
     "@monaco-editor/react": "^4.6.0",
-    "@xterm/addon-fit": "^0.10.0",
-    "@xterm/xterm": "^5.5.0",
     "axios": "^1.6.8",
     "frame": "^1.0.0-alpha.2",
     "monaco-editor": "^0.47.0",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "ssh2": "^1.15.0",
-    "xterm": "^5.3.0",
-    "xterm-addon-fit": "^0.8.0"
+    "ssh2": "^1.15.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.66",

@@ -14,7 +14,7 @@ public class TestQuirkl {
     public void testFileQuirkl() {
         File file = new File("src/main/resources/test_cases/test_1.qkl");
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            QuirklCompiler.main(new String[]{"-d", String.join("\n", reader.lines().toList()), "0", "10", "SUM", "sads"});
+            QuirklCompiler.main(new String[]{"-d", "-p", String.join("\n", reader.lines().toList()), "0", "10", "SUM", "sads"});
         } catch (Exception e) {
             e.printStackTrace();
         }

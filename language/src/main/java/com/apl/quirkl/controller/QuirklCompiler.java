@@ -20,26 +20,56 @@ public class QuirklCompiler implements Callable<Integer> {
     @Option(names = {"-d", "--debug"}, description = "Enable debug mode")
     private boolean debug;
 
-    @Parameters(index = "0", description = "The program to run as a string")
+    @Option(names = {"-f", "--file"}, description = "Run program from file")
+    private String path;
+
+    @Option(names = {"-p", "--program"}, description = "The program to run as a string")
     private String program;
 
-    @Parameters(index = "1..*", description = "The user input for the program")
+    @Parameters(index = "0..*", description = "The user input for the program")
     private String[] input;
+
+    @Option(names = {"-h", "--help"}, usageHelp = true, description = "Display a help message")
+    private boolean helpRequested;
 
     public static BufferedReader reader;
 
     public static void main(String[] args) {
-        System.out.println("return " + new CommandLine(new QuirklCompiler()).execute(args));
+        CommandLine commandLine = new CommandLine(new QuirklCompiler());
+        if (commandLine.isUsageHelpRequested()) {
+            commandLine.usage(System.out);
+        } else {
+            System.out.println("return " + commandLine.execute(args));
+        }
     }
 
     @Override
     public Integer call() {
+        String programStr = "";
+        if (path != null) {
+            if (!path.endsWith(".qkl")) {
+                System.err.println("Invalid file type!");
+                return -1;
+            }
+
+            try {
+                programStr = String.join("\n", new BufferedReader(new FileReader(path)).lines().toList());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else if (program != null) {
+            programStr = program;
+        } else {
+            System.err.println("No program provided!");
+            return -1;
+        }
+
         if (input == null)
             input = new String[0];
 
         reader = new BufferedReader(new StringReader(String.join("\n", input)));
 
-        QuirklLexer lexer = new QuirklLexer(CharStreams.fromString(program));
+        QuirklLexer lexer = new QuirklLexer(CharStreams.fromString(programStr));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         QuirklParser parser = new QuirklParser(tokens);
 

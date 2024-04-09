@@ -1,13 +1,9 @@
-import { useEffect, useRef, useCallback } from 'react';
-import { Terminal } from 'xterm';
-import { FitAddon } from 'xterm-addon-fit';
-import 'xterm/css/xterm.css';
+import { useRef } from 'react';
 import PropTypes from "prop-types";
-import { Client } from 'ssh2';
 
-const TerminalComponent = ({ setOutput, setIsLoading, setIsError, toast }) => {
+const TerminalComponent = () => {
     const terminalRef = useRef(null);
-
+    /*
     const runCode = useCallback(async (command) => {
         if (!command) return;
         try {
@@ -60,7 +56,7 @@ const TerminalComponent = ({ setOutput, setIsLoading, setIsError, toast }) => {
             runCode(data);
             terminal.write(`\r\n$ ${data}`);
         });
-    }, [runCode]);
+    }, [runCode]);*/
 
     return <div ref={terminalRef} />;
 };

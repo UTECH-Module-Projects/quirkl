@@ -1,0 +1,5 @@
+x: num = num("5");
+
+print(x, "\n");
+
+y: num = num("5.5");

@@ -1,10 +1,10 @@
-// Generated from ./src/main/antlr4/Quirkl.g4 by ANTLR 4.13.1
+// Generated from ./src/main/antlr4/Quirkl_TEMP.g4 by ANTLR 4.13.1
 package com.apl.quirkl.language.semantics.visitor;
 
 import com.apl.quirkl.language.parser.QuirklParser;
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 
-// Generated from ./language/src/main/antlr4/Quirkl.g4 by ANTLR 4.13.1
+// Generated from ./language/src/main/antlr4/Quirkl_TEMP.g4 by ANTLR 4.13.1
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 
 /**

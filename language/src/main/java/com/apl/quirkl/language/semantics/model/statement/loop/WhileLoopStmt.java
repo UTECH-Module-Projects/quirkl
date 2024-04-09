@@ -27,7 +27,7 @@ public class WhileLoopStmt extends LoopStmt {
         int iterations = 0;
         while (true) {
             if (!this.isDoWhile)
-                if (this.condition.eval().getValue()) break;
+                if (!this.condition.eval().getValue()) break;
 
             if (iterations++ > MAX_RUN)
                 throw QuirklLoopException.exceededLoopLimit(this.getMyScope(), this.getCoord());

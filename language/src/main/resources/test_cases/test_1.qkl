@@ -13,11 +13,11 @@ e: func = pass () to test: num { give 9;};
 --**
 f: func = pass (a: bool, b: num): bool -> a > b;
 
-print(a + b * c / d, "\n");
-print(b /\ 2, "\n");
-print(b % 2, "\n");
-print(b, "\n");
-print(b \/ 2, "\n");
+print(a + b * c / d, '\n');
+print(b /\ 2, '\n');
+print(b % 2, '\n');
+print(b, '\n');
+print(b \/ 2, '\n');
 
 
 *-- This is a Summation

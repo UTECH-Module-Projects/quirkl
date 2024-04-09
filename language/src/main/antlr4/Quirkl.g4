@@ -150,7 +150,7 @@ variable_data_type
 id                  : (LETTER | (keywords (LETTER | DIGIT))) (keywords | LETTER | DIGIT)* ;        //IDENTIFIER
 
 //Literals
-STRING              : '"'(~[\\"] | '\\n' | '\\t')*'"' | '\''(~[\\"] | '\\n' | '\\t')*'\'' ; //STRING
+STRING              : '"'(~["] | '\\n' | '\\t')*'"' | '\''(~['] | '\\n' | '\\t')*'\'' ; //STRING
 BOOLEAN             : 'true' | 'false' ;
 number              : MINUS?DIGIT+ ;
 decimal             : MINUS?DIGIT+'.'DIGIT+ ;
@@ -245,7 +245,7 @@ PRINT               : 'print' ;                         //PRINT
 INPUT               : 'input' ;                         //INPUT
 
 //Whitespace
-WS                  : [\t\r\n]+ -> skip ;              //SKIP WHITESPACE
+WS                  : [ \t\r\n]+ -> skip ;              //SKIP WHITESPACE
 
 //Comments
 COMMENT             : '*--' ~[\r\n]* -> skip ;          //SKIP COMMENTS

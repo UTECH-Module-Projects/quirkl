@@ -1,0 +1,4 @@
+num1: num = 0;
+num2: num = -1;
+
+print(num1, '/\', num1, '=', num1 /\ num2, '\n');
