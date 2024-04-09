@@ -182,3 +182,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+
+.mvn
+node
