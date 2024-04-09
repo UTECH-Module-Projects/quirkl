@@ -15,13 +15,15 @@
     <name>quirkl</name>
     <description>Web version of Quirkl Language</description>
     <modules>
-        <module>quirkl-language</module>
+        <module>language</module>
     </modules>
 
     <packaging>pom</packaging>
 
     <properties>
         <java.version>21</java.version>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
     </properties>
 
     <dependencies>

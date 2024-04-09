@@ -183,6 +183,4 @@ dist-ssr
 *.sln
 *.sw?
 
-
-.mvn
 node
