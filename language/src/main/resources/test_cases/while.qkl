@@ -1,8 +1,0 @@
-x: num = 0;
-
-print(?(x < 10), "\n");
-
-run check ?(x < 10) {
-    print(x, "\n");
-    ++x;
-}

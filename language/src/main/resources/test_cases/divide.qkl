@@ -1,7 +1,0 @@
-num1: num = 120;
-num2: num = 10;
-num3: num = 0;
-
-print(num1, '/', num2, '=', num1 / num2, '\n');
-
-print(num1, '/', num3, '=', num1 / num3, '\n');

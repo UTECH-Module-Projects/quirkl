@@ -15,7 +15,8 @@
     <name>quirkl</name>
     <description>Web version of Quirkl Language</description>
     <modules>
-        <module>language</module>
+        <module>quirkl-language</module>
+        <module>quirkl-back-end</module>
     </modules>
 
     <packaging>pom</packaging>
@@ -51,7 +52,6 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
-
             <plugin>
                 <groupId>com.github.eirslett</groupId>
                 <artifactId>frontend-maven-plugin</artifactId>
@@ -78,12 +78,12 @@
                     <execution>
                         <id>npm install</id>
                         <goals>
-							<goal>npm</goal>
+                            <goal>npm</goal>
                         </goals>
                         <phase>generate-resources</phase>
-						<configuration>
-							<arguments>install</arguments>
-						</configuration>
+                        <configuration>
+                            <arguments>install</arguments>
+                        </configuration>
                     </execution>
 
                     <!-- build our production version -->
@@ -100,31 +100,8 @@
                 </executions>
                 <configuration>
                     <nodeVersion>v20.11.0</nodeVersion>
-                    <workingDirectory>front-end</workingDirectory>
+                    <workingDirectory>quirkl-front-end</workingDirectory>
                 </configuration>
-            </plugin>
-            <!-- copy our react build artifacts to spring boot -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>Copy JavaScript app into SpringBoot</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>target/classes/static/</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>front-end/dist</directory>
-                                    <filtering>false</filtering>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>

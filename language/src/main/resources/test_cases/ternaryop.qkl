@@ -1,7 +1,0 @@
-x: num = 10;
-y: num = 5;
-
-result: num = ?(x > y) -> x : y;
-*-- If x is greater than y, result will be x; otherwise, result will be y
-
-print(result, "\n"); *-- 10

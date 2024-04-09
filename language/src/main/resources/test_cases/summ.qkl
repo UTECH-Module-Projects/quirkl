@@ -1,7 +1,0 @@
-start: num = 1;
-end: num = 5;
-sum: num = start ~ end (pass (x: num): num -> x);
-*-- This will sum the numbers from 1 to 5,
-*-- resulting in sum = 1 + 2 + 3 + 4 + 5 = 15
-
-print(sum, "\n");
