@@ -1,0 +1,8 @@
+x: num = 0;
+
+print(?(x < 10), "\n");
+
+run {
+    print(x, "\n");
+    ++x;
+} check ?(x < 10);

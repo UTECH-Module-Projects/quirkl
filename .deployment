@@ -1,3 +1,0 @@
-[config]
-project = front-end/
-postDeploymentActions = move.sh

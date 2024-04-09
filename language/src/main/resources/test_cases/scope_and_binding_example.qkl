@@ -1,9 +1,0 @@
-run {
-    pass () to testBound: void {
-        print("I am in testBound\n");
-    }
-} catch(e) {
-    print(e, "\n");
-}
-
-testBound();
