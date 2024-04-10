@@ -1,0 +1,70 @@
+a: num = 3;
+b: num = 4;
+
+run {
+    print("a is 3");
+} check ?(a == 3) catch (e) {
+    print(e);
+}
+
+a + b;
+a - b;
+a * b;
+a / b;
+a % b;
+a /\ b;
+a \/ b;
+
+print(a ~ b (pass (x: num): num { return x * x; }));
+
+*-- This is a single line
+
+**--
+  This is a block commenty
+  sdasdasd
+--**
+
+**--
+pass (a: num, b: num, fun: func) to sumWithFunc: num {
+    give a ~* b (fun);
+}
+
+pass () to something: num -> 9 + 10;
+
+pass (x: num) to squared: num {
+    isZero: bool = ?(x == 0);
+    result: num;
+    result = x * x;
+    **--
+    if ?(isZero) {
+        result = b;
+    } else {
+        result = x * x;
+    }
+    --**
+
+    print("" + x + " * " + x + " = " + result);
+    give result;
+}
+
+myResult: dec = sumWithFunc(a, b, squared);
+print("squared sum from " + a + " to " + b + " = " + myResult);
+--**
+
+
+
+run (x: num = 3; ?(x < 13); x++) {
+    if ?(x == 3) {
+        err: "No Number 3!!!";
+    }
+} catch (e) {
+    print(e);
+}
+
+run {
+    test: func = pass (): void { print(0 / 0); };
+
+    test();
+} catch (e) {
+    print(e);
+}

@@ -1,0 +1,36 @@
+result: dec;
+
+run {
+    num1: dec = input("Enter a number: ");
+    num2: dec = input("Enter another number: ");
+
+    print(" __________________________\n|   Operations   |  Codes  |\n|----------------|---------|\n| Addition       |   ADD   |\n| Subtraction    |   SUB   |\n| Multiplication |   MUL   |\n| Division       |   DIV   |\n| Modulus        |   MOD   |\n| Exponentiation |   EXP   |\n| Root           |   ROOT  |\n| Summation      |   SUM   |\n|________________|_________|\n");
+
+    op: str = input("Enter an operation: ");
+
+    match (op) {
+        is ("ADD") -> result = num1 + num2;
+        is ("SUB") -> result = num1 - num2;
+        is ("MUL") -> result = num1 * num2;
+        is ("DIV") -> result = num1 / num2;
+        is ("MOD") -> result = num1 % num2;
+        is ("EXP") -> result = num1 /\ num2;
+        is ("ROOT") -> result = num1 \/ num2;
+        is ("SUM") {
+            print(" ___________________________\n|   Types        |  Codes   |\n|----------------|----------|\n| Regular Sum    |  REG     |\n| Squared Sum    |  SQUARE  |\n| Even Only Sum  |  EVEN    |\n|________________|__________|\n");
+            op: str = input("Enter a summation type: ");
+
+            match (op) {
+                is ("REG") -> result = num1 ~ num2 (pass(n:num): num -> n);
+                is ("SQUARE") -> result = num1 ~ num2 (pass(n:num): num -> n /\ 2);
+                is ("EVEN") -> result = num1 ~ num2 (pass(n:num): num -> ?(n % 2 == 0) -> n : 0);
+                else -> print("Invalid Type!\n");
+            }
+        }
+        else -> print("Invalid operation!\n");
+    }
+
+    print("Result: ", result, "\n");
+} catch(e) {
+    print(e, "\n");
+}
