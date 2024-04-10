@@ -27,7 +27,7 @@ jobs:
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
         with:
-          name: quirkl
+          name: app
           path: '${{ github.workspace }}/quirkl-back-end/target/*.jar'
 
   deploy:
@@ -43,7 +43,7 @@ jobs:
       - name: Download artifact from build job
         uses: actions/download-artifact@v3
         with:
-          name: quirkl
+          name: app
       
       - name: Login to Azure
         uses: azure/login@v1
@@ -56,7 +56,7 @@ jobs:
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
         with:
-          app-name: 'quirkl'
+          app-name: 'app'
           slot-name: 'Production'
           package: '*.jar'
           
