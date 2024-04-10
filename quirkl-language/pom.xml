@@ -95,7 +95,7 @@
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
-<!--                    <outputDirectory>..</outputDirectory> &lt;!&ndash; Add this line &ndash;&gt;-->
+                    <outputDirectory>../quirkl-back-end</outputDirectory>
                 </configuration>
 
                 <executions>

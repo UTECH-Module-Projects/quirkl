@@ -16,7 +16,7 @@ const Interact = ({ editorRef }) => {
         const code = editorRef.current.getValue();
 
         try {
-            const response = await fetch('http://localhost:8080/run', {
+            const response = await fetch('https://quirkl.azurewebsites.net/run', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
