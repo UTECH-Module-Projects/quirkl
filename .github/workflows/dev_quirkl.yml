@@ -1,7 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy Node.js app to Azure Web App - quirkl
+name: Build and deploy JAR app to Azure Web App - quirkl
 
 on:
   push:
@@ -11,33 +11,27 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Node.js version
-        uses: actions/setup-node@v3
+      - name: Set up Java version
+        uses: actions/setup-java@v1
         with:
-          node-version: '20.x'
+          java-version: '21'
 
-      - name: npm install, build, and test
-        run: |
-          npm install
-          npm run build --if-present
-          npm run test --if-present
-
-      - name: Zip artifact for deployment
-        run: zip release.zip ./* -r
+      - name: Build with Maven
+        run: mvn clean install
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
         with:
-          name: node-app
-          path: release.zip
+          name: app
+          path: '${{ github.workspace }}/quirkl-back-end/target/*.jar'
 
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     needs: build
     environment:
       name: 'Production'
@@ -49,23 +43,20 @@ jobs:
       - name: Download artifact from build job
         uses: actions/download-artifact@v3
         with:
-          name: node-app
-
-      - name: Unzip artifact for deployment
-        run: unzip release.zip
+          name: app
       
       - name: Login to Azure
         uses: azure/login@v1
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_FF0DD30DF5BC4B4F9A2F12C8C6AE1A2D }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_D4A638AAB6EE4C07BC9ADA4FB819AD89 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_5072818A87D941B187C1783DF51BE7CF }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_3FAFA79DA5274F1FA043A1BE8508F447 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_76381A118DF54BF38325C4ABD52C65FE }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_36B98C60C1F342BC8C8B06644BDCDD89 }}
 
-      - name: 'Deploy to Azure Web App'
+      - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
         with:
           app-name: 'quirkl'
           slot-name: 'Production'
-          package: .
+          package: '*.jar'
           
