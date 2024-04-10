@@ -8,7 +8,7 @@ const chatbot_config = {
 const handleUserInput = async (value) => {
     try {
         // Pass the user input to your custom language compiler or interpreter
-        const response = await fetch('https://quirkl.azurewebsites.net', {
+        const response = await fetch('https://quirkl.azurewebsites.net/run', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
